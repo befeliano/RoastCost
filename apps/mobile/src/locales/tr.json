@@ -326,6 +326,7 @@
     "catalog": "Kataloğu gör →",
     "tapPin": "Bir pine dokunun, kavurucuyu görün",
     "pendingTitle": "Kavurucular onaydan sonra açılacak",
-    "pendingBody": "Kafeniz onaylanınca Eskişehir'deki kavurucuları haritada görecek, toptan fiyatları karşılaştırıp sipariş verebileceksiniz."
+    "pendingBody": "Kafeniz onaylanınca Eskişehir'deki kavurucuları haritada görecek, toptan fiyatları karşılaştırıp sipariş verebileceksiniz.",
+    "featuredBadge": "Öne çıkan"
   }
 }

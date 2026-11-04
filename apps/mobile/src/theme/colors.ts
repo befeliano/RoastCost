@@ -11,6 +11,10 @@ export const colors = {
   danger: '#B3261E',
   info: '#2F5D86',
   pin: '#D92D20', // map pins
+  // warm decorative blobs (sun → orange → coral), never used for text
+  sun: '#FFD23F',
+  orange: '#FF9F43',
+  coral: '#FF6B6B',
   successBg: '#E7F5EC',
   warningBg: '#FBF1E1',
   dangerBg: '#FBEAE8',

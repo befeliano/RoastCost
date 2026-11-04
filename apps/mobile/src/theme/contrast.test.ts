@@ -40,6 +40,11 @@ describe.each(Object.values(PALETTES))('WCAG AA contrast — palette $label', (p
     expect(contrast(p.primaryText, colors.bg)).toBeGreaterThanOrEqual(4.5));
   it('primaryText on surface', () =>
     expect(contrast(p.primaryText, colors.surface)).toBeGreaterThanOrEqual(4.5));
+  it('onPrimary on both gradient ends (header title is large text ≥ 3:1)', () => {
+    for (const g of p.gradient) expect(contrast(p.onPrimary, g)).toBeGreaterThanOrEqual(3);
+  });
+  it('onAccent on accent (badges, active tab)', () =>
+    expect(contrast(p.onAccent, p.accent)).toBeGreaterThanOrEqual(4.5));
   it('primaryText on primaryBg (pills)', () =>
     expect(contrast(p.primaryText, p.primaryBg)).toBeGreaterThanOrEqual(4.5));
 });

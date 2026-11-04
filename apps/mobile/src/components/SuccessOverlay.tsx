@@ -1,13 +1,16 @@
+import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
+  runOnJS,
   useAnimatedProps,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
   withDelay,
+  withSequence,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
@@ -16,105 +19,166 @@ import { colors, space } from '@/theme';
 import { Button } from './Button';
 import { Text } from './Text';
 
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
-const CHECK_LEN = 48;
-const CONFETTI = ['#12874A', '#38A8E0', '#C9A227', '#D92D20', '#7A4B2A'];
 
-function Particle({ i, reduce }: { i: number; reduce: boolean }) {
-  const p = useSharedValue(0);
-  const cfg = useMemo(() => {
-    const angle = (Math.PI * 2 * i) / 14 + (i % 3) * 0.2;
-    const dist = 90 + (i % 4) * 22;
-    return {
-      dx: Math.cos(angle) * dist,
-      dy: Math.sin(angle) * dist - 30,
-      rot: (i % 2 ? 1 : -1) * (180 + i * 20),
-      color: CONFETTI[i % CONFETTI.length],
-    };
-  }, [i]);
-  useEffect(() => {
-    if (!reduce)
-      p.value = withDelay(120, withTiming(1, { duration: 900, easing: Easing.out(Easing.cubic) }));
-  }, [p, reduce]);
-  const style = useAnimatedStyle(() => ({
-    opacity: p.value === 0 ? 0 : 1 - p.value,
-    transform: [
-      { translateX: cfg.dx * p.value },
-      { translateY: cfg.dy * p.value + 60 * p.value * p.value },
-      { rotate: `${cfg.rot * p.value}deg` },
-    ],
-  }));
-  return <Animated.View style={[styles.particle, { backgroundColor: cfg.color }, style]} />;
+const SIZE = 132;
+const R = 54;
+const RING = 2 * Math.PI * R;
+const CHECK = 64;
+const GREEN = '#22B05E';
+
+function haptic() {
+  void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 }
 
-/** Success pop-up: the check mark draws itself, own confetti particles, success haptic (spec §11.4). */
+/**
+ * Apple-Pay-like confirmation: frosted-glass backdrop → the ring draws itself → it fills with a pop
+ * → the check mark draws → success haptic + a soft glow pulse. With `autoHideMs` it dismisses itself
+ * (e.g. "Sepete eklendi"); without it a "Tamam" button is shown. Reduce motion → instant.
+ */
 export function SuccessOverlay({
   visible,
   title,
   body,
   onClose,
+  autoHideMs,
 }: {
   visible: boolean;
   title: string;
   body?: string;
   onClose: () => void;
+  autoHideMs?: number;
 }) {
   const reduce = useReducedMotion();
-  const scale = useSharedValue(0.6);
-  const draw = useSharedValue(0);
+  const backdrop = useSharedValue(0);
+  const ring = useSharedValue(0);
+  const fill = useSharedValue(0);
+  const check = useSharedValue(0);
+  const glow = useSharedValue(0);
+  const text = useSharedValue(0);
+
   useEffect(() => {
     if (!visible) return;
-    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    scale.value = reduce ? 1 : withSpring(1, { damping: 9, stiffness: 180 });
-    draw.value = reduce
-      ? 1
-      : withDelay(150, withTiming(1, { duration: 450, easing: Easing.out(Easing.quad) }));
+    if (reduce) {
+      backdrop.value = 1;
+      ring.value = 1;
+      fill.value = 1;
+      check.value = 1;
+      text.value = 1;
+      haptic();
+    } else {
+      backdrop.value = withTiming(1, { duration: 220 });
+      ring.value = withDelay(
+        80,
+        withTiming(1, { duration: 520, easing: Easing.inOut(Easing.cubic) }),
+      );
+      fill.value = withDelay(560, withSpring(1, { damping: 9, stiffness: 220, mass: 0.7 }));
+      check.value = withDelay(
+        700,
+        withTiming(1, { duration: 320, easing: Easing.out(Easing.cubic) }, (done) => {
+          if (done) runOnJS(haptic)();
+        }),
+      );
+      glow.value = withDelay(
+        820,
+        withSequence(
+          withTiming(1, { duration: 0 }),
+          withTiming(0, { duration: 700, easing: Easing.out(Easing.quad) }),
+        ),
+      );
+      text.value = withDelay(760, withTiming(1, { duration: 300 }));
+    }
+    const timer = autoHideMs ? setTimeout(onClose, autoHideMs + (reduce ? 0 : 900)) : undefined;
     return () => {
-      scale.value = 0.6;
-      draw.value = 0;
+      if (timer) clearTimeout(timer);
+      backdrop.value = 0;
+      ring.value = 0;
+      fill.value = 0;
+      check.value = 0;
+      glow.value = 0;
+      text.value = 0;
     };
-  }, [visible, reduce, scale, draw]);
-  const badge = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  const checkProps = useAnimatedProps(() => ({ strokeDashoffset: CHECK_LEN * (1 - draw.value) }));
+  }, [visible, reduce, autoHideMs, onClose, backdrop, ring, fill, check, glow, text]);
+
+  const backdropStyle = useAnimatedStyle(() => ({ opacity: backdrop.value }));
+  const ringProps = useAnimatedProps(() => ({ strokeDashoffset: RING * (1 - ring.value) }));
+  const fillStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: fill.value }],
+    opacity: fill.value > 0.01 ? 1 : 0,
+  }));
+  const checkProps = useAnimatedProps(() => ({ strokeDashoffset: CHECK * (1 - check.value) }));
+  const glowStyle = useAnimatedStyle(() => ({
+    opacity: glow.value * 0.45,
+    transform: [{ scale: 1 + (1 - glow.value) * 0.6 }],
+  }));
+  const textStyle = useAnimatedStyle(() => ({
+    opacity: text.value,
+    transform: [{ translateY: (1 - text.value) * 12 }],
+  }));
+
   if (!visible) return null;
   return (
-    <Modal transparent visible animationType="fade" onRequestClose={onClose}>
+    <Modal transparent visible animationType="none" onRequestClose={onClose} statusBarTranslucent>
+      <Animated.View style={[StyleSheet.absoluteFill, backdropStyle]}>
+        <BlurView intensity={55} tint="light" style={StyleSheet.absoluteFill} />
+        <View style={[StyleSheet.absoluteFill, styles.tint]} />
+      </Animated.View>
       <Pressable
-        style={styles.backdrop}
+        style={styles.center}
         onPress={onClose}
         accessibilityRole="button"
         accessibilityLabel="Kapat"
       >
-        <View style={styles.card} accessibilityRole="alert">
-          <View style={styles.burst}>
-            {Array.from({ length: 14 }, (_, i) => (
-              <Particle key={i} i={i} reduce={reduce} />
-            ))}
-            <Animated.View style={badge}>
-              <Svg width={96} height={96} viewBox="0 0 96 96">
-                <Circle cx="48" cy="48" r="44" fill={colors.success} />
-                <AnimatedPath
-                  d="M30 50 L43 63 L67 36"
-                  stroke="#fff"
-                  strokeWidth={7}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                  strokeDasharray={CHECK_LEN}
-                  animatedProps={checkProps}
-                />
-              </Svg>
-            </Animated.View>
+        <View
+          style={styles.card}
+          accessibilityRole="alert"
+          accessibilityLabel={`${title}${body ? '. ' + body : ''}`}
+        >
+          <View style={styles.badge}>
+            <Animated.View style={[styles.glow, glowStyle]} />
+            <Animated.View style={[styles.fill, fillStyle]} />
+            <Svg
+              width={SIZE}
+              height={SIZE}
+              viewBox={`0 0 ${SIZE} ${SIZE}`}
+              style={StyleSheet.absoluteFill}
+            >
+              <AnimatedCircle
+                cx={SIZE / 2}
+                cy={SIZE / 2}
+                r={R}
+                stroke={GREEN}
+                strokeWidth={6}
+                fill="none"
+                strokeLinecap="round"
+                strokeDasharray={RING}
+                animatedProps={ringProps}
+                transform={`rotate(-90 ${SIZE / 2} ${SIZE / 2})`}
+              />
+              <AnimatedPath
+                d="M42 68 L59 85 L92 50"
+                stroke="#FFFFFF"
+                strokeWidth={9}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+                strokeDasharray={CHECK}
+                animatedProps={checkProps}
+              />
+            </Svg>
           </View>
-          <Text variant="h2" style={styles.center}>
-            {title}
-          </Text>
-          {body ? (
-            <Text variant="small" style={styles.center}>
-              {body}
+          <Animated.View style={[styles.texts, textStyle]}>
+            <Text variant="h2" style={styles.centerText}>
+              {title}
             </Text>
-          ) : null}
-          <Button title="Tamam" onPress={onClose} style={styles.btn} />
+            {body ? (
+              <Text variant="body" color={colors.textMuted} style={styles.centerText}>
+                {body}
+              </Text>
+            ) : null}
+            {!autoHideMs ? <Button title="Tamam" onPress={onClose} style={styles.btn} /> : null}
+          </Animated.View>
         </View>
       </Pressable>
     </Modal>
@@ -122,24 +186,36 @@ export function SuccessOverlay({
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(43,31,26,0.45)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: space.xl,
-  },
+  tint: { backgroundColor: 'rgba(255,255,255,0.25)' },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl },
   card: {
-    backgroundColor: colors.bg,
-    borderRadius: 24,
-    padding: space.xl,
-    alignItems: 'center',
-    gap: space.md,
     width: '100%',
-    maxWidth: 360,
+    maxWidth: 340,
+    alignItems: 'center',
+    gap: space.lg,
+    paddingVertical: space.xxl,
+    paddingHorizontal: space.xl,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255,255,255,0.82)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.9)',
   },
-  burst: { width: 120, height: 120, alignItems: 'center', justifyContent: 'center' },
-  particle: { position: 'absolute', width: 8, height: 12, borderRadius: 2 },
-  center: { textAlign: 'center' },
-  btn: { alignSelf: 'stretch', marginTop: space.sm },
+  badge: { width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' },
+  fill: {
+    position: 'absolute',
+    width: R * 2 + 6,
+    height: R * 2 + 6,
+    borderRadius: R + 3,
+    backgroundColor: GREEN,
+  },
+  glow: {
+    position: 'absolute',
+    width: SIZE,
+    height: SIZE,
+    borderRadius: SIZE / 2,
+    backgroundColor: GREEN,
+  },
+  texts: { alignItems: 'center', gap: space.xs, alignSelf: 'stretch' },
+  centerText: { textAlign: 'center' },
+  btn: { alignSelf: 'stretch', marginTop: space.md },
 });

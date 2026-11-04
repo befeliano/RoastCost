@@ -44,7 +44,7 @@ export function Chips<T extends string>({
   );
 }
 
-export type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'primary' | 'info';
+export type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'primary' | 'info' | 'accent';
 function tone(t: Tone, c: ThemeColors): { bg: string; fg: string } {
   switch (t) {
     case 'success':
@@ -57,6 +57,8 @@ function tone(t: Tone, c: ThemeColors): { bg: string; fg: string } {
       return { bg: c.primaryBg, fg: c.primaryText };
     case 'info':
       return { bg: c.infoBg, fg: c.info };
+    case 'accent':
+      return { bg: c.accent, fg: c.onAccent };
     default:
       return { bg: c.surface, fg: c.textMuted };
   }

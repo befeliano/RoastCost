@@ -1,12 +1,14 @@
 import { formatTRY } from '@roastcost/shared';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated';
+import { Blob } from '@/components/Blobs';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Icon } from '@/components/Icon';
-import { Chips, EmptyState, SectionTitle } from '@/components/Misc';
+import { Chips, EmptyState, Pill, SectionTitle } from '@/components/Misc';
 import { RoasterAvatar } from '@/components/RoasterAvatar';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
@@ -60,9 +62,18 @@ export default function Explore() {
         <Pressable
           accessibilityRole="button"
           onPress={() => router.push('/cost')}
-          style={[styles.quickCard, { backgroundColor: c.primary }]}
+          style={[styles.quickCard, { backgroundColor: c.primary, overflow: 'hidden' }]}
         >
-          <Icon name="cup" color={c.onPrimary} size={28} />
+          <LinearGradient
+            colors={c.gradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <Blob size={170} color={colors.sun} opacity={0.5} style={{ top: -80, right: -60 }} />
+          <View style={styles.layer}>
+            <Icon name="cup" color={c.onPrimary} size={28} />
+          </View>
           <Text variant="bodyStrong" color={c.onPrimary}>
             {t('explore.calc')}
           </Text>
@@ -70,10 +81,10 @@ export default function Explore() {
         <Pressable
           accessibilityRole="button"
           onPress={() => router.push('/compare')}
-          style={[styles.quickCard, { backgroundColor: c.primaryBg }]}
+          style={[styles.quickCard, { backgroundColor: c.accent, overflow: 'hidden' }]}
         >
-          <Icon name="chart" color={c.primaryText} size={28} />
-          <Text variant="bodyStrong" color={c.primaryText}>
+          <Icon name="chart" color={c.onAccent} size={28} />
+          <Text variant="bodyStrong" color={c.onAccent}>
             {t('explore.compare')}
           </Text>
         </Pressable>
@@ -111,6 +122,11 @@ export default function Explore() {
                         color={r.brandColor}
                         size={56}
                       />
+                      {r.isFeatured ? (
+                        <View style={styles.badge}>
+                          <Pill tone="accent" label={t('explore.featuredBadge')} />
+                        </View>
+                      ) : null}
                     </View>
                     <View style={styles.featuredBody}>
                       <Text variant="h3" numberOfLines={1}>
@@ -243,6 +259,8 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   featuredBand: { height: 72, justifyContent: 'flex-end', padding: space.md, paddingBottom: 0 },
+  layer: { zIndex: 1 },
+  badge: { position: 'absolute', top: space.md, right: space.md },
   featuredBody: { padding: space.md, paddingTop: space.lg, gap: 2 },
   mapCard: { gap: space.md, padding: space.md },
   selRow: {

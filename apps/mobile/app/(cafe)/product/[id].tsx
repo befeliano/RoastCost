@@ -201,6 +201,7 @@ export default function ProductDetail() {
         </Card>
       ) : null}
       <SuccessOverlay
+        autoHideMs={700}
         visible={added}
         title={t('catalog.added')}
         body={`${p.name} · ${kg} kg`}

@@ -1,6 +1,8 @@
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   StyleSheet,
   View,
@@ -14,7 +16,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { radius, type as typo, useColors, type ThemeColors } from '@/theme';
+import { type as typo, useColors } from '@/theme';
 import { Icon, type IconName } from './Icon';
 import { Text } from './Text';
 
@@ -34,7 +36,10 @@ interface Props {
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-/** Press: scale 0.96, release: spring back (spec §11.4). */
+/**
+ * Press: squish to 0.95 + fade to 0.85; release: springs back (spec §11.4).
+ * Primary = palette gradient with a coloured glow.
+ */
 export function Button({
   title,
   onPress,
@@ -46,11 +51,19 @@ export function Button({
   style,
   accessibilityHint,
 }: Props) {
+  const c = useColors();
   const scale = useSharedValue(1);
+  const fade = useSharedValue(1);
   const reduce = useReducedMotion();
-  const anim = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  const v = variants(useColors())[variant];
+  const anim = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: fade.value,
+  }));
   const isDisabled = disabled || loading;
+  const fg = variant === 'primary' ? c.onPrimary : variant === 'danger' ? c.danger : c.primaryText;
+  const border =
+    variant === 'secondary' ? c.primaryText : variant === 'danger' ? c.danger : 'transparent';
+  const bg = variant === 'secondary' || variant === 'danger' ? c.bg : 'transparent';
   return (
     <AnimatedPressable
       accessibilityRole="button"
@@ -59,55 +72,72 @@ export function Button({
       accessibilityState={{ disabled: !!isDisabled, busy: !!loading }}
       disabled={isDisabled}
       onPressIn={() => {
-        scale.value = reduce ? 1 : withTiming(0.96, { duration: 80 });
+        if (reduce) return;
+        scale.value = withTiming(0.95, { duration: 90 });
+        fade.value = withTiming(0.85, { duration: 90 });
       }}
       onPressOut={() => {
-        scale.value = reduce ? 1 : withSpring(1, { damping: 12, stiffness: 300 });
+        scale.value = reduce ? 1 : withSpring(1, { damping: 10, stiffness: 320, mass: 0.6 });
+        fade.value = withTiming(1, { duration: 140 });
       }}
       onPress={() => {
-        if (variant === 'primary') void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        void Haptics.impactAsync(
+          variant === 'primary'
+            ? Haptics.ImpactFeedbackStyle.Medium
+            : Haptics.ImpactFeedbackStyle.Light,
+        );
         onPress?.();
       }}
       style={[
         styles.base,
         small && styles.small,
-        { backgroundColor: v.bg, borderColor: v.border },
+        { backgroundColor: bg, borderColor: border },
+        variant === 'primary' &&
+          !isDisabled &&
+          Platform.select({
+            ios: {
+              shadowColor: c.primary,
+              shadowOpacity: 0.35,
+              shadowRadius: 12,
+              shadowOffset: { width: 0, height: 6 },
+            },
+            default: { elevation: 4 },
+          }),
         isDisabled && styles.disabled,
         anim,
         style,
       ]}
     >
+      {variant === 'primary' ? (
+        <LinearGradient
+          colors={c.gradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[StyleSheet.absoluteFill, { borderRadius: 999 }]}
+        />
+      ) : null}
       {loading ? (
-        <ActivityIndicator color={v.fg} />
+        <ActivityIndicator color={fg} />
       ) : (
         <View style={styles.row}>
-          {icon ? <Icon name={icon} size={small ? 18 : 20} color={v.fg} /> : null}
-          <Text style={[typo.button, { color: v.fg }, small && { fontSize: 14 }]}>{title}</Text>
+          {icon ? <Icon name={icon} size={small ? 18 : 20} color={fg} /> : null}
+          <Text style={[typo.button, { color: fg }, small && { fontSize: 14 }]}>{title}</Text>
         </View>
       )}
     </AnimatedPressable>
   );
 }
 
-function variants(c: ThemeColors): Record<Variant, { bg: string; fg: string; border: string }> {
-  return {
-    primary: { bg: c.primary, fg: c.onPrimary, border: c.primary },
-    secondary: { bg: c.bg, fg: c.primaryText, border: c.primaryText },
-    ghost: { bg: 'transparent', fg: c.primaryText, border: 'transparent' },
-    danger: { bg: c.bg, fg: c.danger, border: c.danger },
-  };
-}
-
 const styles = StyleSheet.create({
   base: {
-    minHeight: 52,
-    borderRadius: radius.md,
+    minHeight: 56,
+    borderRadius: 999,
     borderWidth: 1.5,
-    paddingHorizontal: 18,
+    paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  small: { minHeight: 44, paddingHorizontal: 14 },
+  small: { minHeight: 44, paddingHorizontal: 16 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  disabled: { opacity: 0.5 },
+  disabled: { opacity: 0.45 },
 });

@@ -1,3 +1,4 @@
+import { BlurView } from 'expo-blur';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
@@ -48,7 +49,9 @@ export function BottomSheet({
   if (!mounted) return null;
   return (
     <Modal transparent visible animationType="none" onRequestClose={onClose} statusBarTranslucent>
-      <Animated.View style={[StyleSheet.absoluteFill, styles.backdrop, backdrop]}>
+      <Animated.View style={[StyleSheet.absoluteFill, backdrop]}>
+        <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+        <Animated.View style={[StyleSheet.absoluteFill, styles.backdrop]} />
         <Pressable
           style={StyleSheet.absoluteFill}
           accessibilityRole="button"
@@ -75,12 +78,12 @@ export function BottomSheet({
 }
 
 const styles = StyleSheet.create({
-  backdrop: { backgroundColor: 'rgba(43,31,26,0.45)' },
+  backdrop: { backgroundColor: 'rgba(13,31,0,0.25)' },
   anchor: { flex: 1, justifyContent: 'flex-end' },
   sheet: {
     backgroundColor: colors.bg,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
     padding: space.xl,
     gap: space.md,
   },
