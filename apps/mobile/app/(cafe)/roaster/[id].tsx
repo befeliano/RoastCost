@@ -1,4 +1,3 @@
-import { formatTRY } from '@roastcost/shared';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import type { CatalogProduct } from '@/api/types';
@@ -15,6 +14,9 @@ import { productsOf, tiersOf, useCatalog } from '@/features/catalog/store';
 import { t } from '@/locales';
 import { useCart } from '@/store/cart';
 import { colors, space, useColors } from '@/theme';
+import { formatTRY } from '@/lib/format';
+import { NoteChips } from '@/features/catalog/NoteChips';
+import { Skeleton } from '@/components/Skeleton';
 
 function ProductRow({ p }: { p: CatalogProduct }) {
   const catalog = useCatalog();
@@ -40,11 +42,7 @@ function ProductRow({ p }: { p: CatalogProduct }) {
         </View>
         {inCart ? <Pill tone="primary" icon="check" label={`${inCart / 1000} kg`} /> : null}
       </View>
-      {p.tastingNotes ? (
-        <Text variant="small" color={colors.text}>
-          {p.tastingNotes}
-        </Text>
-      ) : null}
+      <NoteChips notes={p.tastingNotes} max={4} />
       <View style={styles.row}>
         <RoastDots level={p.roastLevel} />
         <View style={styles.flex} />
@@ -72,7 +70,7 @@ export default function RoasterDetail() {
   if (!roaster) {
     return (
       <Screen title={t('catalog.title')} back>
-        <Text>{t('common.loading')}</Text>
+        <Skeleton rows={4} />
       </Screen>
     );
   }

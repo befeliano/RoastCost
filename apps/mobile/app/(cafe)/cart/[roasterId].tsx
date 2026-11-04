@@ -1,4 +1,4 @@
-import { formatTRY, lineTotalKurus, selectTier } from '@roastcost/shared';
+import { lineTotalKurus, selectTier } from '@roastcost/shared';
 import { useNetworkState } from 'expo-network';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -15,7 +15,7 @@ import { SuccessOverlay } from '@/components/SuccessOverlay';
 import { Text } from '@/components/Text';
 import { tiersOf, useCatalog } from '@/features/catalog/store';
 import { useSendFlow } from '@/features/orders/useSendFlow';
-import { gramsToKgInput, parseKgToGrams } from '@/lib/format';
+import { gramsToKgInput, parseKgToGrams, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 import { useCart } from '@/store/cart';
 import { useSession } from '@/store/session';

@@ -1,15 +1,16 @@
-import { formatOrderNo, formatTRY, lineTotalKurus, selectTier } from '@roastcost/shared';
+import { formatOrderNo, lineTotalKurus, selectTier } from '@roastcost/shared';
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { Card } from '@/components/Card';
-import { EmptyState, Pill, SectionTitle } from '@/components/Misc';
+import { EmptyState, ErrorState, Pill, SectionTitle } from '@/components/Misc';
+import { Skeleton } from '@/components/Skeleton';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { StatusCard } from '@/features/account/StatusCards';
 import { tiersOf, useCatalog } from '@/features/catalog/store';
 import { ORDER_TONE } from '@/features/orders/status';
 import { useOrders } from '@/hooks/useCafeData';
-import { formatDate } from '@/lib/format';
+import { formatDate, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 import { useCart } from '@/store/cart';
 import { useSession } from '@/store/session';
@@ -34,8 +35,18 @@ export default function Orders() {
       onRefresh={() => void orders.refetch()}
       refreshing={orders.isRefetching}
     >
-      <SectionTitle>{t('orders.carts')}</SectionTitle>
-      {!cartEntries.length ? <Text variant="small">{t('orders.emptyCart')}</Text> : null}
+      <SectionTitle count={cartEntries.length}>{t('orders.carts')}</SectionTitle>
+      {!cartEntries.length ? (
+        <EmptyState
+          title={t('orders.emptyCartTitle')}
+          body={t('orders.emptyCart')}
+          action={{
+            label: t('orders.goExplore'),
+            icon: 'store',
+            onPress: () => router.push('/explore'),
+          }}
+        />
+      ) : null}
       {cartEntries.map(([roasterId, c]) => {
         const subtotal = Object.entries(c.items).reduce((sum, [pid, g]) => {
           const tier = selectTier(tiersOf(catalog, pid), g / 1000);
@@ -56,8 +67,10 @@ export default function Orders() {
         );
       })}
 
-      <SectionTitle>{t('orders.history')}</SectionTitle>
-      {!orders.data?.items.length && !orders.isLoading ? (
+      <SectionTitle count={orders.data?.items.length}>{t('orders.history')}</SectionTitle>
+      {orders.isLoading ? <Skeleton rows={2} /> : null}
+      {orders.isError ? <ErrorState onRetry={() => void orders.refetch()} /> : null}
+      {!orders.data?.items.length && !orders.isLoading && !orders.isError ? (
         <EmptyState title={t('orders.emptyHistory')} />
       ) : null}
       {orders.data?.items.map((o) => (

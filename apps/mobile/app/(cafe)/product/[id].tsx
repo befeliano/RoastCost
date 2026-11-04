@@ -1,4 +1,4 @@
-import { calculateCupCost, formatTRY, lineTotalKurus, selectTier } from '@roastcost/shared';
+import { calculateCupCost, lineTotalKurus, selectTier } from '@roastcost/shared';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -16,10 +16,12 @@ import { RoastDots } from '@/features/catalog/RoastDots';
 import { tiersOf, useCatalog } from '@/features/catalog/store';
 import { toCostSettings, toRecipeInput } from '@/features/cost/compute';
 import { useIngredients, useRecipes, useSettings } from '@/hooks/useCafeData';
-import { gramsToKgInput, parseKgToGrams } from '@/lib/format';
+import { gramsToKgInput, parseKgToGrams, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 import { useCart } from '@/store/cart';
 import { colors, radius, space, useColors } from '@/theme';
+import { NoteChips } from '@/features/catalog/NoteChips';
+import { Skeleton } from '@/components/Skeleton';
 
 /** One bean: detailed tier pricing, cup cost with this bean, quantity → cart. */
 export default function ProductDetail() {
@@ -38,7 +40,7 @@ export default function ProductDetail() {
   if (!p || !roaster) {
     return (
       <Screen title={t('catalog.title')} back>
-        <Text>{t('common.loading')}</Text>
+        <Skeleton rows={3} />
       </Screen>
     );
   }
@@ -108,17 +110,7 @@ export default function ProductDetail() {
           {p.process ? <Pill label={t(`catalog.process.${p.process}`)} /> : null}
         </View>
         <RoastDots level={p.roastLevel} />
-        {p.tastingNotes ? (
-          <View style={styles.notes}>
-            {p.tastingNotes.split(',').map((n) => (
-              <View key={n} style={[styles.note, { backgroundColor: c.primaryBg }]}>
-                <Text variant="caption" color={c.primaryText}>
-                  {n.trim()}
-                </Text>
-              </View>
-            ))}
-          </View>
-        ) : null}
+        <NoteChips notes={p.tastingNotes} />
       </Card>
 
       <Text variant="h3">{t('catalog.tierTable')}</Text>

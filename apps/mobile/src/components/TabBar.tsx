@@ -54,7 +54,13 @@ export function useTabOptions() {
       headerShown: false,
       tabBarActiveTintColor: c.primaryText,
       tabBarInactiveTintColor: c.textMuted,
-      tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 11, marginTop: 2 },
+      tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 11.5, marginTop: 2 },
+      tabBarBadgeStyle: {
+        backgroundColor: c.primary,
+        color: c.onPrimary,
+        fontFamily: fonts.bold,
+        fontSize: 11,
+      },
       tabBarStyle: {
         position: 'absolute' as const,
         borderTopWidth: 0,
@@ -86,6 +92,6 @@ const styles = StyleSheet.create({
   glassEdge: {
     backgroundColor: 'rgba(255,255,255,0.55)',
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(22,51,0,0.12)',
+    borderTopColor: 'rgba(59,36,22,0.12)',
   },
 });

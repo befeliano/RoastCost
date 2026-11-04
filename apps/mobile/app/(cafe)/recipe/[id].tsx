@@ -1,7 +1,7 @@
 import { kurusToInput, parseTRYInput } from '@roastcost/shared';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ApiError } from '@/api/client';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -20,6 +20,8 @@ import {
 import { parseDecimal } from '@/lib/format';
 import { t } from '@/locales';
 import { colors, space, useColors } from '@/theme';
+import { toast } from '@/components/Toast';
+import { confirm } from '@/lib/confirm';
 
 interface Line {
   ingredientId: string;
@@ -80,24 +82,19 @@ export default function RecipeEdit() {
         id: isNew ? undefined : id,
         body: { name: name.trim(), coffeeGrams: g, usesCup, sellPriceKurus: p, ingredients: items },
       });
+      toast(isNew ? 'Reçete eklendi' : 'Kaydedildi');
       router.back();
     } catch (err) {
       setServerError(err instanceof ApiError ? err.message : t('common.unknownError'));
     }
   };
 
-  const onDelete = () =>
-    Alert.alert(t('recipes.deleteConfirm'), recipe?.name, [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('common.delete'),
-        style: 'destructive',
-        onPress: async () => {
-          await del.mutateAsync(id);
-          router.back();
-        },
-      },
-    ]);
+  const onDelete = async () => {
+    if (!(await confirm(t('recipes.deleteConfirm'), recipe?.name, t('common.delete')))) return;
+    await del.mutateAsync(id);
+    toast('Reçete silindi', 'trash');
+    router.back();
+  };
 
   return (
     <Screen
@@ -178,7 +175,7 @@ export default function RecipeEdit() {
           title={t('common.delete')}
           variant="danger"
           icon="trash"
-          onPress={onDelete}
+          onPress={() => void onDelete()}
           loading={del.isPending}
         />
       ) : null}

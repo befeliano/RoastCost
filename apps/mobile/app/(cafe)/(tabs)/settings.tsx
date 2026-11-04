@@ -1,13 +1,13 @@
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Share, StyleSheet, View } from 'react-native';
+import { Linking, Share, StyleSheet, View } from 'react-native';
 import { api, ApiError } from '@/api/client';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Field } from '@/components/Field';
-import { Notice, Row, SectionTitle } from '@/components/Misc';
+import { Notice, Row, RowGroup, SectionTitle } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { signOutEverywhere } from '@/features/account/signOut';
@@ -16,6 +16,8 @@ import { openLegal } from '@/lib/legal';
 import { t } from '@/locales';
 import { useSession } from '@/store/session';
 import { space } from '@/theme';
+import { RoasterAvatar } from '@/components/RoasterAvatar';
+import { confirm } from '@/lib/confirm';
 
 export default function Settings() {
   const me = useSession((s) => s.me);
@@ -52,15 +54,18 @@ export default function Settings() {
   return (
     <Screen title={t('settings.title')}>
       {me?.cafe ? (
-        <Card>
-          <Text variant="h3">{me.cafe.name}</Text>
-          <Text variant="small">
-            {me.cafe.district} · {me.user.email}
-          </Text>
+        <Card style={styles.profile}>
+          <RoasterAvatar name={me.cafe.name} size={48} />
+          <View style={styles.flex}>
+            <Text variant="h3">{me.cafe.name}</Text>
+            <Text variant="small">
+              {me.cafe.district} · {me.user.email}
+            </Text>
+          </View>
         </Card>
       ) : null}
       {error ? <Notice text={error} tone="danger" /> : null}
-      <View>
+      <RowGroup>
         <Row icon="store" title={t('settings.business')} onPress={() => router.push('/business')} />
         <Row icon="chart" title={t('settings.costParams')} onPress={() => router.push('/costs')} />
         <Row
@@ -68,11 +73,11 @@ export default function Settings() {
           title={t('settings.ingredients')}
           onPress={() => router.push('/ingredients')}
         />
-      </View>
+      </RowGroup>
       <SectionTitle>{t('settings.appearance')}</SectionTitle>
       <ThemePicker />
       <SectionTitle>{t('settings.account')}</SectionTitle>
-      <View>
+      <RowGroup>
         <Row
           icon="gear"
           title={t('settings.changePassword')}
@@ -84,17 +89,37 @@ export default function Settings() {
           subtitle={t('settings.exportBody')}
           onPress={() => void exportData()}
         />
-      </View>
+      </RowGroup>
       <SectionTitle>{t('settings.legal')}</SectionTitle>
-      <View>
+      <RowGroup>
         <Row icon="book" title={t('settings.terms')} onPress={() => openLegal('terms')} />
         <Row icon="book" title={t('settings.privacy')} onPress={() => openLegal('privacy')} />
         <Row icon="book" title={t('settings.kvkk')} onPress={() => openLegal('kvkk')} />
-      </View>
+      </RowGroup>
+      <SectionTitle>{t('settings.more')}</SectionTitle>
+      <RowGroup>
+        <Row
+          icon="share"
+          title={t('settings.recommend')}
+          subtitle={t('settings.recommendBody')}
+          onPress={() => void Share.share({ message: t('settings.recommendMessage') })}
+        />
+        {SUPPORT_EMAIL ? (
+          <Row
+            icon="mail"
+            title={t('settings.support')}
+            subtitle={SUPPORT_EMAIL}
+            onPress={() => void Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=RoastCost`)}
+          />
+        ) : null}
+      </RowGroup>
       <Button
         title={t('settings.logout')}
         variant="secondary"
-        onPress={() => void signOutEverywhere()}
+        onPress={async () => {
+          if (await confirm(t('settings.logoutConfirm'), undefined, t('settings.logout')))
+            void signOutEverywhere();
+        }}
       />
       <Button
         title={t('settings.deleteAccount')}
@@ -133,4 +158,11 @@ export default function Settings() {
   );
 }
 
-const styles = StyleSheet.create({ center: { textAlign: 'center', marginTop: space.lg } });
+/** Set EXPO_PUBLIC_SUPPORT_EMAIL at build time; the row is hidden until a real address exists. */
+const SUPPORT_EMAIL = process.env.EXPO_PUBLIC_SUPPORT_EMAIL;
+
+const styles = StyleSheet.create({
+  center: { textAlign: 'center', marginTop: space.lg },
+  flex: { flex: 1 },
+  profile: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+});

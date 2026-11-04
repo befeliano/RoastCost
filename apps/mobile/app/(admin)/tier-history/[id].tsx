@@ -1,4 +1,3 @@
-import { formatTRY } from '@roastcost/shared';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
 import { Alert } from 'react-native';
@@ -9,7 +8,7 @@ import { Card } from '@/components/Card';
 import { Pill } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
-import { formatDateTime } from '@/lib/format';
+import { formatDateTime, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 
 const ACTION: Record<

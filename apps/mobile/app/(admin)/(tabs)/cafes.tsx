@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { api } from '@/api/client';
 import type { AdminCafe, Page } from '@/api/types';
-import { Chips, EmptyState, Pill, Row } from '@/components/Misc';
+import { Chips, EmptyState, Pill, Row, RowGroup } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
 import { CAFE_LABEL, CAFE_TONE } from '@/features/admin/labels';
 import { formatDate } from '@/lib/format';
@@ -31,15 +31,17 @@ export default function Cafes() {
         onChange={setStatus}
       />
       {!q.data?.items.length && !q.isLoading ? <EmptyState title={t('admin.emptyCafes')} /> : null}
-      {q.data?.items.map((c) => (
-        <Row
-          key={c.id}
-          title={c.name}
-          subtitle={`${c.district} · ${c.ownerEmail ?? ''} · ${formatDate(c.createdAt)}`}
-          right={<Pill tone={CAFE_TONE[c.status]} label={CAFE_LABEL[c.status]} />}
-          onPress={() => router.push({ pathname: '/cafe-detail/[id]', params: { id: c.id } })}
-        />
-      ))}
+      <RowGroup>
+        {q.data?.items.map((c) => (
+          <Row
+            key={c.id}
+            title={c.name}
+            subtitle={`${c.district} · ${c.ownerEmail ?? ''} · ${formatDate(c.createdAt)}`}
+            right={<Pill tone={CAFE_TONE[c.status]} label={CAFE_LABEL[c.status]} />}
+            onPress={() => router.push({ pathname: '/cafe-detail/[id]', params: { id: c.id } })}
+          />
+        ))}
+      </RowGroup>
     </Screen>
   );
 }

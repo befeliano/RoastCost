@@ -8,6 +8,7 @@ import { Notice } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
 import { t } from '@/locales';
 import { useSession } from '@/store/session';
+import { toast } from '@/components/Toast';
 
 export default function Business() {
   const cafe = useSession((s) => s.me?.cafe);
@@ -26,6 +27,7 @@ export default function Business() {
         body: { name: name.trim(), district: district.trim(), phone },
       });
       await useSession.getState().refreshMe();
+      toast('Kaydedildi');
       router.back();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : t('common.unknownError'));

@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { api } from '@/api/client';
 import type { AdminRoaster } from '@/api/types';
 import { Button } from '@/components/Button';
-import { EmptyState, Pill, Row } from '@/components/Misc';
+import { EmptyState, Pill, Row, RowGroup } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
 import { formatDate } from '@/lib/format';
 import { t } from '@/locales';
@@ -26,20 +26,22 @@ export default function Catalog() {
         onPress={() => router.push({ pathname: '/roaster-edit/[id]', params: { id: 'new' } })}
       />
       {!q.data?.length && !q.isLoading ? <EmptyState title={t('catalog.empty')} /> : null}
-      {q.data?.map((r) => (
-        <Row
-          key={r.id}
-          title={r.name}
-          subtitle={[
-            `${r.productCount} ürün · %${r.commissionRateBp / 100} komisyon`,
-            r.pricesUpdatedAt ? `fiyatlar ${formatDate(r.pricesUpdatedAt)}` : null,
-          ]
-            .filter(Boolean)
-            .join(' · ')}
-          right={r.isActive ? undefined : <Pill label="Pasif" />}
-          onPress={() => router.push({ pathname: '/roaster-edit/[id]', params: { id: r.id } })}
-        />
-      ))}
+      <RowGroup>
+        {q.data?.map((r) => (
+          <Row
+            key={r.id}
+            title={r.name}
+            subtitle={[
+              `${r.productCount} ürün · %${r.commissionRateBp / 100} komisyon`,
+              r.pricesUpdatedAt ? `fiyatlar ${formatDate(r.pricesUpdatedAt)}` : null,
+            ]
+              .filter(Boolean)
+              .join(' · ')}
+            right={r.isActive ? undefined : <Pill label="Pasif" />}
+            onPress={() => router.push({ pathname: '/roaster-edit/[id]', params: { id: r.id } })}
+          />
+        ))}
+      </RowGroup>
     </Screen>
   );
 }

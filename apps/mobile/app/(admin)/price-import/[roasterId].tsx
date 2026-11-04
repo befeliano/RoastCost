@@ -1,4 +1,3 @@
-import { formatTRY } from '@roastcost/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -12,6 +11,7 @@ import { Screen } from '@/components/Screen';
 import { SuccessOverlay } from '@/components/SuccessOverlay';
 import { Text } from '@/components/Text';
 import { t } from '@/locales';
+import { formatTRY } from '@/lib/format';
 
 const LABEL: Record<string, { label: string; tone: 'success' | 'info' | 'warning' | 'neutral' }> = {
   create_product: { label: 'Yeni ürün', tone: 'success' },

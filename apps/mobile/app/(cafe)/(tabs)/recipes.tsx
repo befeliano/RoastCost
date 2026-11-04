@@ -1,13 +1,14 @@
-import { formatTRY } from '@roastcost/shared';
 import { router } from 'expo-router';
 import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
-import { EmptyState, Pill } from '@/components/Misc';
+import { EmptyState, ErrorState, Pill } from '@/components/Misc';
+import { Skeleton } from '@/components/Skeleton';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { useIngredients, useRecipes, useSettings } from '@/hooks/useCafeData';
 import { t } from '@/locales';
+import { formatTRY } from '@/lib/format';
 
 export default function Recipes() {
   const recipes = useRecipes();
@@ -27,7 +28,13 @@ export default function Recipes() {
         variant="secondary"
         onPress={() => router.push({ pathname: '/recipe/[id]', params: { id: 'new' } })}
       />
-      {!list.length && !recipes.isLoading ? <EmptyState title={t('recipes.empty')} /> : null}
+      {recipes.isLoading ? <Skeleton rows={4} /> : null}
+      {recipes.isError && !list.length ? (
+        <ErrorState onRetry={() => void recipes.refetch()} />
+      ) : null}
+      {!list.length && !recipes.isLoading && !recipes.isError ? (
+        <EmptyState title={t('recipes.empty')} />
+      ) : null}
       {list.map((r, i) => {
         const parts = r.ingredients.map(
           (ri) =>

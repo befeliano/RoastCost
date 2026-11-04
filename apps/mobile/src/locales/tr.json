@@ -159,7 +159,13 @@
     "version": "Sürüm {v}",
     "appearance": "Görünüm",
     "themeColor": "Tema rengi",
-    "themeHint": "Üst bar, butonlar ve vurgular bu renkte olur."
+    "themeHint": "Üst bar, butonlar ve vurgular bu renkte olur.",
+    "more": "Diğer",
+    "recommend": "Uygulamayı öner",
+    "recommendBody": "Kafe sahibi arkadaşlarınıza gönderin",
+    "recommendMessage": "Fincan başı maliyetimi ve yerel kavurucuların toptan fiyatlarını RoastCost ile takip ediyorum. Sen de dene — App Store ve Google Play'de \"RoastCost\" diye arat.",
+    "support": "Destek",
+    "logoutConfirm": "Çıkış yapılsın mı?"
   },
   "catalog": {
     "title": "Kavurucular",
@@ -204,7 +210,7 @@
     "title": "Siparişler",
     "carts": "Sepetler",
     "history": "Geçmiş siparişler",
-    "emptyCart": "Sepetiniz boş. Kavurucular'dan ürün ekleyin.",
+    "emptyCart": "Bir kavurucunun kataloğundan çekirdek ekleyin; her kavurucu için ayrı sepet tutulur.",
     "emptyHistory": "Henüz sipariş yok",
     "subtotal": "Ara toplam",
     "deliveryDate": "İstenen teslim tarihi",
@@ -237,7 +243,9 @@
     "items": "{n} ürün",
     "minKg": "En az {kg} kg",
     "tier": "{kg} kg+ kademe",
-    "waMissing": "WhatsApp açılamadı. Mesajı kopyalayıp gönderebilirsiniz."
+    "waMissing": "WhatsApp açılamadı. Mesajı kopyalayıp gönderebilirsiniz.",
+    "emptyCartTitle": "Sepetiniz boş",
+    "goExplore": "Kavurucuları keşfet"
   },
   "admin": {
     "panel": "Panel",

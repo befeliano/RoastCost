@@ -1,4 +1,3 @@
-import { formatTRY } from '@roastcost/shared';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -18,9 +17,8 @@ import { CityMap, TurkeyMap } from '@/features/explore/Maps';
 import { t } from '@/locales';
 import { useSession } from '@/store/session';
 import { colors, radius, space, useColors } from '@/theme';
-
-/** "₺885,00" → "₺885" for whole-lira list prices */
-const priceShort = (kurus: number) => formatTRY(kurus).replace(/,00$/, '');
+import { formatTRY } from '@/lib/format';
+import { Skeleton } from '@/components/Skeleton';
 
 export default function Explore() {
   const me = useSession((s) => s.me);
@@ -90,6 +88,7 @@ export default function Explore() {
         </Pressable>
       </View>
 
+      {!roasters.length && catalog.syncing ? <Skeleton rows={3} avatar /> : null}
       {!roasters.length && !catalog.syncing ? <EmptyState title={t('catalog.empty')} /> : null}
 
       {featured.length ? (
@@ -131,7 +130,7 @@ export default function Explore() {
                       </Text>
                       {st.minPricePerKgKurus ? (
                         <Text variant="bodyStrong" color={c.primaryText}>
-                          {t('explore.from', { price: priceShort(st.minPricePerKgKurus) })}
+                          {t('explore.from', { price: formatTRY(st.minPricePerKgKurus) })}
                         </Text>
                       ) : null}
                     </View>
@@ -178,7 +177,7 @@ export default function Explore() {
             )}
           </Card>
 
-          <SectionTitle>{t('explore.byDistrict')}</SectionTitle>
+          <SectionTitle count={list.length}>{t('explore.byDistrict')}</SectionTitle>
           <Chips
             options={[
               { value: 'all', label: t('catalog.all') },
@@ -211,7 +210,7 @@ export default function Explore() {
                     <View style={styles.rowMeta}>
                       {st.minPricePerKgKurus ? (
                         <Text variant="bodyStrong" color={c.primaryText}>
-                          {t('explore.from', { price: priceShort(st.minPricePerKgKurus) })}
+                          {t('explore.from', { price: formatTRY(st.minPricePerKgKurus) })}
                         </Text>
                       ) : null}
                     </View>
@@ -241,7 +240,7 @@ const styles = StyleSheet.create({
   },
   featuredRow: { gap: space.md, paddingRight: space.lg },
   featured: {
-    width: 176,
+    width: 190,
     padding: space.md,
     gap: space.md,
     borderRadius: 14,

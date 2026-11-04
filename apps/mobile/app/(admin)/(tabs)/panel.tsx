@@ -1,4 +1,3 @@
-import { formatTRY } from '@roastcost/shared';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
@@ -13,6 +12,7 @@ import { signOutEverywhere } from '@/features/account/signOut';
 import { ThemePicker } from '@/features/account/ThemePicker';
 import { t } from '@/locales';
 import { colors, space, useColors } from '@/theme';
+import { formatTRY } from '@/lib/format';
 
 function Stat({
   label,

@@ -1,10 +1,4 @@
-import {
-  calculateCupCost,
-  formatPct,
-  formatTRY,
-  kurusToInput,
-  parseTRYInput,
-} from '@roastcost/shared';
+import { calculateCupCost, formatPct, kurusToInput, parseTRYInput } from '@roastcost/shared';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -26,12 +20,13 @@ import { useIngredients, useRecipes, useSettings } from '@/hooks/useCafeData';
 import { t } from '@/locales';
 import { useSession } from '@/store/session';
 import { colors, space, useColors } from '@/theme';
+import { formatTRY, formatTRYFull } from '@/lib/format';
 
 function Line({ label, value }: { label: string; value: number }) {
   return (
     <View style={styles.line}>
       <Text variant="body">{label}</Text>
-      <AnimatedNumber variant="money" value={value} format={formatTRY} />
+      <AnimatedNumber variant="money" value={value} format={formatTRYFull} />
     </View>
   );
 }
@@ -214,7 +209,7 @@ export default function Cost() {
                 variant="money"
                 style={styles.total}
                 value={result.totalKurus}
-                format={formatTRY}
+                format={formatTRYFull}
               />
             </View>
           </Card>

@@ -1,4 +1,3 @@
-import { formatTRY } from '@roastcost/shared';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -18,6 +17,7 @@ import { useCostPrefs } from '@/features/cost/prefs';
 import { useIngredients, useRecipes, useSettings } from '@/hooks/useCafeData';
 import { t } from '@/locales';
 import { colors, space } from '@/theme';
+import { formatTRY } from '@/lib/format';
 
 /** Every active product ranked by cost per cup for the selected recipe (spec §7.3 Karşılaştırma). */
 export default function Compare() {

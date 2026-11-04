@@ -17,6 +17,7 @@ import { useCatalog } from '@/features/catalog/store';
 import { CACHE_BUSTER, persister, queryClient } from '@/lib/query';
 import { useSession } from '@/store/session';
 import { colors } from '@/theme';
+import { ToastHost } from '@/components/Toast';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -67,7 +68,10 @@ export default function RootLayout() {
           persistOptions={{ persister, buster: CACHE_BUSTER, maxAge: 7 * 24 * 60 * 60_000 }}
         >
           <Stack
-            screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.surface },
+            }}
           >
             <Stack.Protected guard={status === 'signedOut'}>
               <Stack.Screen name="(auth)" />
@@ -81,6 +85,7 @@ export default function RootLayout() {
               />
             </Stack.Protected>
           </Stack>
+          <ToastHost />
         </PersistQueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

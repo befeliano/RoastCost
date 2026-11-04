@@ -1,6 +1,17 @@
-import { formatTRY } from '@roastcost/shared';
+import { formatTRY as formatTRYFull } from '@roastcost/shared';
 
-export { formatTRY };
+/** Full form, always with kuruş ("₺3,50", "₺12,00") — for cost breakdowns where columns must align. */
+export { formatTRYFull };
+
+/** Display form: whole liras drop ",00" ("₺1.100", "₺27,25"). */
+export function formatTRY(kurus: number): string {
+  return kurus % 100 === 0 ? formatTRYFull(kurus).replace(/,00(?=\D*$)/, '') : formatTRYFull(kurus);
+}
+
+/** 2500 g → "2,5 kg" */
+export function formatGramsKg(g: number): string {
+  return `${String(Math.round(g) / 1000).replace('.', ',')} kg`;
+}
 
 export function formatDate(iso: string): string {
   return new Intl.DateTimeFormat('tr-TR', {

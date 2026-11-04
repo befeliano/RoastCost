@@ -29,6 +29,7 @@ export function Chips<T extends string>({
             accessibilityRole="button"
             accessibilityState={{ selected: on }}
             onPress={() => onChange(o.value)}
+            hitSlop={{ top: 4, bottom: 4 }}
             style={[styles.chip, on && { backgroundColor: c.primary, borderColor: c.primary }]}
           >
             <Text
@@ -186,19 +187,74 @@ export function Row({
   );
 }
 
-export function SectionTitle({ children, action }: { children: string; action?: React.ReactNode }) {
+export function SectionTitle({
+  children,
+  action,
+  count,
+}: {
+  children: string;
+  action?: React.ReactNode;
+  count?: number;
+}) {
   return (
     <View style={styles.sectionRow}>
-      <Text variant="h3" style={styles.flex} accessibilityRole="header">
-        {children}
-      </Text>
+      <View style={[styles.flex, styles.sectionTitle]}>
+        <Text variant="h3" accessibilityRole="header">
+          {children}
+        </Text>
+        {count !== undefined ? (
+          <View style={styles.count}>
+            <Text variant="caption">{count}</Text>
+          </View>
+        ) : null}
+      </View>
       {action}
     </View>
   );
 }
 
+/** iOS-style grouped list: rounded container, hairline separators, no line under the last row. */
+export function RowGroup({ children }: { children: React.ReactNode }) {
+  return (
+    <View style={styles.group}>
+      <View style={styles.groupInner}>{children}</View>
+    </View>
+  );
+}
+
+/** Failed query: what happened + a retry button. */
+export function ErrorState({ onRetry, text }: { onRetry: () => void; text?: string }) {
+  const c = useColors();
+  return (
+    <View style={styles.error}>
+      <Icon name="warning" color={c.danger} />
+      <Text variant="body" style={styles.center}>
+        {text ?? 'Bağlantı kurulamadı. İnternetinizi kontrol edip tekrar deneyin.'}
+      </Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={onRetry}
+        style={[styles.retry, { borderColor: c.primaryText }]}
+      >
+        <Icon name="refresh" size={18} color={c.primaryText} />
+        <Text variant="bodyStrong" color={c.primaryText}>
+          Tekrar dene
+        </Text>
+      </Pressable>
+    </View>
+  );
+}
+
 /** Our own empty-state drawing: a cup with a bean (no third-party illustration). */
-export function EmptyState({ title, body }: { title: string; body?: string }) {
+export function EmptyState({
+  title,
+  body,
+  action,
+}: {
+  title: string;
+  body?: string;
+  action?: { label: string; onPress: () => void; icon?: IconName };
+}) {
   const c = useColors();
   return (
     <View style={styles.empty}>
@@ -242,6 +298,18 @@ export function EmptyState({ title, body }: { title: string; body?: string }) {
           {body}
         </Text>
       ) : null}
+      {action ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={action.onPress}
+          style={[styles.retry, { borderColor: c.primaryText }]}
+        >
+          {action.icon ? <Icon name={action.icon} size={18} color={c.primaryText} /> : null}
+          <Text variant="bodyStrong" color={c.primaryText}>
+            {action.label}
+          </Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -284,7 +352,7 @@ const styles = StyleSheet.create({
     minHeight: 52,
     paddingVertical: space.sm,
     paddingHorizontal: space.md,
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
     backgroundColor: colors.bg,
   },
@@ -297,6 +365,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sectionRow: { flexDirection: 'row', alignItems: 'center', marginTop: space.md },
+  sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  count: {
+    minWidth: 22,
+    paddingHorizontal: 6,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.border,
+  },
+  group: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    backgroundColor: colors.bg,
+  },
+  // hides the separator under the last row
+  groupInner: { marginBottom: -1 },
+  error: { alignItems: 'center', gap: space.md, paddingVertical: space.xl },
+  retry: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1.5,
+    borderRadius: 12,
+    paddingHorizontal: space.lg,
+    minHeight: 44,
+    marginTop: space.xs,
+  },
   empty: { alignItems: 'center', gap: space.sm, paddingVertical: space.xxl },
   center: { textAlign: 'center' },
 });

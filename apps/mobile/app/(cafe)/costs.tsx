@@ -10,6 +10,7 @@ import { Screen } from '@/components/Screen';
 import { useSettings, useUpdateSettings } from '@/hooks/useCafeData';
 import { parseDecimal } from '@/lib/format';
 import { t } from '@/locales';
+import { toast } from '@/components/Toast';
 
 type Form = Record<'dose' | 'cw' | 'iw' | 'cup' | 'over' | 'margin' | 'vat' | 'step', string>;
 
@@ -71,6 +72,7 @@ export default function Costs() {
     if (Object.keys(e).length) return;
     try {
       await update.mutateAsync(patch);
+      toast('Kaydedildi');
       router.back();
     } catch (err) {
       setServerError(err instanceof ApiError ? err.message : t('common.unknownError'));

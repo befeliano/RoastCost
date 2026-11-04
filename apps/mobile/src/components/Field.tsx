@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,
@@ -8,7 +8,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { colors, fonts, radius, space } from '@/theme';
+import { colors, fonts, radius, space, useColors } from '@/theme';
+import { Icon } from './Icon';
 import { Text } from './Text';
 
 interface Props extends TextInputProps {
@@ -21,7 +22,23 @@ interface Props extends TextInputProps {
 }
 
 /** Labelled input; on error: gentle shake + haptic (spec §11.4) and the error as text (§11.5). */
-export function Field({ label, error, hint, suffix, hideLabel, style, ...rest }: Props) {
+export function Field({
+  label,
+  error,
+  hint,
+  suffix,
+  hideLabel,
+  style,
+  secureTextEntry,
+  onFocus,
+  onBlur,
+  keyboardType,
+  ...rest
+}: Props) {
+  const c = useColors();
+  const [focused, setFocused] = useState(false);
+  const [reveal, setReveal] = useState(false);
+  const numeric = keyboardType === 'decimal-pad' || keyboardType === 'number-pad';
   const x = useSharedValue(0);
   const reduce = useReducedMotion();
   useEffect(() => {
@@ -43,16 +60,44 @@ export function Field({ label, error, hint, suffix, hideLabel, style, ...rest }:
           {label}
         </Text>
       )}
-      <View style={[styles.inputRow, error ? styles.inputError : null]}>
+      <View
+        style={[
+          styles.inputRow,
+          focused && { borderColor: c.primaryText, borderWidth: 1.5 },
+          error ? styles.inputError : null,
+        ]}
+      >
         <TextInput
           accessibilityLabel={label}
           accessibilityHint={error ?? hint}
           placeholderTextColor={colors.textMuted}
           style={[styles.input, style]}
           maxFontSizeMultiplier={1.6}
+          keyboardType={keyboardType}
+          // numeric pads get a "Bitti" key so the keyboard can be closed (iOS)
+          returnKeyType={numeric ? 'done' : rest.returnKeyType}
+          secureTextEntry={secureTextEntry && !reveal}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur?.(e);
+          }}
           {...rest}
         />
         {suffix ? <Text variant="small">{suffix}</Text> : null}
+        {secureTextEntry ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={reveal ? 'Parolayı gizle' : 'Parolayı göster'}
+            hitSlop={10}
+            onPress={() => setReveal((v) => !v)}
+          >
+            <Icon name={reveal ? 'eyeOff' : 'eye'} size={20} color={colors.textMuted} />
+          </Pressable>
+        ) : null}
       </View>
       {error ? (
         <Text variant="small" color={colors.danger} accessibilityLiveRegion="polite">

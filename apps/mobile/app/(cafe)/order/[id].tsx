@@ -1,6 +1,6 @@
-import { formatDateTr, formatKg, formatOrderNo, formatTRY } from '@roastcost/shared';
+import { formatDateTr, formatKg, formatOrderNo } from '@roastcost/shared';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from '@/api/client';
 import type { OrderCreated } from '@/api/types';
@@ -15,9 +15,12 @@ import { Text } from '@/components/Text';
 import { ORDER_TONE } from '@/features/orders/status';
 import { useSendFlow } from '@/features/orders/useSendFlow';
 import { keys, useOrder } from '@/hooks/useCafeData';
-import { formatDateTime } from '@/lib/format';
+import { formatDateTime, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 import { colors, space } from '@/theme';
+import { confirm } from '@/lib/confirm';
+import { toast } from '@/components/Toast';
+import { Skeleton } from '@/components/Skeleton';
 
 function Step({
   done,
@@ -59,7 +62,7 @@ export default function OrderDetail() {
   if (!o)
     return (
       <Screen title={t('orders.title')} back>
-        <Text>{t('common.loading')}</Text>
+        <Skeleton rows={3} />
       </Screen>
     );
   const open = o.status === 'draft' || o.status === 'sent';
@@ -80,22 +83,19 @@ export default function OrderDetail() {
       const created = await api<OrderCreated>(`/orders/${o.id}/link`, { method: 'POST' });
       await flow.open(created);
     } catch (e) {
-      Alert.alert(e instanceof ApiError ? e.message : t('common.unknownError'));
+      toast(e instanceof ApiError ? e.message : t('common.unknownError'), 'warning');
     }
   };
-  const cancel = () =>
-    Alert.alert(t('orders.cancelConfirm'), formatOrderNo(o.orderNo), [
-      { text: t('common.no'), style: 'cancel' },
-      {
-        text: t('orders.cancelOrder'),
-        style: 'destructive',
-        onPress: async () => {
-          await api(`/orders/${o.id}/cancel`, { method: 'POST' });
-          void qc.invalidateQueries({ queryKey: keys.orders });
-          void q.refetch();
-        },
-      },
-    ]);
+  const cancel = async () => {
+    if (
+      !(await confirm(t('orders.cancelConfirm'), formatOrderNo(o.orderNo), t('orders.cancelOrder')))
+    )
+      return;
+    await api(`/orders/${o.id}/cancel`, { method: 'POST' });
+    toast('Sipariş iptal edildi');
+    void qc.invalidateQueries({ queryKey: keys.orders });
+    void q.refetch();
+  };
 
   return (
     <Screen
@@ -145,7 +145,7 @@ export default function OrderDetail() {
       {open ? (
         <>
           <Button title={t('orders.resend')} icon="send" onPress={() => void resend()} />
-          <Button title={t('orders.cancelOrder')} variant="danger" onPress={cancel} />
+          <Button title={t('orders.cancelOrder')} variant="danger" onPress={() => void cancel()} />
         </>
       ) : null}
       <BottomSheet visible={flow.ask} onClose={flow.notYet} title={t('orders.didSend')}>

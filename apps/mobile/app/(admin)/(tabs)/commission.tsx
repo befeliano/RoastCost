@@ -1,4 +1,4 @@
-import { formatOrderNo, formatTRY, type CommissionStatus } from '@roastcost/shared';
+import { formatOrderNo, type CommissionStatus } from '@roastcost/shared';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -7,7 +7,7 @@ import type { AdminOrder, Page } from '@/api/types';
 import { Chips, EmptyState, Pill, Row } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
 import { COMMISSION_TONE } from '@/features/admin/labels';
-import { formatDate } from '@/lib/format';
+import { formatDate, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 
 type Filter = CommissionStatus | 'all' | 'conflict';

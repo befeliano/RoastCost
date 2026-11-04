@@ -1,6 +1,5 @@
 import {
   PRODUCT_CATEGORIES,
-  formatTRY,
   formatTrPhone,
   kurusToInput,
   normalizeTrPhone,
@@ -20,7 +19,7 @@ import { Field } from '@/components/Field';
 import { Chips, Notice, SectionTitle, ToggleRow } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
-import { parseDecimal } from '@/lib/format';
+import { parseDecimal, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 import { colors, space, useColors } from '@/theme';
 

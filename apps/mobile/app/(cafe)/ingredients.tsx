@@ -1,15 +1,17 @@
-import { formatTRY, kurusToInput, parseTRYInput, type IngredientKind } from '@roastcost/shared';
+import { kurusToInput, parseTRYInput, type IngredientKind } from '@roastcost/shared';
 import { useState } from 'react';
-import { Alert } from 'react-native';
 import { ApiError } from '@/api/client';
 import type { Ingredient } from '@/api/types';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Field } from '@/components/Field';
-import { Chips, Notice, Row } from '@/components/Misc';
+import { Chips, Notice, Row, RowGroup } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
 import { useDeleteIngredient, useIngredients, useSaveIngredient } from '@/hooks/useCafeData';
 import { t } from '@/locales';
+import { formatTRY } from '@/lib/format';
+import { toast } from '@/components/Toast';
+import { confirm } from '@/lib/confirm';
 
 const KINDS: { value: IngredientKind; label: string }[] = [
   { value: 'milk', label: t('settings.kindMilk') },
@@ -40,39 +42,35 @@ export default function Ingredients() {
         kind: edit.kind,
         pricePerLiterKurus: p,
       });
+      toast('Kaydedildi');
       setEdit(null);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : t('common.unknownError'));
     }
   };
-  const remove = () =>
-    edit?.id &&
-    Alert.alert(t('common.delete'), edit.name, [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('common.delete'),
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await del.mutateAsync(edit.id as string);
-            setEdit(null);
-          } catch (e) {
-            setError(e instanceof ApiError ? e.message : t('common.unknownError'));
-          }
-        },
-      },
-    ]);
+  const remove = async () => {
+    if (!edit?.id || !(await confirm(t('common.delete'), edit.name, t('common.delete')))) return;
+    try {
+      await del.mutateAsync(edit.id);
+      toast('Silindi', 'trash');
+      setEdit(null);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : t('common.unknownError'));
+    }
+  };
 
   return (
     <Screen title={t('settings.ingredients')} back>
-      {(list.data ?? []).map((i) => (
-        <Row
-          key={i.id}
-          title={i.name}
-          subtitle={`${KINDS.find((k) => k.value === i.kind)?.label} · ${formatTRY(i.pricePerLiterKurus)}/L`}
-          onPress={() => open(i)}
-        />
-      ))}
+      <RowGroup>
+        {(list.data ?? []).map((i) => (
+          <Row
+            key={i.id}
+            title={i.name}
+            subtitle={`${KINDS.find((k) => k.value === i.kind)?.label} · ${formatTRY(i.pricePerLiterKurus)}/L`}
+            onPress={() => open(i)}
+          />
+        ))}
+      </RowGroup>
       <Button title={t('common.add')} icon="plus" variant="secondary" onPress={() => open()} />
       <BottomSheet
         visible={!!edit}
@@ -98,7 +96,9 @@ export default function Ingredients() {
           suffix="₺/L"
         />
         <Button title={t('common.save')} onPress={() => void submit()} loading={save.isPending} />
-        {edit?.id ? <Button title={t('common.delete')} variant="danger" onPress={remove} /> : null}
+        {edit?.id ? (
+          <Button title={t('common.delete')} variant="danger" onPress={() => void remove()} />
+        ) : null}
       </BottomSheet>
     </Screen>
   );

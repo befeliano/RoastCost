@@ -1,7 +1,6 @@
 import {
   formatKg,
   formatOrderNo,
-  formatTRY,
   formatTrPhone,
   kurusToInput,
   parseTRYInput,
@@ -20,7 +19,7 @@ import { Notice, Pill, SectionTitle } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { COMMISSION_TONE } from '@/features/admin/labels';
-import { formatDateTime } from '@/lib/format';
+import { formatDateTime, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 import { space } from '@/theme';
 
