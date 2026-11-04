@@ -1,0 +1,24 @@
+# Local development database. Production compose lives in deploy/ (Faz 9).
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:-postgres}
+      POSTGRES_DB: postgres
+      ROASTCOST_MIGRATOR_PASSWORD: ${ROASTCOST_MIGRATOR_PASSWORD:-migrator_dev}
+      ROASTCOST_APP_PASSWORD: ${ROASTCOST_APP_PASSWORD:-app_dev}
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./apps/api/scripts/docker-init.sh:/docker-entrypoint-initdb.d/10-roastcost.sh:ro
+      - ./apps/api/scripts/bootstrap.sql:/roastcost/bootstrap.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+volumes:
+  pgdata:

@@ -1,0 +1,37 @@
+{
+  "name": "roastcost",
+  "private": true,
+  "version": "0.1.0",
+  "description": "RoastCost — cafe cup-cost calculator and roaster ordering app",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r --if-present typecheck",
+    "lint": "eslint . --max-warnings=0",
+    "test": "pnpm -r --if-present test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose up -d db",
+    "db:migrate": "pnpm --filter @roastcost/api migrate",
+    "db:seed": "pnpm --filter @roastcost/api seed",
+    "api:dev": "pnpm --filter @roastcost/api dev",
+    "mobile": "pnpm --filter @roastcost/mobile start"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "eslint": "^9.39.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.5.0",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^4.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

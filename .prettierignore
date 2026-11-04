@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+.expo
+apps/mobile/ios
+apps/mobile/android
+pnpm-lock.yaml
+PROJE_SARTNAMESI.md
+*.sql
