@@ -17,7 +17,7 @@ Paletler (Ayarlar → Görünüm): Kahve (koyu → açık kahve gradyan, varsay�
 
 ## Tipografi
 
-Urbanist (OFL, uygulamayla paketli) — yuvarlak, zarif geometrik sans. Ölçek: h1 24, h2 19, h3 16, gövde 15, küçük 13, etiket 11.5; liste satırı başlığı 14.5 medium. Para tabular rakamlarla. Serif yok. (Visby / Lorin / Monolith ticari lisanslı — K13 gereği kullanılamaz.)
+Plus Jakarta Sans (OFL, uygulamayla paketli). Ölçek: h1 24, h2 19, h3 16, gövde 15, küçük 13, etiket 11.5; liste satırı başlığı 14.5 medium. Para tabular rakamlarla. Serif yok. (Visby / Lorin / Monolith ticari lisanslı — K13 gereği kullanılamaz.)
 
 ## Şekil ve derinlik
 

@@ -126,7 +126,7 @@ export default function Explore() {
                       <Text variant="small" numberOfLines={1}>
                         {r.district ?? r.city}
                       </Text>
-                      <Text variant="small" numberOfLines={1}>
+                      <Text variant="small">
                         {t('explore.counts', { e: st.espresso, f: st.filter })}
                       </Text>
                       {st.minPricePerKgKurus ? (

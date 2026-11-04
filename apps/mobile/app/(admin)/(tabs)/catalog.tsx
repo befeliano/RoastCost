@@ -5,7 +5,7 @@ import type { AdminRoaster } from '@/api/types';
 import { Button } from '@/components/Button';
 import { EmptyState, Pill, Row } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
-import { Freshness } from '@/features/catalog/Freshness';
+import { formatDate } from '@/lib/format';
 import { t } from '@/locales';
 
 export default function Catalog() {
@@ -30,8 +30,13 @@ export default function Catalog() {
         <Row
           key={r.id}
           title={r.name}
-          subtitle={`${r.productCount} ürün · %${r.commissionRateBp / 100} komisyon`}
-          right={r.isActive ? <Freshness iso={r.pricesUpdatedAt} /> : <Pill label="Pasif" />}
+          subtitle={[
+            `${r.productCount} ürün · %${r.commissionRateBp / 100} komisyon`,
+            r.pricesUpdatedAt ? `fiyatlar ${formatDate(r.pricesUpdatedAt)}` : null,
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+          right={r.isActive ? undefined : <Pill label="Pasif" />}
           onPress={() => router.push({ pathname: '/roaster-edit/[id]', params: { id: r.id } })}
         />
       ))}

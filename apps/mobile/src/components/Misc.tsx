@@ -18,6 +18,7 @@ export function Chips<T extends string>({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
+      style={styles.chipsScroll}
       contentContainerStyle={styles.chips}
     >
       {options.map((o) => {
@@ -129,6 +130,9 @@ export function ToggleRow({
         value={value}
         onValueChange={onChange}
         trackColor={{ true: c.primary, false: c.border }}
+        thumbColor="#FFFFFF"
+        // react-native-web otherwise paints a teal thumb when on
+        {...({ activeThumbColor: '#FFFFFF' } as object)}
       />
     </View>
   );
@@ -244,7 +248,8 @@ export function EmptyState({ title, body }: { title: string; body?: string }) {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  chips: { gap: space.sm, paddingVertical: 2 },
+  chipsScroll: { flexGrow: 0, flexShrink: 0 },
+  chips: { gap: space.sm, paddingVertical: 2, alignItems: 'center' },
   chip: {
     borderWidth: 1,
     borderColor: colors.border,

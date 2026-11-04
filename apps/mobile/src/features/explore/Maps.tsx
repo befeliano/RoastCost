@@ -15,7 +15,7 @@ function Pin({ x, y, scale = 1, label }: { x: number; y: number; scale?: number;
       <Circle cx={0} cy={-22} r={4.5} fill="#FFFFFF" />
       {label ? (
         <SvgText
-          fontFamily="Urbanist_700Bold"
+          fontFamily="PlusJakartaSans_700Bold"
           x={0}
           y={-27}
           fontSize={11}
@@ -76,7 +76,7 @@ export function TurkeyMap({ roasters }: { roasters: CatalogRoaster[] }) {
               strokeWidth={4}
             />
             <SvgText
-              fontFamily="Urbanist_700Bold"
+              fontFamily="PlusJakartaSans_700Bold"
               x={cl.x + 36}
               y={cl.y - 87}
               fontSize={32}
@@ -161,7 +161,7 @@ export function CityMap({
         ))}
         {districts.map((d) => (
           <SvgText
-            fontFamily="Urbanist_700Bold"
+            fontFamily="PlusJakartaSans_700Bold"
             key={d.d}
             x={d.x}
             y={d.y + 34}

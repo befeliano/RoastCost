@@ -308,7 +308,8 @@
     "brandColor": "Marka rengi (#RRGGBB)",
     "logoUrl": "Logo adresi (https://…)",
     "description": "Kısa tanıtım",
-    "featured": "Keşfet'te öne çıkar"
+    "featured": "Keşfet'te öne çıkar",
+    "auditEmpty": "Henüz kayıt yok — yönetim işlemleri burada listelenir"
   },
   "empty": {
     "generic": "Burada henüz bir şey yok"
