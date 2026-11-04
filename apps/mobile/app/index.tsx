@@ -1,17 +1,11 @@
-import { APP_NAME } from '@roastcost/shared';
-import { Text, View } from 'react-native';
+import { Redirect } from 'expo-router';
+import { useSession } from '@/store/session';
 
+/** Entry: route by session and role. */
 export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#FFFFFF',
-      }}
-    >
-      <Text style={{ fontSize: 28, color: '#5E1A2B' }}>{APP_NAME}</Text>
-    </View>
-  );
+  const { status, me } = useSession();
+  if (status !== 'signedIn') return <Redirect href="/welcome" />;
+  if (me && me.missingConsents.length > 0) return <Redirect href="/consents" />;
+  if (me?.user.role === 'admin') return <Redirect href="/panel" />;
+  return <Redirect href="/cost" />;
 }

@@ -1,0 +1,196 @@
+import { formatDateTr, formatKg, formatOrderNo, formatTRY } from '@roastcost/shared';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Alert, StyleSheet, View } from 'react-native';
+import { useQueryClient } from '@tanstack/react-query';
+import { api, ApiError } from '@/api/client';
+import type { OrderCreated } from '@/api/types';
+import { BottomSheet } from '@/components/BottomSheet';
+import { Button } from '@/components/Button';
+import { Card } from '@/components/Card';
+import { Icon } from '@/components/Icon';
+import { Notice, Pill } from '@/components/Misc';
+import { Screen } from '@/components/Screen';
+import { SuccessOverlay } from '@/components/SuccessOverlay';
+import { Text } from '@/components/Text';
+import { ORDER_TONE } from '@/features/orders/status';
+import { useSendFlow } from '@/features/orders/useSendFlow';
+import { keys, useOrder } from '@/hooks/useCafeData';
+import { formatDateTime } from '@/lib/format';
+import { t } from '@/locales';
+import { colors, space } from '@/theme';
+
+function Step({
+  done,
+  label,
+  time,
+  tone,
+}: {
+  done: boolean;
+  label: string;
+  time?: string | null;
+  tone?: string;
+}) {
+  return (
+    <View style={styles.step}>
+      <View
+        style={[
+          styles.dot,
+          done && { backgroundColor: tone ?? colors.success, borderColor: tone ?? colors.success },
+        ]}
+      >
+        {done ? <Icon name="check" size={14} color="#fff" strokeWidth={3} /> : null}
+      </View>
+      <View style={styles.flex}>
+        <Text variant={done ? 'bodyStrong' : 'body'} color={done ? colors.text : colors.textMuted}>
+          {label}
+        </Text>
+        {time ? <Text variant="small">{formatDateTime(time)}</Text> : null}
+      </View>
+    </View>
+  );
+}
+
+export default function OrderDetail() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const q = useOrder(id);
+  const qc = useQueryClient();
+  const flow = useSendFlow();
+  const o = q.data;
+  if (!o)
+    return (
+      <Screen title={t('orders.title')} back>
+        <Text>{t('common.loading')}</Text>
+      </Screen>
+    );
+  const open = o.status === 'draft' || o.status === 'sent';
+  const final =
+    o.status === 'confirmed' ||
+    o.status === 'declined' ||
+    o.status === 'expired' ||
+    o.status === 'cancelled';
+  const finalTone =
+    o.status === 'confirmed'
+      ? colors.success
+      : o.status === 'declined'
+        ? colors.danger
+        : colors.textMuted;
+
+  const resend = async () => {
+    try {
+      const created = await api<OrderCreated>(`/orders/${o.id}/link`, { method: 'POST' });
+      await flow.open(created);
+    } catch (e) {
+      Alert.alert(e instanceof ApiError ? e.message : t('common.unknownError'));
+    }
+  };
+  const cancel = () =>
+    Alert.alert(t('orders.cancelConfirm'), formatOrderNo(o.orderNo), [
+      { text: t('common.no'), style: 'cancel' },
+      {
+        text: t('orders.cancelOrder'),
+        style: 'destructive',
+        onPress: async () => {
+          await api(`/orders/${o.id}/cancel`, { method: 'POST' });
+          void qc.invalidateQueries({ queryKey: keys.orders });
+          void q.refetch();
+        },
+      },
+    ]);
+
+  return (
+    <Screen
+      title={formatOrderNo(o.orderNo)}
+      back
+      onRefresh={() => void q.refetch()}
+      refreshing={q.isRefetching}
+    >
+      <View style={styles.row}>
+        <Text variant="h2" style={styles.flex}>
+          {o.roasterName}
+        </Text>
+        <Pill tone={ORDER_TONE[o.status]} label={t(`orders.status.${o.status}`)} />
+      </View>
+      <Card style={styles.gap}>
+        <Step done label={t('orders.status.draft')} time={o.createdAt} />
+        <Step done={!!o.sentAt} label={t('orders.status.sent')} time={o.sentAt} />
+        <Step
+          done={final}
+          label={final ? t(`orders.status.${o.status}`) : t('orders.status.confirmed')}
+          time={o.decidedAt}
+          tone={finalTone}
+        />
+      </Card>
+      {o.declineReason ? <Notice text={o.declineReason} tone="danger" /> : null}
+      <Card style={styles.gap}>
+        {o.items?.map((i) => (
+          <View key={i.productName} style={styles.row}>
+            <Text variant="body" style={styles.flex}>
+              {i.productName} · {formatKg(i.quantityG)}
+            </Text>
+            <Text variant="money">{formatTRY(i.lineTotalKurus)}</Text>
+          </View>
+        ))}
+        <View style={styles.row}>
+          <Text variant="h3" style={styles.flex}>
+            {t('orders.subtotal')}
+          </Text>
+          <Text variant="h3">{formatTRY(o.subtotalKurus)}</Text>
+        </View>
+        <Text variant="small">
+          {t('orders.deliveryDate')}:{' '}
+          {o.requestedDeliveryDate ? formatDateTr(o.requestedDeliveryDate) : t('orders.noDate')}
+        </Text>
+        {o.note ? <Text variant="small">“{o.note}”</Text> : null}
+      </Card>
+      {open ? (
+        <>
+          <Button title={t('orders.resend')} icon="send" onPress={() => void resend()} />
+          <Button title={t('orders.cancelOrder')} variant="danger" onPress={cancel} />
+        </>
+      ) : null}
+      <BottomSheet visible={flow.ask} onClose={flow.notYet} title={t('orders.didSend')}>
+        <Text variant="body">{t('orders.didSendBody')}</Text>
+        <Button
+          title={t('orders.sentYes')}
+          icon="check"
+          onPress={async () => {
+            await flow.confirmSent();
+            void q.refetch();
+          }}
+        />
+        <Button
+          title={t('orders.copy')}
+          variant="secondary"
+          icon="copy"
+          onPress={() => void flow.copy()}
+        />
+        <Button title={t('orders.sentNo')} variant="ghost" onPress={flow.notYet} />
+      </BottomSheet>
+      <SuccessOverlay
+        visible={flow.success}
+        title={t('orders.sentTitle')}
+        body={t('orders.sentBody')}
+        onClose={() => {
+          flow.setSuccess(false);
+          router.setParams({});
+        }}
+      />
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  gap: { gap: space.sm },
+  row: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  step: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 40 },
+  dot: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

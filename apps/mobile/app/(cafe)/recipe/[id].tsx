@@ -1,0 +1,194 @@
+import { kurusToInput, parseTRYInput } from '@roastcost/shared';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Alert, StyleSheet, View } from 'react-native';
+import { ApiError } from '@/api/client';
+import { Button } from '@/components/Button';
+import { Card } from '@/components/Card';
+import { Field } from '@/components/Field';
+import { Icon } from '@/components/Icon';
+import { Chips, Notice, ToggleRow } from '@/components/Misc';
+import { Screen } from '@/components/Screen';
+import { Text } from '@/components/Text';
+import {
+  useDeleteRecipe,
+  useIngredients,
+  useRecipes,
+  useSaveRecipe,
+  useSettings,
+} from '@/hooks/useCafeData';
+import { parseDecimal } from '@/lib/format';
+import { t } from '@/locales';
+import { colors, space } from '@/theme';
+
+interface Line {
+  ingredientId: string;
+  ml: string;
+}
+
+export default function RecipeEdit() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const isNew = id === 'new';
+  const recipe = useRecipes().data?.find((r) => r.id === id);
+  const ingredients = useIngredients().data ?? [];
+  const dose = useSettings().data?.espressoDoseG ?? 18;
+  const save = useSaveRecipe();
+  const del = useDeleteRecipe();
+
+  const [name, setName] = useState('');
+  const [grams, setGrams] = useState('');
+  const [usesCup, setUsesCup] = useState(true);
+  const [price, setPrice] = useState('');
+  const [lines, setLines] = useState<Line[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!recipe) return;
+    setName(recipe.name);
+    setGrams(recipe.coffeeGrams ? String(recipe.coffeeGrams).replace('.', ',') : '');
+    setUsesCup(recipe.usesCup);
+    setPrice(recipe.sellPriceKurus ? kurusToInput(recipe.sellPriceKurus) : '');
+    setLines(
+      recipe.ingredients.map((i) => ({
+        ingredientId: i.ingredientId,
+        ml: String(i.quantityMl).replace('.', ','),
+      })),
+    );
+  }, [recipe]);
+
+  const unused = ingredients.filter((i) => !lines.some((l) => l.ingredientId === i.id));
+
+  const onSave = async () => {
+    const e: Record<string, string> = {};
+    if (!name.trim()) e.name = t('common.required');
+    const g = grams.trim() ? parseDecimal(grams) : null;
+    if (grams.trim() && (g === null || g <= 0 || g > 60)) e.grams = '0–60 g arası';
+    const p = price.trim() ? parseTRYInput(price) : null;
+    if (price.trim() && !p) e.price = t('common.invalidMoney');
+    const items = lines.map((l) => ({
+      ingredientId: l.ingredientId,
+      quantityMl: parseDecimal(l.ml) ?? -1,
+    }));
+    if (items.some((i) => i.quantityMl <= 0 || i.quantityMl > 1000)) e.lines = '1–1000 ml arası';
+    setErrors(e);
+    if (Object.keys(e).length) return;
+    setServerError(null);
+    try {
+      await save.mutateAsync({
+        id: isNew ? undefined : id,
+        body: { name: name.trim(), coffeeGrams: g, usesCup, sellPriceKurus: p, ingredients: items },
+      });
+      router.back();
+    } catch (err) {
+      setServerError(err instanceof ApiError ? err.message : t('common.unknownError'));
+    }
+  };
+
+  const onDelete = () =>
+    Alert.alert(t('recipes.deleteConfirm'), recipe?.name, [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('common.delete'),
+        style: 'destructive',
+        onPress: async () => {
+          await del.mutateAsync(id);
+          router.back();
+        },
+      },
+    ]);
+
+  return (
+    <Screen
+      title={isNew ? t('recipes.new') : name || t('recipes.title')}
+      back
+      footer={<Button title={t('common.save')} onPress={onSave} loading={save.isPending} />}
+    >
+      {serverError ? <Notice text={serverError} tone="danger" /> : null}
+      <Field label={t('recipes.name')} value={name} onChangeText={setName} error={errors.name} />
+      <Field
+        label={t('recipes.coffeeGrams')}
+        value={grams}
+        onChangeText={setGrams}
+        keyboardType="decimal-pad"
+        suffix="g"
+        hint={t('recipes.coffeeGramsHint', { dose })}
+        error={errors.grams}
+      />
+      <ToggleRow label={t('recipes.usesCup')} value={usesCup} onChange={setUsesCup} />
+      <Field
+        label={t('recipes.sellPrice')}
+        value={price}
+        onChangeText={setPrice}
+        keyboardType="decimal-pad"
+        suffix="₺"
+        error={errors.price}
+      />
+
+      <Text variant="h3">{t('recipes.ingredients')}</Text>
+      {!lines.length ? <Text variant="small">{t('recipes.noIngredients')}</Text> : null}
+      {lines.map((l, idx) => {
+        const ing = ingredients.find((i) => i.id === l.ingredientId);
+        return (
+          <Card key={l.ingredientId} style={styles.line}>
+            <Text variant="bodyStrong" style={styles.flex}>
+              {ing?.name ?? '?'}
+            </Text>
+            <View style={styles.ml}>
+              <Field
+                label={t('recipes.ml')}
+                value={l.ml}
+                keyboardType="decimal-pad"
+                onChangeText={(v) =>
+                  setLines((ls) => ls.map((x, i) => (i === idx ? { ...x, ml: v } : x)))
+                }
+              />
+            </View>
+            <Button
+              title={t('orders.remove')}
+              icon="trash"
+              variant="ghost"
+              small
+              onPress={() => setLines((ls) => ls.filter((_, i) => i !== idx))}
+            />
+          </Card>
+        );
+      })}
+      {errors.lines ? (
+        <Text variant="small" color={colors.danger}>
+          {errors.lines}
+        </Text>
+      ) : null}
+      {unused.length ? (
+        <View style={styles.add}>
+          <View style={styles.addHead}>
+            <Icon name="plus" size={18} color={colors.primary} />
+            <Text variant="caption">{t('recipes.addIngredient').toUpperCase()}</Text>
+          </View>
+          <Chips
+            options={unused.map((i) => ({ value: i.id, label: i.name }))}
+            value={null}
+            onChange={(v) => setLines((ls) => [...ls, { ingredientId: v, ml: '' }])}
+          />
+        </View>
+      ) : null}
+      {!isNew ? (
+        <Button
+          title={t('common.delete')}
+          variant="danger"
+          icon="trash"
+          onPress={onDelete}
+          loading={del.isPending}
+        />
+      ) : null}
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  line: { flexDirection: 'row', alignItems: 'flex-end', gap: space.sm, paddingVertical: space.sm },
+  ml: { width: 110 },
+  add: { gap: space.sm },
+  addHead: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+});

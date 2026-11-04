@@ -20,6 +20,21 @@ Docker yoksa: yerel PostgreSQL'de bir süper kullanıcıyla
 - Bilgisayar ve telefon aynı Wi-Fi'de olmalı.
 - `apps/mobile/app.json → expo.extra.apiUrl` değerini bilgisayarın yerel IP'si yap (ör. `http://192.168.1.20:3000`) — telefon `localhost`'a ulaşamaz.
 
+## Supabase'de deneme (yalnızca test / demo verisi)
+
+> ⚠️ Şartname K12: kullanıcı verisi Türkiye dışına çıkmamalı. Supabase sunucuları yurt dışındadır; **gerçek kafe verisiyle
+> üretimde kullanılmamalı** (KVKK m.9). Ayrıca `legal/` metinleri "yurt dışına aktarım yapılmaz" der — Supabase ile bu cümle yanlış olur.
+> Uydurma verilerle denemek için uygundur.
+
+1. Supabase → SQL Editor → `apps/api/migrations/0001_init.sql` dosyasının tamamını yapıştır → Run.
+2. `apps/api/scripts/supabase-setup.sql` içindeki parolayı değiştir → Run. (Rol parolası + Supabase'in otomatik REST API'sinin kapatılması.)
+3. `.env`:
+   - `DATABASE_URL=postgres://roastcost_app.<proje-ref>:<parola>@<pooler-host>:5432/postgres` (Project Settings → Database → **Session pooler** bağlantısındaki host; kullanıcı adının sonuna `.<proje-ref>` eklenir)
+   - `MIGRATOR_DATABASE_URL` = Supabase'in verdiği `postgres.<proje-ref>` bağlantı dizesi
+4. `pnpm db:seed` ile uydurma veri, `pnpm api:dev` ile API.
+
+Hata "already exists" ise ilk deneme yarım kalmıştır; SQL Editor'da `drop schema public cascade; create schema public; grant usage on schema public to postgres, anon, authenticated, service_role;` çalıştırıp 1. adımdan başla (yalnızca boş, deneme projesinde!).
+
 ## Testler
 
 ```bash

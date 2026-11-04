@@ -149,11 +149,9 @@ export async function buildApp(
         .status(429)
         .send(e.error ? e : { error: { code: 'rate_limited', message: 'Çok fazla istek.' } });
     if (e.statusCode && e.statusCode >= 400 && e.statusCode < 500) {
-      return reply
-        .status(e.statusCode)
-        .send({
-          error: { code: e.code ?? 'bad_request', message: e.message ?? 'Geçersiz istek.' },
-        });
+      return reply.status(e.statusCode).send({
+        error: { code: e.code ?? 'bad_request', message: e.message ?? 'Geçersiz istek.' },
+      });
     }
     req.log.error({ err }, 'unhandled error');
     return reply

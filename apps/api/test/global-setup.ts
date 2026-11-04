@@ -37,9 +37,8 @@ export default async function setup(): Promise<void> {
   try {
     await db.query(`alter schema public owner to roastcost_migrator;
       revoke create on schema public from public;
-      grant usage on schema public to roastcost_app;
-      create extension if not exists citext;
-      create extension if not exists pgcrypto;`);
+      grant usage on schema public to roastcost_app;`);
+    // extensions are created by the migration itself (proves 0001 is self-contained)
   } finally {
     await db.end();
   }

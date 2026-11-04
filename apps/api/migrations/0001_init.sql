@@ -1,6 +1,17 @@
 -- 0001_init.sql — RoastCost base schema (spec §6.2, with hardening noted in docs/DECISIONS.md)
 -- Runs as roastcost_migrator (schema owner). The API connects as roastcost_app (RLS enforced).
 
+-- ===== Prerequisites (self-contained: also works when pasted into a hosted SQL editor) =====
+create extension if not exists citext;
+create extension if not exists pgcrypto;
+do $$
+begin
+  if not exists (select 1 from pg_roles where rolname = 'roastcost_app') then
+    -- placeholder; give it a password + LOGIN separately (see docs/RUNBOOK.md)
+    create role roastcost_app nologin nosuperuser nobypassrls;
+  end if;
+end $$;
+
 -- ===== Enums =====
 create type user_role         as enum ('cafe_owner','admin');
 create type cafe_status       as enum ('pending','approved','rejected','suspended');
