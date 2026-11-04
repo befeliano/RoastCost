@@ -61,68 +61,68 @@ Durum: `[x]` uygulandı, `[ ]` bekliyor.
 45. [x] K — Çekirdek seçicide kg fiyatı ve kategori görünür.
 46. [x] Ç — Maliyet dağılımı çubuğu (kahve / malzeme / bardak / sabit gider).
 47. [x] F — Maliyet sonucunu paylaş (metin).
-48. [ ] İ — Reçete listesinde fincan maliyeti.
-49. [ ] İ — Reçete listesinde kâr marjı rozeti (zarar / hedef altı / iyi).
-50. [ ] T — Her kartta tekrar eden "Hazır şablon" etiketi kalkar.
-51. [ ] İ — Reçete düzenlemede canlı maliyet ve önerilen fiyat.
-52. [ ] K — "Önerilen fiyatı kullan" düğmesi.
-53. [ ] F — Reçeteyi çoğalt.
+48. [x] İ — Reçete listesinde fincan maliyeti.
+49. [x] İ — Reçete listesinde kâr marjı rozeti (zarar / hedef altı / iyi).
+50. [x] T — Her kartta tekrar eden "Hazır şablon" etiketi kalkar.
+51. [x] İ — Reçete düzenlemede canlı maliyet ve önerilen fiyat.
+52. [x] K — "Önerilen fiyatı kullan" düğmesi.
+53. [x] F — Reçeteyi çoğalt.
 54. [x] G — Silme onayları web'de de çalışır (ortak `confirm` yardımcısı).
-55. [ ] F — Malzemede paket fiyatından litre fiyatı hesaplayıcı.
-56. [ ] F — Sabit gider hesaplayıcı (aylık gider ÷ aylık fincan).
-57. [ ] T — Maliyet parametreleri bölümlere ayrılır (Kahve / Sarf / Fiyatlama).
-58. [ ] K — Karşılaştır: aylık tüketim seçilebilir.
-59. [ ] İ — Karşılaştır: minimum siparişi karşılanmayanlar işaretli.
-60. [ ] Ç — Karşılaştır: tahmini aylık kahve gideri.
-61. [ ] K — Karşılaştır: satıra dokununca ürün sayfası açılır.
-62. [ ] Ç — Karşılaştır: en ucuza göre fark ("+₺0,30").
-63. [ ] K — Ürün sayfasında hızlı miktar etiketleri (kademe başlangıçları).
-64. [ ] İ — Ürün sayfasında bu çekirdekle tüm reçetelerin maliyeti.
-65. [ ] F — Ürün sayfasında "Maliyette kullan".
-66. [ ] K — Ürün sayfasında sepetten çıkar.
-67. [ ] Ç — Kademe tablosunda tasarruf TL olarak da.
+55. [x] F — Malzemede paket fiyatından litre fiyatı hesaplayıcı.
+56. [x] F — Sabit gider hesaplayıcı (aylık gider ÷ aylık fincan).
+57. [x] T — Maliyet parametreleri bölümlere ayrılır (Kahve / Sarf / Fiyatlama).
+58. [x] K — Karşılaştır: aylık tüketim seçilebilir.
+59. [x] İ — Karşılaştır: minimum siparişi karşılanmayanlar işaretli.
+60. [x] Ç — Karşılaştır: tahmini aylık kahve gideri.
+61. [x] K — Karşılaştır: satıra dokununca ürün sayfası açılır.
+62. [x] Ç — Karşılaştır: en ucuza göre fark ("+₺0,30").
+63. [x] K — Ürün sayfasında hızlı miktar etiketleri (kademe başlangıçları).
+64. [x] İ — Ürün sayfasında bu çekirdekle tüm reçetelerin maliyeti.
+65. [x] F — Ürün sayfasında "Maliyette kullan".
+66. [x] K — Ürün sayfasında sepetten çıkar.
+67. [x] Ç — Kademe tablosunda tasarruf TL olarak da.
 
 ## 5. Siparişler
 
 68. [x] K — Boş sepette "Kavurucuları keşfet" düğmesi.
 69. [x] İ — Sepet kartında toplam kg ve minimum durumu.
-70. [ ] K — Sipariş geçmişinde durum filtresi.
-71. [ ] F — "Tekrar sipariş ver" (siparişi sepete kopyalar).
-72. [ ] K — Sipariş sayfasından kavurucunun kataloğuna geçiş.
+70. [x] K — Sipariş geçmişinde durum filtresi.
+71. [x] F — "Tekrar sipariş ver" (siparişi sepete kopyalar).
+72. [x] K — Sipariş sayfasından kavurucunun kataloğuna geçiş.
 73. [x] G — Sipariş iptal onayı web uyumlu.
-74. [ ] Ç — Bu ayki toplam kahve harcaması özeti.
-75. [ ] T — Sipariş notu tırnaksız, ikonlu.
+74. [x] Ç — Bu ayki toplam kahve harcaması özeti.
+75. [x] T — Sipariş notu tırnaksız, ikonlu.
 
 ## 6. Karşılama, hesap, ayarlar
 
-76. [ ] Ç — Karşılama ekranında 3 ikonlu değer maddesi.
-77. [ ] K — Kayıtta adım adları (Hesap · Kafe · Onay).
-78. [ ] İ — İlçe serbest metin değil, seçim listesi (kayıt + işletme bilgileri).
-79. [ ] K — Girişte son e-posta hatırlanır.
-80. [ ] K — Klavyede "ileri" ile sonraki alana geçiş.
+76. [x] Ç — Karşılama ekranında 3 ikonlu değer maddesi.
+77. [x] K — Kayıtta adım adları (Hesap · Kafe · Onay).
+78. [x] İ — İlçe serbest metin değil, seçim listesi (kayıt + işletme bilgileri).
+79. [x] K — Girişte son e-posta hatırlanır.
+80. [x] K — Klavyede "ileri" ile sonraki alana geçiş.
 81. [x] Ç — Ayarlarda kafe kartında baş harf avatarı.
 82. [x] F — Ayarlarda sürüm ve destek e-postası.
 83. [x] Ç — "Uygulamayı öner" (paylaş).
 84. [x] G — Çıkış yaparken onay.
 85. [x] Ç — Keşfet'te kapatılabilir ilk kullanım ipucu.
-86. [ ] F — Karşılamada "Kavurucu musunuz?" iletişim bağlantısı.
+86. [x] F — Karşılamada "Kavurucu musunuz?" iletişim bağlantısı.
 
 ## 7. Yönetim paneli
 
-87. [ ] K — Kafeler listesinde arama.
-88. [ ] K — Kavurucular listesinde arama.
+87. [x] K — Kafeler listesinde arama.
+88. [x] K — Kavurucular listesinde arama.
 89. [x] F — Kavurucu düzenlemede konum önizlemesi (mini harita).
-90. [ ] İ — Panelde "fiyatı 30 günden eski" kavurucu uyarısı.
-91. [ ] T — Denetim kayıtlarında eylem adları Türkçe.
+90. [x] İ — Panelde "fiyatı 30 günden eski" kavurucu uyarısı.
+91. [x] T — Denetim kayıtlarında eylem adları Türkçe.
 
 ## 8. Teknik ve erişilebilirlik
 
 92. [x] G — Web + mobil ortak `confirm()` yardımcısı (Alert web'de çalışmıyor).
-93. [ ] G — İkon düğmelerinde erişilebilirlik etiketi.
+93. [x] G — İkon düğmelerinde erişilebilirlik etiketi.
 94. [x] G — Dokunma hedefleri en az 44 pt (chip'lere hitSlop).
 95. [x] K — Sayısal alanlarda klavye "Bitti" tuşu.
-96. [ ] Ç — Açılış ekranı ve ikon arka planı kahve tonunda.
-97. [ ] T — Alt menü etiketleri daha okunur.
+96. [x] Ç — Açılış ekranı ve ikon arka planı kahve tonunda.
+97. [x] T — Alt menü etiketleri daha okunur.
 98. [x] Ç — Ürün/kavurucu detayında yükleme iskeleti.
 99. [x] G — Para biçimlendirme için birim testleri.
-100.  [ ] G — DESIGN.md ve karar kaydı güncellenir.
+100.  [x] G — DESIGN.md ve karar kaydı güncellenir.

@@ -15,6 +15,11 @@ pnpm mobile                     # Expo Go ile QR kodu okut
 Docker yoksa: yerel PostgreSQL'de bir süper kullanıcıyla
 `psql -v migrator_password=... -v app_password=... -v dbname=roastcost -f apps/api/scripts/bootstrap.sql`.
 
+### Mobil ortam değişkenleri (isteğe bağlı)
+
+- `EXPO_PUBLIC_SUPPORT_EMAIL` — Ayarlar → Destek ve karşılama ekranındaki "Kavurucu musunuz?" bağlantısı bu adrese gider. Tanımlı değilse ikisi de gizlenir.
+- Migration `0003` (sipariş koşulları) sonrası `pnpm db:migrate` çalıştırın; kavurucunun min. sipariş kg'ı ve kart farkı admin → Katalog → kavurucu düzenleme ekranından girilir.
+
 ### iPhone'da Expo Go ile test
 
 - Bilgisayar ve telefon aynı Wi-Fi'de olmalı.

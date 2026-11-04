@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+  type TextInputInstance,
+  type TextInputProps,
+} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,
@@ -19,6 +26,8 @@ interface Props extends TextInputProps {
   suffix?: string;
   /** label stays for screen readers but isn't drawn (e.g. when a heading above already says it) */
   hideLabel?: boolean;
+  /** React 19: ref is a plain prop and is passed through to the TextInput */
+  ref?: React.Ref<TextInputInstance>;
 }
 
 /** Labelled input; on error: gentle shake + haptic (spec §11.4) and the error as text (§11.5). */

@@ -21,6 +21,8 @@ import { colors, space } from '@/theme';
 import { confirm } from '@/lib/confirm';
 import { toast } from '@/components/Toast';
 import { Skeleton } from '@/components/Skeleton';
+import { useCatalog } from '@/features/catalog/store';
+import { useCart } from '@/store/cart';
 
 function Step({
   done,
@@ -140,8 +142,41 @@ export default function OrderDetail() {
           {t('orders.deliveryDate')}:{' '}
           {o.requestedDeliveryDate ? formatDateTr(o.requestedDeliveryDate) : t('orders.noDate')}
         </Text>
-        {o.note ? <Text variant="small">“{o.note}”</Text> : null}
+        {o.note ? (
+          <View style={styles.row}>
+            <Icon name="book" size={16} color={colors.textMuted} />
+            <Text variant="small" style={styles.flex}>
+              {o.note}
+            </Text>
+          </View>
+        ) : null}
       </Card>
+      <Button
+        title={t('orders.reorder')}
+        variant="secondary"
+        icon="repeat"
+        onPress={() => {
+          const cart = useCart.getState();
+          let added = 0;
+          for (const i of o.items ?? []) {
+            if (i.productId && useCatalog.getState().products[i.productId]?.isActive) {
+              cart.setQuantity(o.roasterId, i.productId, i.quantityG);
+              added++;
+            }
+          }
+          if (!added) return toast(t('orders.reorderNone'), 'warning');
+          toast(t('orders.reordered', { n: added }), 'repeat');
+          router.push({ pathname: '/cart/[roasterId]', params: { roasterId: o.roasterId } });
+        }}
+      />
+      {useCatalog.getState().roasters[o.roasterId] ? (
+        <Button
+          title={t('orders.openRoaster')}
+          variant="ghost"
+          icon="store"
+          onPress={() => router.push({ pathname: '/roaster/[id]', params: { id: o.roasterId } })}
+        />
+      ) : null}
       {open ? (
         <>
           <Button title={t('orders.resend')} icon="send" onPress={() => void resend()} />

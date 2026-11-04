@@ -37,3 +37,13 @@ Plus Jakarta Sans (OFL, uygulamayla paketli). Ölçek: h1 24, h2 19, h3 16, göv
 - Aktif sekme: accent hap yaylanarak açılır.
 - Başarı (Apple Pay benzeri): buzlu cam → halka çizilir → dolar (pop) → tik çizilir → haptic + parıltı halkası; bildirimler kendiliğinden kapanır.
 - Sayılar count-up; listeler ilk 8 öğe kademeli belirir.
+
+## Bileşenler (iyileştirmeler sonrası)
+
+- **Para:** `formatTRY` tam liralarda kuruşu gizler (`₺1.100`); maliyet dökümünde `formatTRYFull` (`₺3,50`) — sütunlar hizalı kalsın.
+- **Gruplu liste:** `RowGroup` — yuvarlak köşeli kap, ince ayırıcı, son satırda çizgi yok.
+- **Durumlar:** `Skeleton` (yükleniyor), `ErrorState` (tekrar dene), `EmptyState` + eylem düğmesi.
+- **Geri bildirim:** `toast()` üstte küçük siyah hap; büyük onaylar için `SuccessOverlay`.
+- **Tat notları:** `NoteChips` — meyve / narenciye / çiçek / çikolata / karamel / baharat ailelerine göre yumuşak ton.
+- **Maliyet çubuğu:** `CostBar` — kahve, malzeme, bardak, sabit gider payları.
+- **Alanlar:** odakta kahve kenarlık, parola göster/gizle, sayısal klavyede "Bitti".

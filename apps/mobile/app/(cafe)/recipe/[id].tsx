@@ -1,4 +1,4 @@
-import { kurusToInput, parseTRYInput } from '@roastcost/shared';
+import { calculateCupCost, kurusToInput, parseTRYInput } from '@roastcost/shared';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -17,11 +17,12 @@ import {
   useSaveRecipe,
   useSettings,
 } from '@/hooks/useCafeData';
-import { parseDecimal } from '@/lib/format';
+import { formatTRY, formatTRYFull, parseDecimal } from '@/lib/format';
 import { t } from '@/locales';
 import { colors, space, useColors } from '@/theme';
 import { toast } from '@/components/Toast';
 import { confirm } from '@/lib/confirm';
+import { useCupCost } from '@/features/cost/useCupCost';
 
 interface Line {
   ingredientId: string;
@@ -61,6 +62,45 @@ export default function RecipeEdit() {
   }, [recipe]);
 
   const unused = ingredients.filter((i) => !lines.some((l) => l.ingredientId === i.id));
+  const cup = useCupCost();
+  const preview =
+    cup.settings && cup.source
+      ? calculateCupCost(
+          {
+            coffeeGrams: grams.trim() ? parseDecimal(grams) : null,
+            usesCup,
+            sellPriceKurus: price.trim() ? parseTRYInput(price) : null,
+            ingredients: lines.map((l) => ({
+              quantityMl: parseDecimal(l.ml) ?? 0,
+              pricePerLiterKurus:
+                ingredients.find((i) => i.id === l.ingredientId)?.pricePerLiterKurus ?? 0,
+            })),
+          },
+          cup.source,
+          cup.settings,
+        )
+      : null;
+  const duplicate = async () => {
+    if (!recipe) return;
+    try {
+      await save.mutateAsync({
+        body: {
+          name: `${recipe.name} ${t('recipes.copySuffix')}`.slice(0, 80),
+          coffeeGrams: recipe.coffeeGrams,
+          usesCup: recipe.usesCup,
+          sellPriceKurus: recipe.sellPriceKurus,
+          ingredients: recipe.ingredients.map((i) => ({
+            ingredientId: i.ingredientId,
+            quantityMl: i.quantityMl,
+          })),
+        },
+      });
+      toast(t('recipes.duplicated'), 'copy');
+      router.back();
+    } catch (err) {
+      setServerError(err instanceof ApiError ? err.message : t('common.unknownError'));
+    }
+  };
 
   const onSave = async () => {
     const e: Record<string, string> = {};
@@ -134,7 +174,9 @@ export default function RecipeEdit() {
             </Text>
             <View style={styles.ml}>
               <Field
-                label={t('recipes.ml')}
+                label={`${ing?.name ?? ''} ${t('recipes.ml')}`}
+                hideLabel
+                suffix="ml"
                 value={l.ml}
                 keyboardType="decimal-pad"
                 onChangeText={(v) =>
@@ -170,6 +212,53 @@ export default function RecipeEdit() {
           />
         </View>
       ) : null}
+      <Card style={styles.preview}>
+        <Text variant="caption">{t('recipes.preview').toLocaleUpperCase('tr')}</Text>
+        {preview ? (
+          <>
+            <View style={styles.previewRow}>
+              <Text variant="body">{t('cost.total')}</Text>
+              <Text variant="h3">{formatTRYFull(preview.totalKurus)}</Text>
+            </View>
+            {preview.currentMarginPct !== null ? (
+              <View style={styles.previewRow}>
+                <Text variant="body">{t('cost.currentMargin')}</Text>
+                <Text
+                  variant="h3"
+                  color={
+                    preview.marginStatus === 'loss'
+                      ? colors.danger
+                      : preview.marginStatus === 'below_target'
+                        ? colors.warning
+                        : colors.success
+                  }
+                >
+                  %{Math.round(preview.currentMarginPct)}
+                </Text>
+              </View>
+            ) : null}
+            <Button
+              title={t('recipes.useSuggested', {
+                price: formatTRY(preview.suggestedPriceRoundedKurus),
+              })}
+              variant="secondary"
+              small
+              icon="spark"
+              onPress={() => setPrice(kurusToInput(preview.suggestedPriceRoundedKurus))}
+            />
+          </>
+        ) : (
+          <Text variant="small">{t('recipes.previewNoSource')}</Text>
+        )}
+      </Card>
+      {!isNew ? (
+        <Button
+          title={t('recipes.duplicate')}
+          variant="ghost"
+          icon="copy"
+          onPress={() => void duplicate()}
+        />
+      ) : null}
       {!isNew ? (
         <Button
           title={t('common.delete')}
@@ -185,8 +274,10 @@ export default function RecipeEdit() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  line: { flexDirection: 'row', alignItems: 'flex-end', gap: space.sm, paddingVertical: space.sm },
+  line: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingVertical: space.sm },
   ml: { width: 110 },
   add: { gap: space.sm },
   addHead: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  preview: { gap: space.sm },
+  previewRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
 });

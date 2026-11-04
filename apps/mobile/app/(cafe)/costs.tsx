@@ -11,16 +11,25 @@ import { useSettings, useUpdateSettings } from '@/hooks/useCafeData';
 import { parseDecimal } from '@/lib/format';
 import { t } from '@/locales';
 import { toast } from '@/components/Toast';
+import { StyleSheet, View } from 'react-native';
+import { Card } from '@/components/Card';
+import { Icon } from '@/components/Icon';
+import { SectionTitle } from '@/components/Misc';
+import { Text } from '@/components/Text';
+import { formatTRYFull } from '@/lib/format';
+import { space, useColors } from '@/theme';
 
 type Form = Record<'dose' | 'cw' | 'iw' | 'cup' | 'over' | 'margin' | 'vat' | 'step', string>;
 
 export default function Costs() {
+  const c = useColors();
   const s = useSettings().data;
   const update = useUpdateSettings();
   const [f, setF] = useState<Form | null>(null);
   const [exVat, setExVat] = useState(true);
   const [errors, setErrors] = useState<Partial<Form>>({});
   const [serverError, setServerError] = useState<string | null>(null);
+  const [monthly, setMonthly] = useState({ cost: '', cups: '' });
   useEffect(() => {
     if (s && !f) {
       const n = (v: number) => String(v).replace('.', ',');
@@ -44,6 +53,9 @@ export default function Costs() {
       </Screen>
     );
   const set = (k: keyof Form) => (v: string) => setF({ ...f, [k]: v });
+  const mCost = parseTRYInput(monthly.cost.replace(/\./g, '') || '');
+  const mCups = Number(monthly.cups.replace(/\D/g, ''));
+  const perCup = mCost && mCups > 0 ? Math.round(mCost / mCups) : null;
 
   const save = async () => {
     const e: Partial<Form> = {};
@@ -86,6 +98,7 @@ export default function Costs() {
       footer={<Button title={t('common.save')} onPress={save} loading={update.isPending} />}
     >
       {serverError ? <Notice text={serverError} tone="danger" /> : null}
+      <SectionTitle>{t('settings.secCoffee')}</SectionTitle>
       <Field
         label={t('settings.dose')}
         value={f.dose}
@@ -102,6 +115,7 @@ export default function Costs() {
         suffix="%"
         error={errors.cw}
       />
+      <SectionTitle>{t('settings.secSupplies')}</SectionTitle>
       <Field
         label={t('settings.ingredientWaste')}
         value={f.iw}
@@ -118,6 +132,7 @@ export default function Costs() {
         suffix="₺"
         error={errors.cup}
       />
+      <SectionTitle>{t('settings.secPricing')}</SectionTitle>
       <Field
         label={t('settings.overhead')}
         value={f.over}
@@ -127,6 +142,41 @@ export default function Costs() {
         hint={t('settings.overheadHint')}
         error={errors.over}
       />
+      <Card style={styles.calc}>
+        <View style={styles.calcHead}>
+          <Icon name="calc" size={18} color={c.primaryText} />
+          <Text variant="caption">{t('settings.overheadCalc').toLocaleUpperCase('tr')}</Text>
+        </View>
+        <View style={styles.calcRow}>
+          <View style={styles.flex}>
+            <Field
+              label={t('settings.monthlyCost')}
+              value={monthly.cost}
+              onChangeText={(v) => setMonthly((m) => ({ ...m, cost: v }))}
+              keyboardType="decimal-pad"
+              suffix="₺"
+              placeholder="örn. 60.000"
+            />
+          </View>
+          <View style={styles.flex}>
+            <Field
+              label={t('settings.monthlyCups')}
+              value={monthly.cups}
+              onChangeText={(v) => setMonthly((m) => ({ ...m, cups: v }))}
+              keyboardType="number-pad"
+              placeholder="örn. 4000"
+            />
+          </View>
+        </View>
+        {perCup !== null ? (
+          <Button
+            title={t('settings.useOverhead', { price: formatTRYFull(perCup) })}
+            variant="secondary"
+            small
+            onPress={() => setF({ ...f, over: kurusToInput(perCup) })}
+          />
+        ) : null}
+      </Card>
       <Field
         label={t('settings.targetMargin')}
         value={f.margin}
@@ -156,3 +206,10 @@ export default function Costs() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  calc: { gap: space.sm },
+  calcHead: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  calcRow: { flexDirection: 'row', gap: space.sm },
+});

@@ -1,8 +1,10 @@
 import { formatOrderNo, lineTotalKurus, selectTier } from '@roastcost/shared';
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Card } from '@/components/Card';
-import { EmptyState, ErrorState, Pill, SectionTitle } from '@/components/Misc';
+import { Chips, EmptyState, ErrorState, Pill, SectionTitle } from '@/components/Misc';
+import { Icon } from '@/components/Icon';
 import { Skeleton } from '@/components/Skeleton';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
@@ -14,13 +16,37 @@ import { formatDate, formatGramsKg, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 import { useCart } from '@/store/cart';
 import { useSession } from '@/store/session';
-import { colors, space } from '@/theme';
+import { colors, space, useColors } from '@/theme';
 
 export default function Orders() {
   const cafe = useSession((s) => s.me?.cafe);
   const carts = useCart((s) => s.carts);
   const catalog = useCatalog();
   const orders = useOrders();
+  const c = useColors();
+  const [filter, setFilter] = useState<'all' | 'open' | 'confirmed' | 'closed'>('all');
+  const all = orders.data?.items ?? [];
+  const visible = all.filter((o) =>
+    filter === 'all'
+      ? true
+      : filter === 'open'
+        ? o.status === 'draft' || o.status === 'sent'
+        : filter === 'confirmed'
+          ? o.status === 'confirmed'
+          : o.status === 'declined' || o.status === 'expired' || o.status === 'cancelled',
+  );
+  const now = new Date();
+  const thisMonth = all.filter((o) => {
+    const d = new Date(o.createdAt);
+    return (
+      d.getFullYear() === now.getFullYear() &&
+      d.getMonth() === now.getMonth() &&
+      o.status !== 'cancelled' &&
+      o.status !== 'declined'
+    );
+  });
+  const monthSpend = thisMonth.reduce((s, o) => s + o.subtotalKurus, 0);
+  const monthCount = thisMonth.length;
   if (cafe && cafe.status !== 'approved') {
     return (
       <Screen title={t('orders.title')}>
@@ -82,12 +108,34 @@ export default function Orders() {
       })}
 
       <SectionTitle count={orders.data?.items.length}>{t('orders.history')}</SectionTitle>
+      {monthSpend ? (
+        <Card style={styles.row}>
+          <Icon name="chart" color={c.primaryText} />
+          <View style={styles.flex}>
+            <Text variant="small">{t('orders.monthSpend')}</Text>
+            <Text variant="h3">{formatTRY(monthSpend)}</Text>
+          </View>
+          <Text variant="small">{t('orders.monthOrders', { n: monthCount })}</Text>
+        </Card>
+      ) : null}
+      {orders.data?.items.length ? (
+        <Chips
+          options={[
+            { value: 'all' as const, label: t('catalog.all') },
+            { value: 'open' as const, label: t('orders.filterOpen') },
+            { value: 'confirmed' as const, label: t('orders.status.confirmed') },
+            { value: 'closed' as const, label: t('orders.filterClosed') },
+          ]}
+          value={filter}
+          onChange={setFilter}
+        />
+      ) : null}
       {orders.isLoading ? <Skeleton rows={2} /> : null}
       {orders.isError ? <ErrorState onRetry={() => void orders.refetch()} /> : null}
       {!orders.data?.items.length && !orders.isLoading && !orders.isError ? (
         <EmptyState title={t('orders.emptyHistory')} />
       ) : null}
-      {orders.data?.items.map((o) => (
+      {visible.map((o) => (
         <Card
           key={o.id}
           onPress={() => router.push({ pathname: '/order/[id]', params: { id: o.id } })}

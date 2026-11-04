@@ -1,4 +1,6 @@
+import { calculateCupCost } from '@roastcost/shared';
 import { router } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -9,8 +11,12 @@ import { Text } from '@/components/Text';
 import { useIngredients, useRecipes, useSettings } from '@/hooks/useCafeData';
 import { t } from '@/locales';
 import { formatTRY } from '@/lib/format';
+import { toRecipeInput } from '@/features/cost/compute';
+import { useCupCost } from '@/features/cost/useCupCost';
+import { space } from '@/theme';
 
 export default function Recipes() {
+  const cup = useCupCost();
   const recipes = useRecipes();
   const ingredients = useIngredients();
   const settings = useSettings();
@@ -56,10 +62,45 @@ export default function Recipes() {
                 {parts.length ? ' · ' + parts.join(' · ') : ''}
                 {r.usesCup ? ' · bardak' : ''}
               </Text>
-              {r.sellPriceKurus ? (
-                <Text variant="small">Menü: {formatTRY(r.sellPriceKurus)}</Text>
-              ) : null}
-              {r.templateKey ? <Pill label={t('recipes.default')} /> : null}
+              {(() => {
+                const res =
+                  cup.settings && cup.source
+                    ? calculateCupCost(
+                        toRecipeInput(r, ingredients.data ?? []),
+                        cup.source,
+                        cup.settings,
+                      )
+                    : null;
+                if (!res) return null;
+                const tone =
+                  res.marginStatus === 'loss'
+                    ? 'danger'
+                    : res.marginStatus === 'below_target'
+                      ? 'warning'
+                      : 'success';
+                return (
+                  <View style={styles.costRow}>
+                    <Text variant="bodyStrong">
+                      {t('recipes.costLine', { cost: formatTRY(res.totalKurus) })}
+                    </Text>
+                    {r.sellPriceKurus && res.currentMarginPct !== null ? (
+                      <Pill
+                        tone={tone}
+                        label={t('recipes.marginLine', {
+                          price: formatTRY(r.sellPriceKurus),
+                          pct: Math.round(res.currentMarginPct),
+                        })}
+                      />
+                    ) : (
+                      <Text variant="small">
+                        {t('recipes.suggestedLine', {
+                          price: formatTRY(res.suggestedPriceRoundedKurus),
+                        })}
+                      </Text>
+                    )}
+                  </View>
+                );
+              })()}
             </Card>
           </Animated.View>
         );
@@ -67,3 +108,14 @@ export default function Recipes() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  costRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: space.sm,
+    marginTop: space.xs,
+    flexWrap: 'wrap',
+  },
+});

@@ -7,7 +7,9 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Field } from '@/components/Field';
 import { Icon } from '@/components/Icon';
-import { Notice, Pill } from '@/components/Misc';
+import { Chips, Notice, Pill, Row, RowGroup } from '@/components/Misc';
+import { toast } from '@/components/Toast';
+import { useCostPrefs } from '@/features/cost/prefs';
 import { RoasterAvatar } from '@/components/RoasterAvatar';
 import { Screen } from '@/components/Screen';
 import { SuccessOverlay } from '@/components/SuccessOverlay';
@@ -16,7 +18,7 @@ import { RoastDots } from '@/features/catalog/RoastDots';
 import { tiersOf, useCatalog } from '@/features/catalog/store';
 import { toCostSettings, toRecipeInput } from '@/features/cost/compute';
 import { useIngredients, useRecipes, useSettings } from '@/hooks/useCafeData';
-import { gramsToKgInput, parseKgToGrams, formatTRY } from '@/lib/format';
+import { formatTRY, formatTRYFull, gramsToKgInput, parseKgToGrams } from '@/lib/format';
 import { t } from '@/locales';
 import { useCart } from '@/store/cart';
 import { colors, radius, space, useColors } from '@/theme';
@@ -148,6 +150,7 @@ export default function ProductDetail() {
                 color={save > 0 ? colors.success : colors.textMuted}
               >
                 {save > 0 ? `−%${save}` : '—'}
+                {save > 0 ? `\n−${formatTRY(base - tt.pricePerKgKurus)}` : ''}
               </Text>
             </Pressable>
           );
@@ -155,6 +158,15 @@ export default function ProductDetail() {
       </Card>
 
       <Text variant="h3">{t('catalog.quantity')}</Text>
+      <Chips
+        options={Array.from(new Set([...tiers.map((tt) => tt.minKg), 1, 5, 10]))
+          .filter((k) => k >= (tiers[0]?.minKg ?? 1))
+          .sort((a, b) => a - b)
+          .slice(0, 6)
+          .map((k) => ({ value: String(k), label: `${k} kg` }))}
+        value={grams ? String(grams / 1000) : null}
+        onChange={(v) => setKg(v)}
+      />
       <View style={styles.row}>
         <Button title="−1" variant="secondary" small onPress={() => step(-1)} />
         <View style={styles.flex}>
@@ -193,6 +205,57 @@ export default function ProductDetail() {
           ) : null}
         </Card>
       ) : null}
+      {tier && settings && recipes.length ? (
+        <>
+          <Text variant="h3">{t('catalog.allRecipes')}</Text>
+          <RowGroup>
+            {recipes
+              .filter((rc) => rc.isActive)
+              .map((rc) => {
+                const res = calculateCupCost(
+                  toRecipeInput(rc, ingredients),
+                  {
+                    pricePerKgKurus: tier.pricePerKgKurus,
+                    pricesIncludeVat: roaster.pricesIncludeVat,
+                    vatRatePct: roaster.vatRatePct,
+                  },
+                  toCostSettings(settings),
+                );
+                return (
+                  <Row
+                    key={rc.id}
+                    title={rc.name}
+                    subtitle={t('recipes.suggestedLine', {
+                      price: formatTRY(res.suggestedPriceRoundedKurus),
+                    })}
+                    right={<Text variant="money">{formatTRYFull(res.totalKurus)}</Text>}
+                  />
+                );
+              })}
+          </RowGroup>
+        </>
+      ) : null}
+      <Button
+        title={t('catalog.useInCalc')}
+        variant="secondary"
+        icon="calc"
+        onPress={() => {
+          useCostPrefs.getState().set({ mode: 'catalog', productId: p.id });
+          toast(t('catalog.usedInCalc'));
+          router.push('/cost');
+        }}
+      />
+      {inCart ? (
+        <Button
+          title={t('catalog.removeFromCart')}
+          variant="ghost"
+          icon="trash"
+          onPress={() => {
+            useCart.getState().remove(roaster.id, p.id);
+            toast(t('catalog.removedFromCart'), 'trash');
+          }}
+        />
+      ) : null}
       <SuccessOverlay
         autoHideMs={700}
         visible={added}
@@ -226,5 +289,5 @@ const styles = StyleSheet.create({
   th: { minHeight: 38, backgroundColor: colors.surface },
   c1: { flex: 1 },
   c2: { flex: 1.4 },
-  c3: { width: 60, textAlign: 'right' },
+  c3: { width: 72, textAlign: 'right' },
 });

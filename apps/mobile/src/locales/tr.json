@@ -62,7 +62,11 @@
     "suspendedTitle": "Hesabınız askıya alındı",
     "newTermsTitle": "Metinler güncellendi",
     "newTermsBody": "Devam etmek için güncel metinleri onaylayın.",
-    "accept": "Onaylıyorum"
+    "accept": "Onaylıyorum",
+    "point1": "Fincan başı gerçek maliyetinizi saniyeler içinde hesaplayın",
+    "point2": "Yerel kavurucuların kademeli toptan fiyatlarını karşılaştırın",
+    "point3": "Siparişinizi tek dokunuşla WhatsApp üzerinden iletin",
+    "areYouRoaster": "Kavurucu musunuz? Kataloğunuzu eklemek için yazın"
   },
   "tabs": {
     "cost": "Maliyet",
@@ -124,7 +128,16 @@
     "noIngredients": "Malzeme yok",
     "deleteConfirm": "Bu reçete silinsin mi?",
     "default": "Hazır şablon",
-    "empty": "Henüz reçete yok"
+    "empty": "Henüz reçete yok",
+    "costLine": "Maliyet {cost}",
+    "marginLine": "Menü {price} · %{pct} kâr",
+    "suggestedLine": "Önerilen {price}",
+    "preview": "Bu reçetenin maliyeti",
+    "previewNoSource": "Maliyet için Maliyet sekmesinde bir kahve seçin veya kg fiyatı girin.",
+    "useSuggested": "Önerilen fiyatı kullan ({price})",
+    "duplicate": "Çoğalt",
+    "copySuffix": "(kopya)",
+    "duplicated": "Reçete çoğaltıldı"
   },
   "settings": {
     "title": "Ayarlar",
@@ -172,7 +185,18 @@
     "recommendBody": "Kafe sahibi arkadaşlarınıza gönderin",
     "recommendMessage": "Fincan başı maliyetimi ve yerel kavurucuların toptan fiyatlarını RoastCost ile takip ediyorum. Sen de dene — App Store ve Google Play'de \"RoastCost\" diye arat.",
     "support": "Destek",
-    "logoutConfirm": "Çıkış yapılsın mı?"
+    "logoutConfirm": "Çıkış yapılsın mı?",
+    "secCoffee": "Kahve",
+    "secSupplies": "Malzeme ve bardak",
+    "secPricing": "Gider ve fiyatlama",
+    "overheadCalc": "Fincan başı sabit gider hesapla",
+    "monthlyCost": "Aylık sabit gider",
+    "monthlyCups": "Aylık fincan",
+    "useOverhead": "Fincan başı {price} olarak kullan",
+    "pkgCalc": "Paket fiyatından hesapla",
+    "pkgPrice": "Paket fiyatı",
+    "pkgMl": "Paket hacmi",
+    "usePkg": "Litre fiyatı {price} olarak kullan"
   },
   "catalog": {
     "title": "Kavurucular",
@@ -220,7 +244,15 @@
     "sortDefault": "Varsayılan sıralama",
     "sortPrice": "Fiyata göre sırala",
     "sortPriceShort": "Fiyat",
-    "directions": "Yol tarifi al"
+    "directions": "Yol tarifi al",
+    "monthlySpend": "Aylık kahve ≈ {price}",
+    "minOrderPill": "Min. sipariş {kg} kg",
+    "cheapest": "en uygun",
+    "allRecipes": "Bu çekirdekle reçeteleriniz",
+    "useInCalc": "Maliyet hesabında kullan",
+    "usedInCalc": "Maliyet hesabına eklendi",
+    "removeFromCart": "Sepetten çıkar",
+    "removedFromCart": "Sepetten çıkarıldı"
   },
   "orders": {
     "title": "Siparişler",
@@ -267,7 +299,15 @@
     "minOrder": "en az {kg} kg",
     "minOk": "Minimum sipariş miktarı karşılandı",
     "minMissing": "Göndermek için {kg} kg daha ekleyin (farklı çekirdekler karışabilir)",
-    "cardSurcharge": "Kredi kartıyla öderseniz %{pct} fark: +{amount}"
+    "cardSurcharge": "Kredi kartıyla öderseniz %{pct} fark: +{amount}",
+    "reorder": "Tekrar sipariş ver",
+    "reordered": "{n} ürün sepete eklendi",
+    "reorderNone": "Bu siparişteki ürünler artık satışta değil",
+    "openRoaster": "Kavurucunun kataloğu",
+    "monthSpend": "Bu ay kahve harcaması",
+    "monthOrders": "{n} sipariş",
+    "filterOpen": "Açık",
+    "filterClosed": "Kapanan"
   },
   "admin": {
     "panel": "Panel",
@@ -341,7 +381,12 @@
     "featured": "Keşfet'te öne çıkar",
     "auditEmpty": "Henüz kayıt yok — yönetim işlemleri burada listelenir",
     "minOrderKg": "Min. toplam sipariş",
-    "cardSurcharge": "Kart farkı"
+    "cardSurcharge": "Kart farkı",
+    "staleTitle": "{n} kavurucunun fiyatı 30 günden eski — güncelleyin",
+    "staleDays": "{days} gün önce güncellendi",
+    "staleNever": "Fiyat tarihi yok",
+    "searchCafes": "Kafe adı, ilçe veya e-posta",
+    "searchRoasters": "Kavurucu adı veya ilçe"
   },
   "empty": {
     "generic": "Burada henüz bir şey yok"

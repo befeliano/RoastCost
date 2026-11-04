@@ -1,7 +1,7 @@
 import { LEGAL_VERSIONS, normalizeTrPhone } from '@roastcost/shared';
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { StyleSheet, View, type TextInputInstance } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
 import { api, ApiError } from '@/api/client';
 import type { Session } from '@/api/types';
@@ -15,11 +15,11 @@ import { openLegal } from '@/lib/legal';
 import { t } from '@/locales';
 import { useSession } from '@/store/session';
 import { colors, space, useColors } from '@/theme';
-
-const DISTRICTS = ['Tepebaşı', 'Odunpazarı', 'Diğer'] as const;
+import { districtOptions } from '@/features/account/districts';
 
 export default function Register() {
   const [step, setStep] = useState(1);
+  const pwRef = useRef<TextInputInstance>(null);
   const c = useColors();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -110,10 +110,14 @@ export default function Register() {
     >
       <View style={styles.progress} accessibilityLabel={t('auth.step', { n: step })}>
         {[1, 2, 3].map((n) => (
-          <View key={n} style={[styles.dot, n <= step && { backgroundColor: c.primary }]} />
+          <View key={n} style={styles.stepCol}>
+            <View style={[styles.dot, n <= step && { backgroundColor: c.primary }]} />
+            <Text variant="caption" color={n === step ? c.primaryText : undefined}>
+              {n}. {titles[n]}
+            </Text>
+          </View>
         ))}
       </View>
-      <Text variant="caption">{t('auth.step', { n: step })}</Text>
       <Text variant="h2">{titles[step]}</Text>
       {serverError ? <Notice text={serverError} tone="danger" /> : null}
       <Animated.View key={step} entering={FadeInRight.duration(220)} style={styles.form}>
@@ -127,12 +131,15 @@ export default function Register() {
               keyboardType="email-address"
               autoComplete="email"
               textContentType="emailAddress"
+              returnKeyType="next"
+              onSubmitEditing={() => pwRef.current?.focus()}
               error={errors.email}
             />
             <Field
               label={t('auth.password')}
               value={password}
               onChangeText={setPassword}
+              ref={pwRef}
               secureTextEntry
               autoComplete="new-password"
               textContentType="newPassword"
@@ -151,11 +158,7 @@ export default function Register() {
               error={errors.cafeName}
             />
             <Text variant="caption">{t('auth.district').toUpperCase()}</Text>
-            <Chips
-              options={DISTRICTS.map((d) => ({ value: d, label: d }))}
-              value={district}
-              onChange={setDistrict}
-            />
+            <Chips options={districtOptions} value={district} onChange={setDistrict} />
             {district === 'Diğer' ? (
               <Field
                 label={t('auth.district')}
@@ -216,6 +219,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   footer: { flexDirection: 'row', gap: space.md },
   progress: { flexDirection: 'row', gap: 6 },
+  stepCol: { flex: 1, gap: 6 },
   dot: { flex: 1, height: 6, borderRadius: 3, backgroundColor: colors.border },
   form: { gap: space.md },
 });

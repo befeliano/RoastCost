@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   FadeInDown,
   useAnimatedStyle,
@@ -18,6 +18,7 @@ import { Button } from '@/components/Button';
 import { Text } from '@/components/Text';
 import { t } from '@/locales';
 import { colors, space, useColors } from '@/theme';
+import { Icon } from '@/components/Icon';
 
 /** Our own mascot-free cup illustration with gentle steam (no third-party character). */
 function Hero() {
@@ -64,6 +65,9 @@ function Hero() {
   );
 }
 
+/** Set EXPO_PUBLIC_SUPPORT_EMAIL; the roaster link stays hidden until a real address exists. */
+const ROASTER_CONTACT = process.env.EXPO_PUBLIC_SUPPORT_EMAIL;
+
 export default function Welcome() {
   const insets = useSafeAreaInsets();
   const c = useColors();
@@ -83,13 +87,47 @@ export default function Welcome() {
         <Text variant="h2" style={styles.center}>
           {t('auth.welcomeTitle')}
         </Text>
-        <Text variant="body" color={colors.textMuted} style={styles.center}>
-          {t('auth.welcomeBody')}
-        </Text>
+        <View style={styles.points}>
+          {(
+            [
+              ['calc', t('auth.point1')],
+              ['chart', t('auth.point2')],
+              ['send', t('auth.point3')],
+            ] as const
+          ).map(([icon, text], i) => (
+            <Animated.View
+              key={icon}
+              entering={FadeInDown.delay(150 + i * 90).duration(300)}
+              style={styles.point}
+            >
+              <View style={[styles.pointIcon, { backgroundColor: c.primaryBg }]}>
+                <Icon name={icon} size={18} color={c.primaryText} />
+              </View>
+              <Text variant="body" style={styles.flex}>
+                {text}
+              </Text>
+            </Animated.View>
+          ))}
+        </View>
       </Animated.View>
       <View style={styles.actions}>
         <Button title={t('auth.register')} onPress={() => router.push('/register')} />
         <Button title={t('auth.login')} variant="secondary" onPress={() => router.push('/login')} />
+        {ROASTER_CONTACT ? (
+          <Pressable
+            accessibilityRole="link"
+            onPress={() =>
+              void Linking.openURL(
+                `mailto:${ROASTER_CONTACT}?subject=${encodeURIComponent('RoastCost — kavurucu başvurusu')}`,
+              )
+            }
+            style={styles.roasterLink}
+          >
+            <Text variant="small" color={c.primaryText}>
+              {t('auth.areYouRoaster')}
+            </Text>
+          </Pressable>
+        ) : null}
       </View>
     </View>
   );
@@ -108,4 +146,15 @@ const styles = StyleSheet.create({
   steam: { marginBottom: -6 },
   center: { textAlign: 'center' },
   actions: { gap: space.md },
+  flex: { flex: 1 },
+  points: { gap: space.md, alignSelf: 'stretch', marginTop: space.sm },
+  point: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  pointIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  roasterLink: { alignItems: 'center', paddingVertical: space.sm },
 });

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { api } from '@/api/client';
-import type { AdminStats } from '@/api/types';
+import type { AdminStats, AdminRoaster } from '@/api/types';
 import { AnimatedNumber } from '@/components/AnimatedNumber';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -13,6 +13,8 @@ import { ThemePicker } from '@/features/account/ThemePicker';
 import { t } from '@/locales';
 import { colors, space, useColors } from '@/theme';
 import { formatTRY } from '@/lib/format';
+import { Notice, Row } from '@/components/Misc';
+import { daysSince } from '@/lib/format';
 
 function Stat({
   label,
@@ -47,6 +49,13 @@ export default function Panel() {
     queryFn: () => api<AdminStats>('/admin/stats'),
   });
   const s = q.data;
+  const roasters = useQuery({
+    queryKey: ['admin', 'roasters'],
+    queryFn: () => api<AdminRoaster[]>('/admin/roasters'),
+  });
+  const stale = (roasters.data ?? []).filter(
+    (r) => r.isActive && (!r.pricesUpdatedAt || daysSince(r.pricesUpdatedAt) > 30),
+  );
   return (
     <Screen title={t('admin.panel')} onRefresh={() => void q.refetch()} refreshing={q.isRefetching}>
       {s ? (
@@ -75,6 +84,23 @@ export default function Panel() {
           />
         </View>
       ) : null}
+      {stale.length ? (
+        <Card style={styles.staleCard}>
+          <Notice tone="warning" text={t('admin.staleTitle', { n: stale.length })} />
+          {stale.map((r) => (
+            <Row
+              key={r.id}
+              title={r.name}
+              subtitle={
+                r.pricesUpdatedAt
+                  ? t('admin.staleDays', { days: daysSince(r.pricesUpdatedAt) })
+                  : t('admin.staleNever')
+              }
+              onPress={() => router.push({ pathname: '/roaster-edit/[id]', params: { id: r.id } })}
+            />
+          ))}
+        </Card>
+      ) : null}
       <ThemePicker />
       <Button
         title={t('settings.logout')}
@@ -86,6 +112,7 @@ export default function Panel() {
 }
 
 const styles = StyleSheet.create({
+  staleCard: { gap: 8, padding: 0, paddingTop: 12, overflow: 'hidden' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.md },
   stat: { width: '47%', gap: 4 },
 });

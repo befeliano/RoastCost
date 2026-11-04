@@ -60,9 +60,16 @@ export default function Compare() {
         value={cat}
         onChange={setCat}
       />
-      <Text variant="small">
-        {t('cost.monthlyKg')}: {prefs.monthlyKg} kg
-      </Text>
+      <View style={styles.kgRow}>
+        <Text variant="caption">{t('cost.monthlyKg').toLocaleUpperCase('tr')}</Text>
+        <View style={styles.flex}>
+          <Chips
+            options={['3', '5', '10', '20', '50'].map((v) => ({ value: v, label: `${v} kg` }))}
+            value={String(prefs.monthlyKg)}
+            onChange={(v) => prefs.set({ monthlyKg: Number(v) })}
+          />
+        </View>
+      </View>
       <View style={styles.list}>
         <FlashList
           data={rows}
@@ -72,7 +79,7 @@ export default function Compare() {
           renderItem={({ item, index }) => (
             <Card
               onPress={() =>
-                router.push({ pathname: '/roaster/[id]', params: { id: item.roaster.id } })
+                router.push({ pathname: '/product/[id]', params: { id: item.product.id } })
               }
               style={styles.row}
             >
@@ -89,13 +96,35 @@ export default function Compare() {
                   {item.roaster.name} · {formatTRY(item.tier.pricePerKgKurus)}/kg (
                   {t('catalog.fromKg', { kg: item.tier.minKg })})
                 </Text>
+                <Text variant="small">
+                  {t('catalog.monthlySpend', {
+                    price: formatTRY(Math.round(item.tier.pricePerKgKurus * prefs.monthlyKg)),
+                  })}
+                </Text>
                 {item.belowMinimum ? (
                   <Pill tone="warning" label={t('orders.minKg', { kg: item.tier.minKg })} />
+                ) : null}
+                {item.roaster.minOrderKg && item.roaster.minOrderKg > prefs.monthlyKg ? (
+                  <Pill
+                    tone="warning"
+                    label={t('catalog.minOrderPill', {
+                      kg: String(item.roaster.minOrderKg).replace('.', ','),
+                    })}
+                  />
                 ) : null}
               </View>
               <View style={styles.right}>
                 <Text variant="money">{formatTRY(item.breakdown.totalKurus)}</Text>
                 <Text variant="caption">/fincan</Text>
+                {index > 0 && rows[0] ? (
+                  <Text variant="caption" color={colors.warning}>
+                    +{formatTRY(item.breakdown.totalKurus - rows[0].breakdown.totalKurus)}
+                  </Text>
+                ) : (
+                  <Text variant="caption" color={colors.success}>
+                    {t('catalog.cheapest')}
+                  </Text>
+                )}
               </View>
             </Card>
           )}
@@ -110,5 +139,6 @@ const styles = StyleSheet.create({
   list: { flex: 1 },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   rank: { width: 28, textAlign: 'center' },
+  kgRow: { gap: 6 },
   right: { alignItems: 'flex-end' },
 });

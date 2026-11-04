@@ -12,6 +12,9 @@ import { t } from '@/locales';
 import { formatTRY } from '@/lib/format';
 import { toast } from '@/components/Toast';
 import { confirm } from '@/lib/confirm';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '@/components/Text';
+import { space } from '@/theme';
 
 const KINDS: { value: IngredientKind; label: string }[] = [
   { value: 'milk', label: t('settings.kindMilk') },
@@ -25,9 +28,14 @@ export default function Ingredients() {
   const del = useDeleteIngredient();
   const [edit, setEdit] = useState<Partial<Ingredient> | null>(null);
   const [price, setPrice] = useState('');
+  const [pkg, setPkg] = useState({ price: '', ml: '' });
   const [error, setError] = useState<string | null>(null);
 
+  const pkgKurus = parseTRYInput(pkg.price || '');
+  const pkgMl = Number(pkg.ml.replace(/\D/g, ''));
+  const pkgPerL = pkgKurus && pkgMl > 0 ? Math.round((pkgKurus * 1000) / pkgMl) : null;
   const open = (i?: Ingredient) => {
+    setPkg({ price: '', ml: '' });
     setError(null);
     setEdit(i ?? { name: '', kind: 'syrup' });
     setPrice(i ? kurusToInput(i.pricePerLiterKurus) : '');
@@ -95,6 +103,36 @@ export default function Ingredients() {
           keyboardType="decimal-pad"
           suffix="₺/L"
         />
+        <Text variant="caption">{t('settings.pkgCalc').toLocaleUpperCase('tr')}</Text>
+        <View style={styles.calcRow}>
+          <View style={styles.flex}>
+            <Field
+              label={t('settings.pkgPrice')}
+              value={pkg.price}
+              onChangeText={(v) => setPkg((x) => ({ ...x, price: v }))}
+              keyboardType="decimal-pad"
+              suffix="₺"
+            />
+          </View>
+          <View style={styles.flex}>
+            <Field
+              label={t('settings.pkgMl')}
+              value={pkg.ml}
+              onChangeText={(v) => setPkg((x) => ({ ...x, ml: v }))}
+              keyboardType="number-pad"
+              suffix="ml"
+              placeholder="1000"
+            />
+          </View>
+        </View>
+        {pkgPerL !== null ? (
+          <Button
+            title={t('settings.usePkg', { price: formatTRY(pkgPerL) })}
+            variant="secondary"
+            small
+            onPress={() => setPrice(kurusToInput(pkgPerL))}
+          />
+        ) : null}
         <Button title={t('common.save')} onPress={() => void submit()} loading={save.isPending} />
         {edit?.id ? (
           <Button title={t('common.delete')} variant="danger" onPress={() => void remove()} />
@@ -103,3 +141,8 @@ export default function Ingredients() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  calcRow: { flexDirection: 'row', gap: space.sm },
+});

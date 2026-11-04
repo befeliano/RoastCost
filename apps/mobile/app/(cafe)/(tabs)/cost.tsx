@@ -257,6 +257,7 @@ export default function Cost() {
           ) : recipe ? (
             <Pressable
               accessibilityRole="button"
+              accessibilityLabel={t('cost.addMenuPrice')}
               onPress={() => router.push({ pathname: '/recipe/[id]', params: { id: recipe.id } })}
             >
               <Notice text={t('cost.addMenuPrice')} tone="info" icon="plus" />
