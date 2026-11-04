@@ -3,9 +3,17 @@ import { Platform, type TextStyle } from 'react-native';
 import { colors } from './colors';
 
 export { colors };
+export {
+  PALETTES,
+  useColors,
+  useThemeStore,
+  type Palette,
+  type PaletteKey,
+  type ThemeColors,
+} from './palettes';
 
 export const fonts = {
-  heading: 'Fraunces_600SemiBold',
+  heading: 'PlusJakartaSans_800ExtraBold',
   regular: 'PlusJakartaSans_400Regular',
   medium: 'PlusJakartaSans_500Medium',
   semibold: 'PlusJakartaSans_600SemiBold',
@@ -19,8 +27,20 @@ export const hitSlop = { top: 8, bottom: 8, left: 8, right: 8 } as const;
 const num: TextStyle = { fontVariant: ['tabular-nums'] };
 
 export const type = {
-  h1: { fontFamily: fonts.heading, fontSize: 28, lineHeight: 34, color: colors.text },
-  h2: { fontFamily: fonts.heading, fontSize: 22, lineHeight: 28, color: colors.text },
+  h1: {
+    fontFamily: fonts.heading,
+    fontSize: 28,
+    lineHeight: 34,
+    color: colors.text,
+    letterSpacing: -0.5,
+  },
+  h2: {
+    fontFamily: fonts.bold,
+    fontSize: 21,
+    lineHeight: 27,
+    color: colors.text,
+    letterSpacing: -0.3,
+  },
   h3: { fontFamily: fonts.semibold, fontSize: 17, lineHeight: 22, color: colors.text },
   body: { fontFamily: fonts.regular, fontSize: 16, lineHeight: 22, color: colors.text },
   bodyStrong: { fontFamily: fonts.semibold, fontSize: 16, lineHeight: 22, color: colors.text },
@@ -33,7 +53,14 @@ export const type = {
     letterSpacing: 0.3,
   },
   money: { fontFamily: fonts.bold, fontSize: 16, color: colors.text, ...num },
-  bigMoney: { fontFamily: fonts.heading, fontSize: 40, lineHeight: 46, color: colors.text, ...num },
+  bigMoney: {
+    fontFamily: fonts.heading,
+    fontSize: 40,
+    lineHeight: 46,
+    color: colors.text,
+    letterSpacing: -1,
+    ...num,
+  },
   button: { fontFamily: fonts.semibold, fontSize: 16, lineHeight: 20 },
 } satisfies Record<string, TextStyle>;
 

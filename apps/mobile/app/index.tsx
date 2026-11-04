@@ -7,5 +7,5 @@ export default function Index() {
   if (status !== 'signedIn') return <Redirect href="/welcome" />;
   if (me && me.missingConsents.length > 0) return <Redirect href="/consents" />;
   if (me?.user.role === 'admin') return <Redirect href="/panel" />;
-  return <Redirect href="/cost" />;
+  return <Redirect href="/explore" />;
 }

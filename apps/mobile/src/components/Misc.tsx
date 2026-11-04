@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import Svg, { Circle, Ellipse, Path } from 'react-native-svg';
-import { colors, radius, space } from '@/theme';
+import { colors, radius, space, useColors, type ThemeColors } from '@/theme';
 import { Icon, type IconName } from './Icon';
 import { Text } from './Text';
 
@@ -13,6 +13,7 @@ export function Chips<T extends string>({
   value: T | null;
   onChange: (v: T) => void;
 }) {
+  const c = useColors();
   return (
     <ScrollView
       horizontal
@@ -27,11 +28,11 @@ export function Chips<T extends string>({
             accessibilityRole="button"
             accessibilityState={{ selected: on }}
             onPress={() => onChange(o.value)}
-            style={[styles.chip, on && styles.chipOn]}
+            style={[styles.chip, on && { backgroundColor: c.primary, borderColor: c.primary }]}
           >
             <Text
               variant="bodyStrong"
-              color={on ? colors.onPrimary : colors.text}
+              color={on ? c.onPrimary : colors.text}
               style={styles.chipText}
             >
               {o.label}
@@ -44,25 +45,33 @@ export function Chips<T extends string>({
 }
 
 export type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'primary' | 'info';
-const TONE: Record<Tone, { bg: string; fg: string }> = {
-  neutral: { bg: colors.surface, fg: colors.textMuted },
-  success: { bg: colors.successBg, fg: colors.success },
-  warning: { bg: colors.warningBg, fg: colors.warning },
-  danger: { bg: colors.dangerBg, fg: colors.danger },
-  primary: { bg: colors.primaryBg, fg: colors.primary },
-  info: { bg: '#EAF0F6', fg: colors.info },
-};
+function tone(t: Tone, c: ThemeColors): { bg: string; fg: string } {
+  switch (t) {
+    case 'success':
+      return { bg: c.successBg, fg: c.success };
+    case 'warning':
+      return { bg: c.warningBg, fg: c.warning };
+    case 'danger':
+      return { bg: c.dangerBg, fg: c.danger };
+    case 'primary':
+      return { bg: c.primaryBg, fg: c.primaryText };
+    case 'info':
+      return { bg: c.infoBg, fg: c.info };
+    default:
+      return { bg: c.surface, fg: c.textMuted };
+  }
+}
 
 export function Pill({
   label,
-  tone = 'neutral',
+  tone: tn = 'neutral',
   icon,
 }: {
   label: string;
   tone?: Tone;
   icon?: IconName;
 }) {
-  const t = TONE[tone];
+  const t = tone(tn, useColors());
   return (
     <View style={[styles.pill, { backgroundColor: t.bg }]}>
       {icon ? <Icon name={icon} size={14} color={t.fg} strokeWidth={2.2} /> : null}
@@ -75,14 +84,14 @@ export function Pill({
 
 export function Notice({
   text,
-  tone = 'warning',
+  tone: tn = 'warning',
   icon = 'warning',
 }: {
   text: string;
   tone?: Tone;
   icon?: IconName;
 }) {
-  const t = TONE[tone];
+  const t = tone(tn, useColors());
   return (
     <View style={[styles.notice, { backgroundColor: t.bg }]} accessibilityRole="alert">
       <Icon name={icon} size={20} color={t.fg} />
@@ -104,6 +113,7 @@ export function ToggleRow({
   onChange: (v: boolean) => void;
   hint?: string;
 }) {
+  const c = useColors();
   return (
     <View style={styles.toggle}>
       <View style={styles.flex}>
@@ -114,7 +124,7 @@ export function ToggleRow({
         accessibilityLabel={label}
         value={value}
         onValueChange={onChange}
-        trackColor={{ true: colors.primary, false: colors.border }}
+        trackColor={{ true: c.primary, false: c.border }}
       />
     </View>
   );
@@ -126,22 +136,30 @@ export function Row({
   right,
   onPress,
   icon,
+  left,
 }: {
   title: string;
   subtitle?: string | undefined;
   right?: React.ReactNode;
   onPress?: () => void;
   icon?: IconName;
+  left?: React.ReactNode;
 }) {
+  const c = useColors();
   const content = (
     <>
-      {icon ? <Icon name={icon} color={colors.primary} /> : null}
+      {left}
+      {icon ? (
+        <View style={[styles.rowIcon, { backgroundColor: c.primaryBg }]}>
+          <Icon name={icon} size={20} color={c.primaryText} />
+        </View>
+      ) : null}
       <View style={styles.flex}>
         <Text variant="bodyStrong">{title}</Text>
         {subtitle ? <Text variant="small">{subtitle}</Text> : null}
       </View>
       {right}
-      {onPress ? <Icon name="chevron" size={18} color={colors.textMuted} /> : null}
+      {onPress ? <Icon name="chevron" size={18} color={c.textMuted} /> : null}
     </>
   );
   return onPress ? (
@@ -149,7 +167,7 @@ export function Row({
       accessibilityRole="button"
       accessibilityLabel={title}
       onPress={onPress}
-      style={({ pressed }) => [styles.row, pressed && { backgroundColor: colors.primaryBg }]}
+      style={({ pressed }) => [styles.row, pressed && { backgroundColor: c.primaryBg }]}
     >
       {content}
     </Pressable>
@@ -158,56 +176,53 @@ export function Row({
   );
 }
 
-export function SectionTitle({ children }: { children: string }) {
+export function SectionTitle({ children, action }: { children: string; action?: React.ReactNode }) {
   return (
-    <Text variant="h3" style={styles.section} accessibilityRole="header">
-      {children}
-    </Text>
+    <View style={styles.sectionRow}>
+      <Text variant="h3" style={styles.flex} accessibilityRole="header">
+        {children}
+      </Text>
+      {action}
+    </View>
   );
 }
 
 /** Our own empty-state drawing: a cup with a bean (no third-party illustration). */
 export function EmptyState({ title, body }: { title: string; body?: string }) {
+  const c = useColors();
   return (
     <View style={styles.empty}>
       <Svg width={120} height={96} viewBox="0 0 120 96" accessibilityElementsHidden>
-        <Ellipse cx="60" cy="86" rx="44" ry="6" fill={colors.surface} />
+        <Ellipse cx="60" cy="86" rx="44" ry="6" fill={c.border} />
         <Path
           d="M24 34h60v18c0 16-13 28-30 28h0C37 80 24 68 24 52V34Z"
-          fill={colors.primaryBg}
-          stroke={colors.primary}
+          fill={c.primaryBg}
+          stroke={c.primary}
           strokeWidth={3}
         />
         <Path
           d="M84 40h6a10 10 0 0 1 0 20h-7"
           fill="none"
-          stroke={colors.primary}
+          stroke={c.primary}
           strokeWidth={3}
           strokeLinecap="round"
         />
         <Path
           d="M42 12c0 6 6 6 6 12M58 8c0 6 6 6 6 12"
           fill="none"
-          stroke={colors.border}
+          stroke={c.border}
           strokeWidth={3}
           strokeLinecap="round"
         />
-        <Ellipse
-          cx="54"
-          cy="56"
-          rx="9"
-          ry="12"
-          fill={colors.coffee}
-          transform="rotate(-25 54 56)"
-        />
+        <Ellipse cx="54" cy="56" rx="9" ry="12" fill={c.coffee} transform="rotate(-25 54 56)" />
         <Path
           d="M50 47c4 5-2 9 3 18"
-          stroke={colors.surface}
+          stroke={c.surface}
           strokeWidth={2}
           fill="none"
           strokeLinecap="round"
         />
-        <Circle cx="98" cy="20" r="3" fill={colors.border} />
+        <Circle cx="98" cy="20" r="3" fill={c.border} />
       </Svg>
       <Text variant="h3" style={styles.center}>
         {title}
@@ -233,7 +248,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.bg,
   },
-  chipOn: { backgroundColor: colors.primary, borderColor: colors.primary },
   chipText: { fontSize: 15 },
   pill: {
     flexDirection: 'row',
@@ -256,13 +270,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.md,
-    minHeight: 56,
+    minHeight: 60,
     paddingVertical: space.sm,
     paddingHorizontal: space.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    backgroundColor: colors.bg,
   },
-  section: { marginTop: space.md },
+  rowIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sectionRow: { flexDirection: 'row', alignItems: 'center', marginTop: space.md },
   empty: { alignItems: 'center', gap: space.sm, paddingVertical: space.xxl },
   center: { textAlign: 'center' },
 });

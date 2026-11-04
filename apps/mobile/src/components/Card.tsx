@@ -6,7 +6,7 @@ import {
   type ViewProps,
   type ViewStyle,
 } from 'react-native';
-import { colors, radius, space } from '@/theme';
+import { colors, radius, space, useColors } from '@/theme';
 
 export function Card({
   style,
@@ -14,12 +14,13 @@ export function Card({
   children,
   ...rest
 }: ViewProps & { onPress?: () => void; style?: StyleProp<ViewStyle> }) {
+  const c = useColors();
   if (onPress) {
     return (
       <Pressable
         accessibilityRole="button"
         onPress={onPress}
-        style={({ pressed }) => [styles.card, pressed && styles.pressed, style]}
+        style={({ pressed }) => [styles.card, pressed && { backgroundColor: c.primaryBg }, style]}
         {...rest}
       >
         {children}
@@ -35,11 +36,10 @@ export function Card({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.bg,
     borderColor: colors.border,
     borderWidth: 1,
     borderRadius: radius.lg,
     padding: space.lg,
   },
-  pressed: { backgroundColor: colors.primaryBg },
 });

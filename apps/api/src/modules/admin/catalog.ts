@@ -38,6 +38,7 @@ const productDto = (p: Selectable<ProductsTable>, tiers: Selectable<PriceTiersTa
   process: p.process,
   origin: p.origin,
   tastingNotes: p.tasting_notes,
+  roastLevel: p.roast_level,
   isActive: p.is_active,
   deletedAt: p.deleted_at,
   updatedAt: p.updated_at,
@@ -102,6 +103,14 @@ export const adminCatalogRoutes: FastifyPluginAsyncZod = async (app) => {
         vatRatePct: r.vat_rate_pct,
         pricesUpdatedAt: r.prices_updated_at,
         isActive: r.is_active,
+        district: r.district,
+        address: r.address,
+        latitude: r.latitude,
+        longitude: r.longitude,
+        logoUrl: r.logo_url,
+        brandColor: r.brand_color,
+        description: r.description,
+        isFeatured: r.is_featured,
         commissionRateBp: r.commission_rate_bp ?? 1500,
         adminNotes: r.admin_notes,
         productCount: Number(counts.find((c) => c.roaster_id === r.id)?.n ?? 0),
@@ -122,6 +131,14 @@ export const adminCatalogRoutes: FastifyPluginAsyncZod = async (app) => {
           vat_rate_pct: b.vatRatePct,
           is_active: b.isActive,
           prices_updated_at: deps.clock(),
+          district: b.district,
+          address: b.address,
+          latitude: b.latitude ?? null,
+          longitude: b.longitude ?? null,
+          logo_url: b.logoUrl,
+          brand_color: b.brandColor,
+          description: b.description,
+          is_featured: b.isFeatured,
         })
         .returningAll()
         .executeTakeFirstOrThrow();
@@ -166,6 +183,14 @@ export const adminCatalogRoutes: FastifyPluginAsyncZod = async (app) => {
           ...(b.vatRatePct !== undefined && { vat_rate_pct: b.vatRatePct }),
           ...(b.isActive !== undefined && { is_active: b.isActive }),
           ...(b.pricesUpdatedAt !== undefined && { prices_updated_at: b.pricesUpdatedAt }),
+          ...(b.district !== undefined && { district: b.district }),
+          ...(b.address !== undefined && { address: b.address }),
+          ...(b.latitude !== undefined && { latitude: b.latitude }),
+          ...(b.longitude !== undefined && { longitude: b.longitude }),
+          ...(b.logoUrl !== undefined && { logo_url: b.logoUrl }),
+          ...(b.brandColor !== undefined && { brand_color: b.brandColor }),
+          ...(b.description !== undefined && { description: b.description }),
+          ...(b.isFeatured !== undefined && { is_featured: b.isFeatured }),
         };
         if (Object.keys(set).length)
           await tx.updateTable('roasters').set(set).where('id', '=', req.params.id).execute();
@@ -257,6 +282,7 @@ export const adminCatalogRoutes: FastifyPluginAsyncZod = async (app) => {
           process: b.process ?? null,
           origin: b.origin,
           tasting_notes: b.tastingNotes,
+          roast_level: b.roastLevel ?? null,
           is_active: b.isActive,
         })
         .returningAll()
@@ -285,6 +311,7 @@ export const adminCatalogRoutes: FastifyPluginAsyncZod = async (app) => {
           ...(b.process !== undefined && { process: b.process ?? null }),
           ...(b.origin !== undefined && { origin: b.origin }),
           ...(b.tastingNotes !== undefined && { tasting_notes: b.tastingNotes }),
+          ...(b.roastLevel !== undefined && { roast_level: b.roastLevel ?? null }),
           ...(b.isActive !== undefined && { is_active: b.isActive }),
         };
         if (!Object.keys(set).length) throw badRequest('empty_patch', 'Değiştirilecek alan yok.');

@@ -73,7 +73,8 @@
     "cafes": "Kafeler",
     "catalog": "Katalog",
     "commission": "Siparişler",
-    "audit": "Kayıtlar"
+    "audit": "Kayıtlar",
+    "explore": "Keşfet"
   },
   "cost": {
     "title": "Fincan maliyeti",
@@ -155,7 +156,10 @@
     "deleteBody": "Hesabınız silinir; e-posta, kafe adı ve telefon anonimleştirilir, reçete ve ayarlarınız kalıcı olarak silinir. Bu işlem geri alınamaz.",
     "deleteConfirm": "Onaylamak için parolanızı girin",
     "logout": "Çıkış yap",
-    "version": "Sürüm {v}"
+    "version": "Sürüm {v}",
+    "appearance": "Görünüm",
+    "themeColor": "Tema rengi",
+    "themeHint": "Üst bar, butonlar ve vurgular bu renkte olur."
   },
   "catalog": {
     "title": "Kavurucular",
@@ -171,11 +175,30 @@
     "quantity": "Miktar (kg)",
     "cupCost": "{price}/fincan",
     "espresso": "Espresso",
-    "filter": "Filtre",
+    "filter": "Demleme",
     "empty": "Henüz kavurucu yok",
     "onlyEspresso": "Yalnızca espresso",
     "all": "Tümü",
-    "added": "Sepete eklendi"
+    "added": "Sepete eklendi",
+    "process": {
+      "washed": "yıkanmış",
+      "natural": "doğal",
+      "honey": "honey",
+      "anaerobic": "anaerobik",
+      "other": "diğer"
+    },
+    "roast": {
+      "light": "açık kavrum",
+      "medium": "orta kavrum",
+      "dark": "koyu kavrum"
+    },
+    "bestTier": "{kg} kg+ alımda {price}/kg",
+    "tierTable": "Kademeli fiyatlandırma",
+    "minQty": "MİNİMUM",
+    "pricePerKg": "KG FİYATI",
+    "saving": "İNDİRİM",
+    "updateCart": "Sepeti güncelle",
+    "cupWith": "Bu çekirdekle {recipe} maliyeti: {price}/fincan"
   },
   "orders": {
     "title": "Siparişler",
@@ -276,9 +299,33 @@
     "markWaived": "Vazgeç",
     "fixDecision": "Kararı düzelt",
     "audit": "Denetim kayıtları",
-    "emptyCafes": "Bu filtrede kafe yok"
+    "emptyCafes": "Bu filtrede kafe yok",
+    "profile": "Profil ve harita",
+    "address": "Adres",
+    "lat": "Enlem",
+    "lon": "Boylam",
+    "latLonHint": "Google/Apple Haritalar'da kavurucuya basılı tutun, çıkan koordinatı (39.77…, 30.52…) buraya yazın. Harita pini buna göre konur.",
+    "brandColor": "Marka rengi (#RRGGBB)",
+    "logoUrl": "Logo adresi (https://…)",
+    "description": "Kısa tanıtım",
+    "featured": "Keşfet'te öne çıkar"
   },
   "empty": {
     "generic": "Burada henüz bir şey yok"
+  },
+  "explore": {
+    "title": "Keşfet",
+    "hello": "Merhaba, {name}",
+    "calc": "Fincan maliyeti hesapla",
+    "compare": "Kavurucuları karşılaştır",
+    "featured": "Öne çıkan kavurucular",
+    "map": "Haritada kavurucular",
+    "byDistrict": "İlçeye göre kavurucular",
+    "counts": "{e} espresso · {f} demleme",
+    "from": "{price}/kg'dan başlayan",
+    "catalog": "Kataloğu gör →",
+    "tapPin": "Bir pine dokunun, kavurucuyu görün",
+    "pendingTitle": "Kavurucular onaydan sonra açılacak",
+    "pendingBody": "Kafeniz onaylanınca Eskişehir'deki kavurucuları haritada görecek, toptan fiyatları karşılaştırıp sipariş verebileceksiniz."
   }
 }

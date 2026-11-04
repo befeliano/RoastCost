@@ -73,6 +73,14 @@ export interface CatalogRoaster {
   id: string;
   name: string;
   city: string;
+  district: string | null;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  logoUrl: string | null;
+  brandColor: string | null;
+  description: string | null;
+  isFeatured: boolean;
   pricesIncludeVat: boolean;
   vatRatePct: number;
   pricesUpdatedAt: string | null;
@@ -88,6 +96,7 @@ export interface CatalogProduct {
   process: string | null;
   origin: string | null;
   tastingNotes: string | null;
+  roastLevel: 'light' | 'medium' | 'dark' | null;
   isActive: boolean;
   rev: number;
   deletedAt: string | null;
@@ -160,6 +169,14 @@ export interface AdminRoaster {
   id: string;
   name: string;
   city: string;
+  district: string | null;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  logoUrl: string | null;
+  brandColor: string | null;
+  description: string | null;
+  isFeatured: boolean;
   whatsapp: string;
   pricesIncludeVat: boolean;
   vatRatePct: number;

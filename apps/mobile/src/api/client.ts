@@ -1,5 +1,5 @@
-import * as SecureStore from 'expo-secure-store';
 import { API_URL } from '@/lib/env';
+import { secure } from '@/lib/secure';
 
 const REFRESH_KEY = 'rc_refresh_token';
 
@@ -26,18 +26,16 @@ export function onSessionExpired(fn: () => void): () => void {
 
 export async function saveSession(s: { accessToken: string; refreshToken: string }): Promise<void> {
   accessToken = s.accessToken;
-  await SecureStore.setItemAsync(REFRESH_KEY, s.refreshToken, {
-    keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
-  });
+  await secure.set(REFRESH_KEY, s.refreshToken);
 }
 
 export async function clearSession(): Promise<void> {
   accessToken = null;
-  await SecureStore.deleteItemAsync(REFRESH_KEY);
+  await secure.remove(REFRESH_KEY);
 }
 
 export async function getRefreshToken(): Promise<string | null> {
-  return SecureStore.getItemAsync(REFRESH_KEY);
+  return secure.get(REFRESH_KEY);
 }
 
 export function hasAccessToken(): boolean {

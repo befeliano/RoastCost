@@ -124,6 +124,14 @@ export interface RoastersTable {
   vat_rate_pct: Num;
   prices_updated_at: TimestampNullable;
   is_active: ColumnType<boolean, boolean | undefined, boolean>;
+  district: string | null;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  logo_url: string | null;
+  brand_color: string | null;
+  description: string | null;
+  is_featured: ColumnType<boolean, boolean | undefined, boolean>;
   rev: Generated<number>;
   created_at: Timestamp;
   updated_at: Timestamp;
@@ -142,6 +150,7 @@ export interface ProductsTable {
   process: string | null;
   origin: string | null;
   tasting_notes: string | null;
+  roast_level: 'light' | 'medium' | 'dark' | null;
   is_active: ColumnType<boolean, boolean | undefined, boolean>;
   rev: Generated<number>;
   created_at: Timestamp;

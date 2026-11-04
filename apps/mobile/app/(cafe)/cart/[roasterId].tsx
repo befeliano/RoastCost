@@ -223,5 +223,5 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   gap: { gap: space.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  kg: { width: 120 },
+  kg: { width: 132 },
 });

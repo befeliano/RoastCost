@@ -13,7 +13,7 @@ export function OfflineBanner() {
   if (net.isConnected !== false && net.isInternetReachable !== false) return null;
   return (
     <View style={styles.bar} accessibilityRole="alert">
-      <Text variant="caption" color={colors.onPrimary}>
+      <Text variant="caption" color="#FFFFFF">
         {t('common.offline')} ·{' '}
         {t('common.lastSync', { time: syncedAt ? formatRelative(syncedAt) : t('common.never') })}
       </Text>

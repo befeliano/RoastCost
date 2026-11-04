@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router/js-tabs';
 import { Icon, type IconName } from '@/components/Icon';
 import { t } from '@/locales';
-import { colors, fonts } from '@/theme';
+import { colors, fonts, useColors } from '@/theme';
 
 const tab = (title: string, icon: IconName) => ({
   title,
@@ -12,11 +12,12 @@ const tab = (title: string, icon: IconName) => ({
 });
 
 export default function AdminTabs() {
+  const c = useColors();
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
+        tabBarActiveTintColor: c.primaryText,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 11 },
       }}

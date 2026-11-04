@@ -17,7 +17,7 @@ import { Notice } from '@/components/Misc';
 import { Text } from '@/components/Text';
 import { t } from '@/locales';
 import { useSession } from '@/store/session';
-import { colors, space } from '@/theme';
+import { space, useColors } from '@/theme';
 
 /** "Onay bekleniyor" card with a soft breathing animation (spec §10.1). */
 export function StatusCard({
@@ -30,6 +30,7 @@ export function StatusCard({
   compact?: boolean;
 }) {
   const reduce = useReducedMotion();
+  const c = useColors();
   const pulse = useSharedValue(1);
   useEffect(() => {
     if (!reduce && status === 'pending')
@@ -52,7 +53,7 @@ export function StatusCard({
         <Icon
           name={status === 'pending' ? 'clock' : 'warning'}
           size={compact ? 24 : 36}
-          color={colors.primary}
+          color={c.primaryText}
         />
       </Animated.View>
       <View style={styles.flex}>

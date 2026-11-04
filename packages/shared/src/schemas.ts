@@ -172,6 +172,24 @@ export const roasterCreateSchema = z.object({
   isActive: z.boolean().default(true),
   commissionRateBp: z.number().int().min(0).max(5000).default(1500),
   adminNotes: optionalText(2000),
+  district: optionalText(80),
+  address: optionalText(200),
+  latitude: z.number().min(-90).max(90).nullish(),
+  longitude: z.number().min(-180).max(180).nullish(),
+  logoUrl: z
+    .string()
+    .trim()
+    .max(500)
+    .regex(/^https:\/\//, 'Logo adresi https:// ile başlamalı')
+    .nullish()
+    .transform((v) => (v ? v : null)),
+  brandColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Renk #RRGGBB olmalı')
+    .nullish()
+    .transform((v) => (v ? v : null)),
+  description: optionalText(500),
+  isFeatured: z.boolean().default(false),
 });
 export const roasterPatchSchema = z
   .object({
@@ -184,6 +202,22 @@ export const roasterPatchSchema = z
     commissionRateBp: z.number().int().min(0).max(5000),
     adminNotes: optionalText(2000),
     pricesUpdatedAt: z.iso.datetime().nullable(),
+    district: optionalText(80),
+    address: optionalText(200),
+    latitude: z.number().min(-90).max(90).nullable(),
+    longitude: z.number().min(-180).max(180).nullable(),
+    logoUrl: z
+      .string()
+      .trim()
+      .max(500)
+      .regex(/^https:\/\//, 'Logo adresi https:// ile başlamalı')
+      .nullable(),
+    brandColor: z
+      .string()
+      .regex(/^#[0-9A-Fa-f]{6}$/, 'Renk #RRGGBB olmalı')
+      .nullable(),
+    description: optionalText(500),
+    isFeatured: z.boolean(),
   })
   .partial();
 
@@ -194,6 +228,7 @@ export const productCreateSchema = z.object({
   process: z.enum(PRODUCT_PROCESSES).nullish(),
   origin: optionalText(120),
   tastingNotes: optionalText(300),
+  roastLevel: z.enum(['light', 'medium', 'dark']).nullish(),
   isActive: z.boolean().default(true),
 });
 export const productPatchSchema = productCreateSchema.omit({ roasterId: true }).partial();

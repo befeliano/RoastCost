@@ -6,6 +6,7 @@
 import { SYSTEM, createDb, withCtx } from '../src/db';
 import { hashPassword } from '../src/lib/crypto';
 import { seedCafeDefaults } from '../src/modules/auth/service';
+import { ESPRESSO, FILTER, ROASTERS } from './seed-data';
 
 try {
   process.loadEnvFile?.();
@@ -19,27 +20,6 @@ if (!url) throw new Error('DATABASE_URL is not set');
 const db = createDb({ connectionString: url, max: 1 });
 const hash = await hashPassword(process.env.SEED_PASSWORD ?? 'gelistirme123');
 const ctx = { ...SYSTEM, isAdmin: true };
-
-const ROASTERS = [
-  { name: 'Odun Ateşi Kahve Kavurma', whatsapp: '+905550000001', vatIncluded: false },
-  { name: 'Porsuk Kavurucu', whatsapp: '+905550000002', vatIncluded: true },
-  { name: 'Sazova Coffee Lab', whatsapp: '+905550000003', vatIncluded: false },
-];
-const PRODUCTS: [number, string, 'espresso' | 'filter', string, string, number][] = [
-  // roaster index, name, category, process, origin, 1 kg price (TL)
-  [0, 'Ev Harmanı', 'espresso', 'washed', 'Brezilya / Kolombiya', 900],
-  [0, 'Karamel Espresso', 'espresso', 'natural', 'Brezilya', 980],
-  [0, 'Etiyopya Guji', 'filter', 'natural', 'Etiyopya', 1450],
-  [0, 'Kenya AA', 'filter', 'washed', 'Kenya', 1600],
-  [1, 'Porsuk Blend', 'espresso', 'washed', 'Brezilya / Hindistan', 850],
-  [1, 'Kolombiya Huila', 'espresso', 'washed', 'Kolombiya', 1100],
-  [1, 'Guatemala Antigua', 'filter', 'washed', 'Guatemala', 1300],
-  [1, 'Ruanda Honey', 'filter', 'honey', 'Ruanda', 1500],
-  [2, 'Lab Espresso No.1', 'espresso', 'natural', 'Brezilya / Etiyopya', 1050],
-  [2, 'Decaf Kolombiya', 'espresso', 'other', 'Kolombiya', 1200],
-  [2, 'Panama Anaerobik', 'filter', 'anaerobic', 'Panama', 2400],
-  [2, 'Burundi Kayanza', 'filter', 'washed', 'Burundi', 1550],
-];
 
 await withCtx(db, ctx, async (tx) => {
   const already = await tx
@@ -130,7 +110,6 @@ await withCtx(db, ctx, async (tx) => {
     }
   }
 
-  const roasterIds: string[] = [];
   for (const r of ROASTERS) {
     const row = await tx
       .insertInto('roasters')
@@ -139,6 +118,13 @@ await withCtx(db, ctx, async (tx) => {
         whatsapp_e164: r.whatsapp,
         prices_include_vat: r.vatIncluded,
         prices_updated_at: new Date(),
+        district: r.district,
+        address: r.address,
+        latitude: r.lat,
+        longitude: r.lon,
+        brand_color: r.color,
+        description: r.description,
+        is_featured: r.featured,
       })
       .returning('id')
       .executeTakeFirstOrThrow();
@@ -146,23 +132,43 @@ await withCtx(db, ctx, async (tx) => {
       .insertInto('roaster_admin')
       .values({ roaster_id: row.id, commission_rate_bp: 1500 })
       .execute();
-    roasterIds.push(row.id);
-  }
-  for (const [ri, name, category, process, origin, tl] of PRODUCTS) {
-    const p = await tx
-      .insertInto('products')
-      .values({ roaster_id: roasterIds[ri] as string, name, category, process, origin })
-      .returning('id')
-      .executeTakeFirstOrThrow();
-    const base = tl * 100;
-    await tx
-      .insertInto('price_tiers')
-      .values([
-        { product_id: p.id, min_kg: 1, price_per_kg_kurus: base },
-        { product_id: p.id, min_kg: 5, price_per_kg_kurus: Math.round(base * 0.93) },
-        { product_id: p.id, min_kg: 10, price_per_kg_kurus: Math.round(base * 0.87) },
-      ])
-      .execute();
+    const items = [
+      ...ESPRESSO.map((p) => ({ ...p, category: 'espresso' as const })),
+      ...FILTER.slice(0, r.filterCount).map((p) => ({ ...p, category: 'filter' as const })),
+    ];
+    for (const [i, it] of items.entries()) {
+      const p = await tx
+        .insertInto('products')
+        .values({
+          roaster_id: row.id,
+          name: it.name,
+          category: it.category,
+          process: it.process,
+          origin: it.origin,
+          tasting_notes: it.notes,
+          roast_level: it.roast,
+        })
+        .returning('id')
+        .executeTakeFirstOrThrow();
+      // small deterministic variation so roasters differ in the comparison
+      const base = Math.round(it.tl * r.priceFactor * (1 + ((i * 7) % 5) / 100)) * 100;
+      await tx
+        .insertInto('price_tiers')
+        .values([
+          { product_id: p.id, min_kg: 1, price_per_kg_kurus: base },
+          {
+            product_id: p.id,
+            min_kg: 5,
+            price_per_kg_kurus: Math.round((base * 0.93) / 100) * 100,
+          },
+          {
+            product_id: p.id,
+            min_kg: 10,
+            price_per_kg_kurus: Math.round((base * 0.87) / 100) * 100,
+          },
+        ])
+        .execute();
+    }
   }
   console.log(
     'seed done: admin@roastcost.local, kafe1/kafe2 (approved), kafe3 (pending) @roastcost.local',

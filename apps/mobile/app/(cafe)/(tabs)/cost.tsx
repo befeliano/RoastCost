@@ -24,7 +24,7 @@ import { useCostPrefs } from '@/features/cost/prefs';
 import { useIngredients, useRecipes, useSettings } from '@/hooks/useCafeData';
 import { t } from '@/locales';
 import { useSession } from '@/store/session';
-import { colors, space } from '@/theme';
+import { colors, space, useColors } from '@/theme';
 
 function Line({ label, value }: { label: string; value: number }) {
   return (
@@ -38,6 +38,7 @@ function Line({ label, value }: { label: string; value: number }) {
 export default function Cost() {
   const me = useSession((s) => s.me);
   const approved = me?.cafe?.status === 'approved';
+  const c = useColors();
   const settingsQ = useSettings();
   const recipesQ = useRecipes();
   const ingredientsQ = useIngredients();
@@ -159,7 +160,7 @@ export default function Cost() {
           style={styles.pickRow}
           accessibilityLabel={t('cost.pickProduct')}
         >
-          <Icon name="bean" color={colors.primary} />
+          <Icon name="bean" color={c.primaryText} />
           <View style={styles.flex}>
             <Text variant="bodyStrong">{product ? product.name : t('cost.pickProduct')}</Text>
             {roaster && fromCatalog ? (
@@ -216,17 +217,17 @@ export default function Cost() {
               />
             </View>
           </Card>
-          <Card style={[styles.gap, styles.highlight]}>
-            <Text variant="caption" color={colors.onPrimary}>
+          <Card style={[styles.gap, { backgroundColor: c.primary, borderColor: c.primary }]}>
+            <Text variant="caption" color={c.onPrimary}>
               {t('cost.suggested').toUpperCase()}
             </Text>
             <AnimatedNumber
               variant="bigMoney"
-              color={colors.onPrimary}
+              color={c.onPrimary}
               value={result.suggestedPriceRoundedKurus}
               format={formatTRY}
             />
-            <Text variant="small" color={colors.onPrimary}>
+            <Text variant="small" color={c.onPrimary}>
               {t('cost.suggestedNote', {
                 margin: settings.targetMarginPct,
                 vat: settings.saleVatRatePct,
@@ -293,7 +294,7 @@ export default function Cost() {
                   subtitle={p.category === 'espresso' ? t('catalog.espresso') : t('catalog.filter')}
                   right={
                     prefs.productId === p.id ? (
-                      <Icon name="check" color={colors.primary} />
+                      <Icon name="check" color={c.primaryText} />
                     ) : undefined
                   }
                   onPress={() => {
@@ -321,7 +322,6 @@ const styles = StyleSheet.create({
   },
   divider: { height: 1, backgroundColor: colors.border, marginVertical: space.xs },
   total: { fontSize: 20 },
-  highlight: { backgroundColor: colors.primary, borderColor: colors.primary },
   pickRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   sheetList: { maxHeight: 420 },
   sheetHead: { marginTop: space.md, marginBottom: space.xs },

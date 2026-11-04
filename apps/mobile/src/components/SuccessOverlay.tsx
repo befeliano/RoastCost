@@ -18,7 +18,7 @@ import { Text } from './Text';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const CHECK_LEN = 48;
-const CONFETTI = [colors.primary, colors.coffee, '#C9A227', colors.success, '#D97A5B'];
+const CONFETTI = ['#12874A', '#38A8E0', '#C9A227', '#D92D20', '#7A4B2A'];
 
 function Particle({ i, reduce }: { i: number; reduce: boolean }) {
   const p = useSharedValue(0);

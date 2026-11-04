@@ -3,7 +3,7 @@ import { api, ApiError } from '@/api/client';
 import type { CatalogProduct, CatalogRoaster, CatalogSync, CatalogTier } from '@/api/types';
 import { kv } from '@/lib/kv';
 
-const KEY = 'catalog_v1';
+const KEY = 'catalog_v2'; // v2: roaster profile fields (0002) → force a full resync
 const MIN_INTERVAL_MS = 5 * 60_000;
 
 interface CatalogData {

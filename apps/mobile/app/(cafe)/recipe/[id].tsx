@@ -19,7 +19,7 @@ import {
 } from '@/hooks/useCafeData';
 import { parseDecimal } from '@/lib/format';
 import { t } from '@/locales';
-import { colors, space } from '@/theme';
+import { colors, space, useColors } from '@/theme';
 
 interface Line {
   ingredientId: string;
@@ -29,6 +29,7 @@ interface Line {
 export default function RecipeEdit() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const isNew = id === 'new';
+  const c = useColors();
   const recipe = useRecipes().data?.find((r) => r.id === id);
   const ingredients = useIngredients().data ?? [];
   const dose = useSettings().data?.espressoDoseG ?? 18;
@@ -162,7 +163,7 @@ export default function RecipeEdit() {
       {unused.length ? (
         <View style={styles.add}>
           <View style={styles.addHead}>
-            <Icon name="plus" size={18} color={colors.primary} />
+            <Icon name="plus" size={18} color={c.primaryText} />
             <Text variant="caption">{t('recipes.addIngredient').toUpperCase()}</Text>
           </View>
           <Chips

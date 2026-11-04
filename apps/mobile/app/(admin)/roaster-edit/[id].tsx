@@ -22,7 +22,7 @@ import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { parseDecimal } from '@/lib/format';
 import { t } from '@/locales';
-import { colors, space } from '@/theme';
+import { colors, space, useColors } from '@/theme';
 
 type TierSheet = { productId: string; tier?: AdminTier } | null;
 const CAT_LABEL: Record<ProductCategory, string> = {
@@ -34,6 +34,7 @@ export default function RoasterEdit() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const isNew = id === 'new';
   const qc = useQueryClient();
+  const c = useColors();
   const roasters = useQuery({
     queryKey: ['admin', 'roasters'],
     queryFn: () => api<AdminRoaster[]>('/admin/roasters'),
@@ -51,7 +52,15 @@ export default function RoasterEdit() {
     vatRate: '10',
     commission: '15',
     notes: '',
+    district: '',
+    address: '',
+    lat: '',
+    lon: '',
+    color: '',
+    logo: '',
+    desc: '',
   });
+  const [featured, setFeatured] = useState(false);
   const [incVat, setIncVat] = useState(false);
   const [active, setActive] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +77,15 @@ export default function RoasterEdit() {
         vatRate: String(r.vatRatePct),
         commission: String(r.commissionRateBp / 100),
         notes: r.adminNotes ?? '',
+        district: r.district ?? '',
+        address: r.address ?? '',
+        lat: r.latitude !== null ? String(r.latitude) : '',
+        lon: r.longitude !== null ? String(r.longitude) : '',
+        color: r.brandColor ?? '',
+        logo: r.logoUrl ?? '',
+        desc: r.description ?? '',
       });
+      setFeatured(r.isFeatured);
       setIncVat(r.pricesIncludeVat);
       setActive(r.isActive);
     }
@@ -100,6 +117,14 @@ export default function RoasterEdit() {
         commissionRateBp: Math.round((parseDecimal(f.commission) ?? 15) * 100),
         adminNotes: f.notes.trim() || null,
         isActive: active,
+        district: f.district.trim() || null,
+        address: f.address.trim() || null,
+        latitude: f.lat.trim() ? parseDecimal(f.lat) : null,
+        longitude: f.lon.trim() ? parseDecimal(f.lon) : null,
+        brandColor: f.color.trim() || null,
+        logoUrl: f.logo.trim() || null,
+        description: f.desc.trim() || null,
+        isFeatured: featured,
       };
       try {
         if (isNew) {
@@ -211,6 +236,62 @@ export default function RoasterEdit() {
         onChangeText={(v) => setF({ ...f, notes: v })}
         multiline
       />
+      <SectionTitle>{t('admin.profile')}</SectionTitle>
+      <Field
+        label={t('auth.district')}
+        value={f.district}
+        onChangeText={(v) => setF({ ...f, district: v })}
+        placeholder="Tepebaşı"
+      />
+      <Field
+        label={t('admin.address')}
+        value={f.address}
+        onChangeText={(v) => setF({ ...f, address: v })}
+      />
+      <View style={styles.row}>
+        <View style={styles.flex}>
+          <Field
+            label={t('admin.lat')}
+            value={f.lat}
+            onChangeText={(v) => setF({ ...f, lat: v })}
+            keyboardType="decimal-pad"
+            placeholder="39.7767"
+          />
+        </View>
+        <View style={styles.flex}>
+          <Field
+            label={t('admin.lon')}
+            value={f.lon}
+            onChangeText={(v) => setF({ ...f, lon: v })}
+            keyboardType="decimal-pad"
+            placeholder="30.5206"
+          />
+        </View>
+      </View>
+      <Text variant="small">{t('admin.latLonHint')}</Text>
+      <Field
+        label={t('admin.brandColor')}
+        value={f.color}
+        onChangeText={(v) => setF({ ...f, color: v })}
+        autoCapitalize="none"
+        placeholder="#12874A"
+      />
+      <Field
+        label={t('admin.logoUrl')}
+        value={f.logo}
+        onChangeText={(v) => setF({ ...f, logo: v })}
+        autoCapitalize="none"
+        keyboardType="url"
+        placeholder="https://…/logo.png"
+      />
+      <Field
+        label={t('admin.description')}
+        value={f.desc}
+        onChangeText={(v) => setF({ ...f, desc: v })}
+        multiline
+        maxLength={500}
+      />
+      <ToggleRow label={t('admin.featured')} value={featured} onChange={setFeatured} />
       <ToggleRow label={t('admin.active')} value={active} onChange={setActive} />
       <Button
         title={t('common.save')}
@@ -270,7 +351,7 @@ export default function RoasterEdit() {
                   onPress={() => openTier(p.id)}
                   style={[styles.tier, styles.addTier]}
                 >
-                  <Text variant="bodyStrong" color={colors.primary}>
+                  <Text variant="bodyStrong" color={c.primaryText}>
                     + kademe
                   </Text>
                 </Pressable>
@@ -386,5 +467,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
     justifyContent: 'center',
   },
-  addTier: { borderStyle: 'dashed', borderColor: colors.primary },
+  addTier: { borderStyle: 'dashed', borderColor: colors.textMuted },
 });

@@ -11,13 +11,14 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, hitSlop, space } from '@/theme';
+import { colors, hitSlop, space, useColors } from '@/theme';
 import { Icon } from './Icon';
 import { OfflineBanner } from './OfflineBanner';
 import { Text } from './Text';
 
 interface Props {
   title: string;
+  subtitle?: string;
   back?: boolean;
   right?: ReactNode;
   children: ReactNode;
@@ -28,9 +29,10 @@ interface Props {
   showOffline?: boolean;
 }
 
-/** Bordo top bar (spec K14) + content. */
+/** Accent-coloured top bar (spec K14; colour chosen in Ayarlar → Görünüm) + content. */
 export function Screen({
   title,
+  subtitle,
   back,
   right,
   children,
@@ -41,10 +43,11 @@ export function Screen({
   showOffline = true,
 }: Props) {
   const insets = useSafeAreaInsets();
+  const c = useColors();
   return (
     <View style={styles.root}>
-      <StatusBar style="light" />
-      <View style={[styles.bar, { paddingTop: insets.top + 6 }]}>
+      <StatusBar style={c.onPrimary === '#FFFFFF' ? 'light' : 'dark'} />
+      <View style={[styles.bar, { paddingTop: insets.top + 6, backgroundColor: c.primary }]}>
         <View style={styles.barRow}>
           {back ? (
             <Pressable
@@ -54,18 +57,19 @@ export function Screen({
               onPress={() => router.back()}
               style={styles.backBtn}
             >
-              <Icon name="back" color={colors.onPrimary} />
+              <Icon name="back" color={c.onPrimary} />
             </Pressable>
           ) : null}
-          <Text
-            variant="h2"
-            color={colors.onPrimary}
-            style={styles.title}
-            numberOfLines={1}
-            accessibilityRole="header"
-          >
-            {title}
-          </Text>
+          <View style={styles.title}>
+            <Text variant="h2" color={c.onPrimary} numberOfLines={1} accessibilityRole="header">
+              {title}
+            </Text>
+            {subtitle ? (
+              <Text variant="small" color={c.onPrimary} numberOfLines={1} style={styles.subtitle}>
+                {subtitle}
+              </Text>
+            ) : null}
+          </View>
           {right}
         </View>
       </View>
@@ -87,7 +91,7 @@ export function Screen({
                 <RefreshControl
                   refreshing={refreshing}
                   onRefresh={onRefresh}
-                  tintColor={colors.primary}
+                  tintColor={c.primaryText}
                 />
               ) : undefined
             }
@@ -106,12 +110,13 @@ export function Screen({
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.bg },
+  root: { flex: 1, backgroundColor: colors.surface },
   flex: { flex: 1 },
-  bar: { backgroundColor: colors.primary, paddingHorizontal: space.lg, paddingBottom: space.md },
+  bar: { paddingHorizontal: space.lg, paddingBottom: space.md },
   barRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 40 },
   backBtn: { width: 36, height: 40, justifyContent: 'center' },
   title: { flex: 1 },
+  subtitle: { opacity: 0.9 },
   content: { padding: space.lg, gap: space.md },
   footer: {
     paddingHorizontal: space.lg,

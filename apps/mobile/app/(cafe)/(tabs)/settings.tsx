@@ -11,6 +11,7 @@ import { Notice, Row, SectionTitle } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { signOutEverywhere } from '@/features/account/signOut';
+import { ThemePicker } from '@/features/account/ThemePicker';
 import { openLegal } from '@/lib/legal';
 import { t } from '@/locales';
 import { useSession } from '@/store/session';
@@ -68,6 +69,8 @@ export default function Settings() {
           onPress={() => router.push('/ingredients')}
         />
       </View>
+      <SectionTitle>{t('settings.appearance')}</SectionTitle>
+      <ThemePicker />
       <SectionTitle>{t('settings.account')}</SectionTitle>
       <View>
         <Row

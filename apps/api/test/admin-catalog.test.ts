@@ -255,3 +255,52 @@ describe('admin catalog management', () => {
     }
   });
 });
+
+describe('roaster profile (0002)', () => {
+  it('admin sets district, map position, logo and brand colour; approved cafes receive them via sync', async () => {
+    const admin = await makeAdminUser(t);
+    const res = await t.app.inject({
+      method: 'POST',
+      url: '/v1/admin/roasters',
+      headers: bearer(admin),
+      payload: {
+        name: 'Harita Kavurucu',
+        whatsapp: '05330000009',
+        district: 'Tepebaşı',
+        address: 'Örnek Cad. No:1',
+        latitude: 39.7911,
+        longitude: 30.5034,
+        brandColor: '#1B7F4B',
+        logoUrl: 'https://ornek.com/logo.png',
+        description: 'Küçük partiler',
+        isFeatured: true,
+      },
+    });
+    expect(res.statusCode).toBe(201);
+    const bad = await t.app.inject({
+      method: 'PATCH',
+      url: `/v1/admin/roasters/${res.json().id}`,
+      headers: bearer(admin),
+      payload: { logoUrl: 'http://x', brandColor: 'red' },
+    });
+    expect(bad.statusCode).toBe(400);
+    await t.app.inject({
+      method: 'PATCH',
+      url: `/v1/admin/roasters/${res.json().id}`,
+      headers: bearer(admin),
+      payload: { district: 'Odunpazarı' },
+    });
+    const sync = (
+      await t.app.inject({ method: 'GET', url: '/v1/catalog/sync', headers: bearer(admin) })
+    ).json();
+    expect(sync.roasters[0]).toMatchObject({
+      district: 'Odunpazarı',
+      latitude: 39.7911,
+      longitude: 30.5034,
+      brandColor: '#1B7F4B',
+      logoUrl: 'https://ornek.com/logo.png',
+      isFeatured: true,
+    });
+    expect(JSON.stringify(sync)).not.toMatch(/commission/i);
+  });
+});

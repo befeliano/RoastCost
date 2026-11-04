@@ -14,7 +14,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { colors, radius, type as typo } from '@/theme';
+import { radius, type as typo, useColors, type ThemeColors } from '@/theme';
 import { Icon, type IconName } from './Icon';
 import { Text } from './Text';
 
@@ -49,7 +49,7 @@ export function Button({
   const scale = useSharedValue(1);
   const reduce = useReducedMotion();
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  const v = VARIANTS[variant];
+  const v = variants(useColors())[variant];
   const isDisabled = disabled || loading;
   return (
     <AnimatedPressable
@@ -89,12 +89,14 @@ export function Button({
   );
 }
 
-const VARIANTS: Record<Variant, { bg: string; fg: string; border: string }> = {
-  primary: { bg: colors.primary, fg: colors.onPrimary, border: colors.primary },
-  secondary: { bg: colors.bg, fg: colors.primary, border: colors.primary },
-  ghost: { bg: 'transparent', fg: colors.primary, border: 'transparent' },
-  danger: { bg: colors.bg, fg: colors.danger, border: colors.danger },
-};
+function variants(c: ThemeColors): Record<Variant, { bg: string; fg: string; border: string }> {
+  return {
+    primary: { bg: c.primary, fg: c.onPrimary, border: c.primary },
+    secondary: { bg: c.bg, fg: c.primaryText, border: c.primaryText },
+    ghost: { bg: 'transparent', fg: c.primaryText, border: 'transparent' },
+    danger: { bg: c.bg, fg: c.danger, border: c.danger },
+  };
+}
 
 const styles = StyleSheet.create({
   base: {

@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router/js-tabs';
 import { Icon, type IconName } from '@/components/Icon';
 import { t } from '@/locales';
-import { colors, fonts } from '@/theme';
+import { colors, fonts, useColors } from '@/theme';
 
 const tab = (title: string, icon: IconName) => ({
   title,
@@ -12,19 +12,20 @@ const tab = (title: string, icon: IconName) => ({
 });
 
 export default function CafeTabs() {
+  const c = useColors();
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
+        tabBarActiveTintColor: c.primaryText,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 11 },
         tabBarStyle: { borderTopColor: colors.border, backgroundColor: colors.bg },
       }}
     >
+      <Tabs.Screen name="explore" options={tab(t('tabs.explore'), 'store')} />
       <Tabs.Screen name="cost" options={tab(t('tabs.cost'), 'cup')} />
       <Tabs.Screen name="recipes" options={tab(t('tabs.recipes'), 'book')} />
-      <Tabs.Screen name="roasters" options={tab(t('tabs.roasters'), 'bean')} />
       <Tabs.Screen name="orders" options={tab(t('tabs.orders'), 'box')} />
       <Tabs.Screen name="settings" options={tab(t('tabs.settings'), 'gear')} />
     </Tabs>

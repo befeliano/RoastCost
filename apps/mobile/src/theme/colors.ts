@@ -1,20 +1,18 @@
-/** Spec §11.1 — single place to change the brand colour (bordo vs koyu kahve). */
+/** Neutral colours (spec §11.1). The accent colour comes from the selected palette — see palettes.ts. */
 export const colors = {
   bg: '#FFFFFF',
-  surface: '#FBF8F6',
-  border: '#EADFD8',
-  text: '#2B1F1A',
-  textMuted: '#6E5F57', // darker than spec #7A6B63 to pass WCAG AA (4.5:1) on #FBF8F6 too
-  primary: '#5E1A2B',
-  primaryPressed: '#4A1422',
-  onPrimary: '#FFFFFF',
+  surface: '#F7F8F6',
+  border: '#E4E7E3',
+  text: '#1F2421',
+  textMuted: '#5E6661', // WCAG AA on bg and surface
   coffee: '#3A2A22',
-  success: '#2F7D4F',
-  warning: '#8F5E12', // darker than spec #B7791F for text contrast
+  success: '#1E7A46',
+  warning: '#8F5E12',
   danger: '#B3261E',
-  info: '#3B5B7A',
-  successBg: '#EAF5EE',
+  info: '#2F5D86',
+  pin: '#D92D20', // map pins
+  successBg: '#E7F5EC',
   warningBg: '#FBF1E1',
   dangerBg: '#FBEAE8',
-  primaryBg: '#F6ECEE',
+  infoBg: '#E8F0F8',
 } as const;

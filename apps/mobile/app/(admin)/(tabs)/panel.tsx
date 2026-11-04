@@ -10,8 +10,9 @@ import { Card } from '@/components/Card';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { signOutEverywhere } from '@/features/account/signOut';
+import { ThemePicker } from '@/features/account/ThemePicker';
 import { t } from '@/locales';
-import { colors, space } from '@/theme';
+import { colors, space, useColors } from '@/theme';
 
 function Stat({
   label,
@@ -26,11 +27,12 @@ function Stat({
   onPress?: () => void;
   alert?: boolean;
 }) {
+  const c = useColors();
   return (
     <Card style={styles.stat} onPress={onPress}>
       <AnimatedNumber
         variant="h1"
-        color={alert && value > 0 ? colors.primary : colors.text}
+        color={alert && value > 0 ? c.primaryText : colors.text}
         value={value}
         format={(n) => (money ? formatTRY(n) : String(n))}
       />
@@ -73,6 +75,7 @@ export default function Panel() {
           />
         </View>
       ) : null}
+      <ThemePicker />
       <Button
         title={t('settings.logout')}
         variant="secondary"

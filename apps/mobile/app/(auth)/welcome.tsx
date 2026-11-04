@@ -17,11 +17,12 @@ import { APP_NAME } from '@roastcost/shared';
 import { Button } from '@/components/Button';
 import { Text } from '@/components/Text';
 import { t } from '@/locales';
-import { colors, space } from '@/theme';
+import { colors, space, useColors } from '@/theme';
 
 /** Our own mascot-free cup illustration with gentle steam (no third-party character). */
 function Hero() {
   const reduce = useReducedMotion();
+  const c = useColors();
   const steam = useSharedValue(0);
   useEffect(() => {
     if (!reduce)
@@ -49,11 +50,11 @@ function Hero() {
       </Animated.View>
       <Svg width={180} height={130} viewBox="0 0 180 130">
         <Ellipse cx="88" cy="120" rx="70" ry="8" fill={colors.surface} />
-        <Path d="M30 20h110v34c0 32-24 56-55 56S30 86 30 54V20Z" fill={colors.primary} />
+        <Path d="M30 20h110v34c0 32-24 56-55 56S30 86 30 54V20Z" fill={c.primary} />
         <Path
           d="M140 30h10a18 18 0 0 1 0 36h-12"
           fill="none"
-          stroke={colors.primary}
+          stroke={c.primary}
           strokeWidth={8}
           strokeLinecap="round"
         />
@@ -65,6 +66,7 @@ function Hero() {
 
 export default function Welcome() {
   const insets = useSafeAreaInsets();
+  const c = useColors();
   return (
     <View
       style={[
@@ -74,7 +76,7 @@ export default function Welcome() {
     >
       <StatusBar style="dark" />
       <Animated.View entering={FadeInDown.duration(400)} style={styles.top}>
-        <Text variant="h1" color={colors.primary} style={styles.brand}>
+        <Text variant="h1" color={c.primaryText} style={styles.brand}>
           {APP_NAME}
         </Text>
         <Hero />

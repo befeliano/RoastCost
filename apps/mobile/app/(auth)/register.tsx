@@ -14,12 +14,13 @@ import { Text } from '@/components/Text';
 import { openLegal } from '@/lib/legal';
 import { t } from '@/locales';
 import { useSession } from '@/store/session';
-import { colors, space } from '@/theme';
+import { colors, space, useColors } from '@/theme';
 
 const DISTRICTS = ['Tepebaşı', 'Odunpazarı', 'Diğer'] as const;
 
 export default function Register() {
   const [step, setStep] = useState(1);
+  const c = useColors();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [cafeName, setCafeName] = useState('');
@@ -109,7 +110,7 @@ export default function Register() {
     >
       <View style={styles.progress} accessibilityLabel={t('auth.step', { n: step })}>
         {[1, 2, 3].map((n) => (
-          <View key={n} style={[styles.dot, n <= step && styles.dotOn]} />
+          <View key={n} style={[styles.dot, n <= step && { backgroundColor: c.primary }]} />
         ))}
       </View>
       <Text variant="caption">{t('auth.step', { n: step })}</Text>
@@ -216,6 +217,5 @@ const styles = StyleSheet.create({
   footer: { flexDirection: 'row', gap: space.md },
   progress: { flexDirection: 'row', gap: 6 },
   dot: { flex: 1, height: 6, borderRadius: 3, backgroundColor: colors.border },
-  dotOn: { backgroundColor: colors.primary },
   form: { gap: space.md },
 });
