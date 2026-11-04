@@ -78,7 +78,7 @@ export const ROASTERS: SeedRoaster[] = [
     address: 'Ertuğrulgazi Mah. (örnek adres)',
     lat: 39.7951,
     lon: 30.5032,
-    color: '#8A2BE2',
+    color: '#6B4E3D',
     description: 'Toptan siparişte hızlı teslimat, 10 kg üstü avantajlı.',
     featured: false,
     vatIncluded: true,
@@ -323,7 +323,7 @@ export const FLORES = {
   latitude: 39.77623,
   longitude: 30.52919,
   description:
-    'Minimum sipariş toplam 5 kg (farklı kahveler karıştırılabilir). Havale/EFT komisyonsuz, kredi kartında %2,5 banka farkı. Eskişehir içinde 10 kg ve üzeri siparişler 1 iş günü içinde teslim. Vadeli fiyatlar bilgi içindir.',
+    'Havale/EFT ile komisyonsuz ödeme. Eskişehir içinde 10 kg ve üzeri siparişler 1 iş günü içinde teslim edilir.',
   products: [
     // espresso — Tanah & Pagi are blends; Sidamo (Manis), Arjuna and Mogiana are single origins used for espresso
     {

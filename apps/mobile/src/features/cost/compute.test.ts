@@ -14,6 +14,8 @@ const roaster = (id: string, inc = false) => ({
   brandColor: null,
   description: null,
   isFeatured: false,
+  minOrderKg: null,
+  cardSurchargeBp: null,
   pricesIncludeVat: inc,
   vatRatePct: 10,
   pricesUpdatedAt: null,

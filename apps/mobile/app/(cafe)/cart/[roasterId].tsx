@@ -1,8 +1,8 @@
-import { lineTotalKurus, selectTier } from '@roastcost/shared';
+import { lineTotalKurus, nextTierHint, orderTerms, selectTier } from '@roastcost/shared';
 import { useNetworkState } from 'expo-network';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { api, ApiError } from '@/api/client';
 import type { OrderCreated } from '@/api/types';
 import { BottomSheet } from '@/components/BottomSheet';
@@ -15,11 +15,12 @@ import { SuccessOverlay } from '@/components/SuccessOverlay';
 import { Text } from '@/components/Text';
 import { tiersOf, useCatalog } from '@/features/catalog/store';
 import { useSendFlow } from '@/features/orders/useSendFlow';
-import { gramsToKgInput, parseKgToGrams, formatTRY } from '@/lib/format';
+import { formatGramsKg, formatTRY, gramsToKgInput, parseKgToGrams } from '@/lib/format';
 import { t } from '@/locales';
 import { useCart } from '@/store/cart';
 import { useSession } from '@/store/session';
-import { space } from '@/theme';
+import { colors, space, useColors } from '@/theme';
+import { Icon } from '@/components/Icon';
 
 function nextDays(n: number) {
   const fmt = new Intl.DateTimeFormat('tr-TR', {
@@ -49,6 +50,7 @@ export default function Cart() {
   const [kgEdit, setKgEdit] = useState<Record<string, string>>({});
   const days = useMemo(() => nextDays(7), []);
   const roaster = catalog.roasters[roasterId];
+  const c = useColors();
 
   const lines = Object.entries(cart?.items ?? {}).map(([productId, grams]) => {
     const product = catalog.products[productId];
@@ -61,10 +63,22 @@ export default function Cart() {
       tier,
       minKg: tiers[0]?.minKg,
       total: tier ? lineTotalKurus(grams, tier.pricePerKgKurus) : 0,
+      hint: nextTierHint(tiers, grams, 3),
     };
   });
   const subtotal = lines.reduce((s, l) => s + l.total, 0);
-  const invalid = lines.some((l) => !l.tier || !l.product);
+  const terms = orderTerms(
+    lines.map((l) => l.grams),
+    subtotal,
+    roaster?.minOrderKg,
+    roaster?.cardSurchargeBp,
+  );
+  const invalid = lines.some((l) => !l.tier || !l.product) || !terms.meetsMinimum;
+  const setKg = (productId: string, grams: number) => {
+    if (grams <= 0) return;
+    setKgEdit((s) => ({ ...s, [productId]: gramsToKgInput(grams) }));
+    setQuantity(roasterId, productId, grams);
+  };
 
   const send = async () => {
     setBusy(true);
@@ -102,9 +116,19 @@ export default function Cart() {
             <Text variant="money">{formatTRY(l.total)}</Text>
           </View>
           <View style={styles.row}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`${l.product?.name ?? ''} 1 kg azalt`}
+              onPress={() => setKg(l.productId, l.grams - 1000)}
+              style={styles.step}
+              hitSlop={6}
+            >
+              <Icon name="minus" size={18} color={c.primaryText} />
+            </Pressable>
             <View style={styles.kg}>
               <Field
                 label={t('catalog.quantity')}
+                hideLabel
                 value={kgEdit[l.productId] ?? gramsToKgInput(l.grams)}
                 keyboardType="decimal-pad"
                 suffix="kg"
@@ -115,22 +139,75 @@ export default function Cart() {
                 }}
               />
             </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`${l.product?.name ?? ''} 1 kg artır`}
+              onPress={() => setKg(l.productId, l.grams + 1000)}
+              style={styles.step}
+              hitSlop={6}
+            >
+              <Icon name="plus" size={18} color={c.primaryText} />
+            </Pressable>
             <Text variant="small" style={styles.flex}>
               {l.tier
                 ? `${t('orders.tier', { kg: l.tier.minKg })}\n${formatTRY(l.tier.pricePerKgKurus)}/kg`
                 : t('orders.minKg', { kg: l.minKg ?? 1 })}
             </Text>
-            <Button
-              title={t('orders.remove')}
-              variant="ghost"
-              small
-              icon="trash"
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`${l.product?.name ?? ''} — ${t('orders.remove')}`}
               onPress={() => remove(roasterId, l.productId)}
-            />
+              hitSlop={10}
+            >
+              <Icon name="trash" size={20} color={colors.textMuted} />
+            </Pressable>
           </View>
+          {l.hint && l.tier ? (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setKg(l.productId, l.hint!.tier.minKg * 1000)}
+              style={[styles.hint, { backgroundColor: c.primaryBg }]}
+            >
+              <Icon name="spark" size={16} color={c.primaryText} />
+              <Text variant="small" color={c.primaryText} style={styles.flex}>
+                {t('orders.tierHint', {
+                  kg: String(l.hint.extraKg).replace('.', ','),
+                  price: formatTRY(l.hint.tier.pricePerKgKurus),
+                })}
+              </Text>
+            </Pressable>
+          ) : null}
           {!l.tier ? <Notice text={t('orders.minKg', { kg: l.minKg ?? 1 })} tone="danger" /> : null}
         </Card>
       ))}
+      {terms.minOrderKg ? (
+        <Card style={styles.gap}>
+          <View style={styles.row}>
+            <Text variant="bodyStrong" style={styles.flex}>
+              {t('orders.totalKg', { kg: formatGramsKg(terms.totalG) })}
+            </Text>
+            <Text variant="small">
+              {t('orders.minOrder', { kg: String(terms.minOrderKg).replace('.', ',') })}
+            </Text>
+          </View>
+          <View style={styles.bar} accessibilityRole="progressbar">
+            <View
+              style={[
+                styles.barFill,
+                {
+                  width: `${Math.round(terms.progress * 100)}%`,
+                  backgroundColor: terms.meetsMinimum ? colors.success : c.primary,
+                },
+              ]}
+            />
+          </View>
+          <Text variant="small" color={terms.meetsMinimum ? colors.success : colors.text}>
+            {terms.meetsMinimum
+              ? t('orders.minOk')
+              : t('orders.minMissing', { kg: String(terms.missingKg).replace('.', ',') })}
+          </Text>
+        </Card>
+      ) : null}
       <Text variant="caption">{t('orders.deliveryDate').toUpperCase()}</Text>
       <Chips
         options={[{ value: '', label: t('orders.noDate') }, ...days]}
@@ -148,8 +225,18 @@ export default function Cart() {
         <Text variant="h3" style={styles.flex}>
           {t('orders.subtotal')}
         </Text>
-        <Text variant="h2">{formatTRY(subtotal)}</Text>
+        <Text variant="h2" style={styles.num}>
+          {formatTRY(subtotal)}
+        </Text>
       </View>
+      {terms.cardSurchargeKurus ? (
+        <Text variant="small">
+          {t('orders.cardSurcharge', {
+            pct: String((roaster?.cardSurchargeBp ?? 0) / 100).replace('.', ','),
+            amount: formatTRY(terms.cardSurchargeKurus),
+          })}
+        </Text>
+      ) : null}
       <Text variant="small">
         {roaster?.pricesIncludeVat ? t('catalog.vatIncluded') : t('catalog.vatExcluded')}
       </Text>
@@ -167,6 +254,11 @@ export default function Cart() {
           <>
             {!verified ? <Notice text={t('orders.emailFirst')} tone="info" /> : null}
             {offline ? <Notice text={t('orders.offlineOrder')} /> : null}
+            {!terms.meetsMinimum ? (
+              <Text variant="small" style={styles.center}>
+                {t('orders.minMissing', { kg: String(terms.missingKg).replace('.', ',') })}
+              </Text>
+            ) : null}
             <Button
               title={t('orders.send')}
               icon="send"
@@ -223,5 +315,26 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   gap: { gap: space.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  kg: { width: 132 },
+  kg: { flex: 1, maxWidth: 120 },
+  step: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.bg,
+  },
+  hint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm,
+    padding: space.sm,
+    borderRadius: 10,
+  },
+  bar: { height: 8, borderRadius: 4, backgroundColor: colors.border, overflow: 'hidden' },
+  barFill: { height: 8, borderRadius: 4 },
+  num: { fontVariant: ['tabular-nums'] },
+  center: { textAlign: 'center' },
 });

@@ -144,7 +144,7 @@ export function CityMap({
             y1={0}
             x2={(i * W) / 6}
             y2={H + 10}
-            stroke="#E7ECE8"
+            stroke="#ECE4DA"
             strokeWidth={1}
           />
         ))}
@@ -155,7 +155,7 @@ export function CityMap({
             y1={(i * (H + 10)) / 4}
             x2={W}
             y2={(i * (H + 10)) / 4}
-            stroke="#E7ECE8"
+            stroke="#ECE4DA"
             strokeWidth={1}
           />
         ))}
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   city: {
     borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: '#F4F7F5',
+    backgroundColor: '#F8F3EC',
     borderWidth: 1,
     borderColor: colors.border,
   },

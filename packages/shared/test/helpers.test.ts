@@ -16,6 +16,8 @@ import {
   selectTier,
   selectTierForComparison,
   LEGAL_VERSIONS,
+  nextTierHint,
+  orderTerms,
 } from '../src';
 
 describe('money', () => {
@@ -82,6 +84,39 @@ describe('tiers', () => {
   it('computes line totals', () => {
     expect(lineTotalKurus(2500, 90_000)).toBe(225_000);
     expect(lineTotalKurus(333, 100_001)).toBe(33_300);
+  });
+});
+
+describe('order terms (0003)', () => {
+  const tiers = [
+    { minKg: 1, pricePerKgKurus: 100_000 },
+    { minKg: 5, pricePerKgKurus: 90_000 },
+    { minKg: 20, pricePerKgKurus: 80_000 },
+  ];
+  it('next tier hint only when close', () => {
+    expect(nextTierHint(tiers, 3000)).toMatchObject({ extraKg: 2, tier: { minKg: 5 } });
+    expect(nextTierHint(tiers, 6000)).toBeNull(); // 14 kg away
+    expect(nextTierHint(tiers, 6000, 20)).toMatchObject({ extraKg: 14 });
+    expect(nextTierHint(tiers, 25_000)).toBeNull();
+  });
+  it('minimum total kg + card surcharge', () => {
+    const a = orderTerms([2000, 1500], 400_000, 5, 250);
+    expect(a).toMatchObject({
+      totalG: 3500,
+      missingKg: 1.5,
+      meetsMinimum: false,
+      cardSurchargeKurus: 10_000,
+    });
+    expect(a.progress).toBeCloseTo(0.7);
+    expect(orderTerms([5000], 1, 5, null)).toMatchObject({
+      meetsMinimum: true,
+      progress: 1,
+      cardSurchargeKurus: null,
+    });
+    expect(orderTerms([100], 1, null, null)).toMatchObject({
+      meetsMinimum: true,
+      minOrderKg: null,
+    });
   });
 });
 

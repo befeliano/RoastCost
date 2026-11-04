@@ -190,6 +190,8 @@ export const roasterCreateSchema = z.object({
     .transform((v) => (v ? v : null)),
   description: optionalText(500),
   isFeatured: z.boolean().default(false),
+  minOrderKg: z.number().positive().max(1000).nullish(),
+  cardSurchargeBp: z.number().int().min(0).max(2000).nullish(),
 });
 export const roasterPatchSchema = z
   .object({
@@ -218,6 +220,8 @@ export const roasterPatchSchema = z
       .nullable(),
     description: optionalText(500),
     isFeatured: z.boolean(),
+    minOrderKg: z.number().positive().max(1000).nullable(),
+    cardSurchargeBp: z.number().int().min(0).max(2000).nullable(),
   })
   .partial();
 

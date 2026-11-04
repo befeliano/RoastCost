@@ -81,6 +81,8 @@ export interface CatalogRoaster {
   brandColor: string | null;
   description: string | null;
   isFeatured: boolean;
+  minOrderKg: number | null;
+  cardSurchargeBp: number | null;
   pricesIncludeVat: boolean;
   vatRatePct: number;
   pricesUpdatedAt: string | null;
@@ -177,6 +179,8 @@ export interface AdminRoaster {
   brandColor: string | null;
   description: string | null;
   isFeatured: boolean;
+  minOrderKg: number | null;
+  cardSurchargeBp: number | null;
   whatsapp: string;
   pricesIncludeVat: boolean;
   vatRatePct: number;

@@ -318,6 +318,35 @@ describe('order flow (spec §8)', () => {
     expect(expired.body).toContain('geçersiz ya da süresi dolmuş');
   });
 
+  it('roaster minimum total kg (0003): blocks smaller orders, syncs terms to cafes, message shows total', async () => {
+    const { cafe, admin, roasterId, productId } = await setup();
+    const patch = await t.app.inject({
+      method: 'PATCH',
+      url: `/v1/admin/roasters/${roasterId}`,
+      headers: bearer(admin),
+      payload: { minOrderKg: 5, cardSurchargeBp: 250 },
+    });
+    expect(patch.statusCode).toBe(200);
+    const sync = (
+      await t.app.inject({
+        method: 'GET',
+        url: '/v1/catalog/sync',
+        headers: bearer(cafe.accessToken),
+      })
+    ).json();
+    expect(sync.roasters[0]).toMatchObject({ minOrderKg: 5, cardSurchargeBp: 250 });
+
+    const small = await placeOrder(cafe.accessToken, roasterId, productId, 2000);
+    expect(small.statusCode).toBe(400);
+    expect(small.json().error).toMatchObject({
+      code: 'below_order_minimum',
+      details: { minOrderKg: 5, totalKg: 2 },
+    });
+    const ok = await placeOrder(cafe.accessToken, roasterId, productId, 5000);
+    expect(ok.statusCode).toBe(201);
+    expect(decodeURIComponent(ok.json().waUrl)).toContain('Toplam: 5 kg');
+  });
+
   it('validates: below minimum tier, past date, unverified e-mail, pending cafe, foreign product', async () => {
     const { cafe, admin, roasterId, productId } = await setup();
     const small = await placeOrder(cafe.accessToken, roasterId, productId, 500);

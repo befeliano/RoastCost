@@ -1,8 +1,8 @@
-import { calculateCupCost, formatPct, kurusToInput, parseTRYInput } from '@roastcost/shared';
+import { formatPct, kurusToInput, parseTRYInput } from '@roastcost/shared';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { AnimatedNumber } from '@/components/AnimatedNumber';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
@@ -14,11 +14,9 @@ import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { EmailVerifyNotice, StatusCard } from '@/features/account/StatusCards';
 import { activeRoasters, productsOf, tiersOf, useCatalog } from '@/features/catalog/store';
-import { catalogSource, toCostSettings, toRecipeInput } from '@/features/cost/compute';
-import { useCostPrefs } from '@/features/cost/prefs';
-import { useIngredients, useRecipes, useSettings } from '@/hooks/useCafeData';
+import { CostBar } from '@/features/cost/CostBar';
+import { useCupCost } from '@/features/cost/useCupCost';
 import { t } from '@/locales';
-import { useSession } from '@/store/session';
 import { colors, space, useColors } from '@/theme';
 import { formatTRY, formatTRYFull } from '@/lib/format';
 
@@ -32,47 +30,32 @@ function Line({ label, value }: { label: string; value: number }) {
 }
 
 export default function Cost() {
-  const me = useSession((s) => s.me);
-  const approved = me?.cafe?.status === 'approved';
   const c = useColors();
-  const settingsQ = useSettings();
-  const recipesQ = useRecipes();
-  const ingredientsQ = useIngredients();
   const catalog = useCatalog();
-  const prefs = useCostPrefs();
   const [picker, setPicker] = useState(false);
+  const [q, setQ] = useState('');
+  const qn = q.trim().toLocaleLowerCase('tr');
+  const {
+    me,
+    approved,
+    prefs,
+    recipes,
+    recipe,
+    ingredients,
+    settings,
+    mode,
+    product,
+    roaster,
+    fromCatalog,
+    source,
+    result,
+    queries: { settingsQ, recipesQ, ingredientsQ },
+  } = useCupCost();
   const [manualText, setManualText] = useState(
     prefs.manualPricePerKgKurus ? kurusToInput(prefs.manualPricePerKgKurus) : '',
   );
   const [kgText, setKgText] = useState(String(prefs.monthlyKg));
 
-  const recipes = useMemo(() => (recipesQ.data ?? []).filter((r) => r.isActive), [recipesQ.data]);
-  const recipe = recipes.find((r) => r.id === prefs.recipeId) ?? recipes[0];
-  const ingredients = ingredientsQ.data ?? [];
-  const settings = settingsQ.data ? toCostSettings(settingsQ.data) : null;
-  const mode = approved ? prefs.mode : 'manual';
-
-  const product = prefs.productId ? catalog.products[prefs.productId] : undefined;
-  const roaster = product ? catalog.roasters[product.roasterId] : undefined;
-  const fromCatalog =
-    mode === 'catalog' && product && roaster
-      ? catalogSource(roaster, tiersOf(catalog, product.id), prefs.monthlyKg)
-      : null;
-  const source =
-    mode === 'manual'
-      ? prefs.manualPricePerKgKurus
-        ? {
-            pricePerKgKurus: prefs.manualPricePerKgKurus,
-            pricesIncludeVat: prefs.manualIncludesVat,
-            vatRatePct: prefs.manualVatRatePct,
-          }
-        : null
-      : (fromCatalog?.source ?? null);
-
-  const result =
-    recipe && settings
-      ? calculateCupCost(toRecipeInput(recipe, ingredients), source, settings)
-      : null;
   const syrupMissing =
     recipe?.templateKey === 'mocha' &&
     !recipe.ingredients.some(
@@ -195,6 +178,14 @@ export default function Cost() {
       {result && settings ? (
         <>
           <Card style={styles.gap}>
+            <CostBar
+              parts={[
+                { label: t('cost.barCoffee'), value: result.coffeeKurus },
+                { label: t('cost.barIngredients'), value: result.ingredientsKurus },
+                { label: t('cost.barCup'), value: result.cupKurus },
+                { label: t('cost.barOverhead'), value: result.overheadKurus },
+              ]}
+            />
             <Line
               label={t('cost.coffee', { grams: result.coffeeGrams })}
               value={result.coffeeKurus}
@@ -271,6 +262,27 @@ export default function Cost() {
               <Notice text={t('cost.addMenuPrice')} tone="info" icon="plus" />
             </Pressable>
           ) : null}
+          <Button
+            title={t('cost.share')}
+            variant="ghost"
+            icon="share"
+            onPress={() =>
+              void Share.share({
+                message: [
+                  `${recipe?.name ?? ''} — ${t('cost.total')}: ${formatTRYFull(result.totalKurus)}`,
+                  `${t('cost.coffee', { grams: result.coffeeGrams })}: ${formatTRYFull(result.coffeeKurus)}`,
+                  `${t('cost.ingredients')}: ${formatTRYFull(result.ingredientsKurus)}`,
+                  `${t('cost.cup')}: ${formatTRYFull(result.cupKurus)}`,
+                  `${t('cost.overhead')}: ${formatTRYFull(result.overheadKurus)}`,
+                  `${t('cost.suggested')}: ${formatTRY(result.suggestedPriceRoundedKurus)}`,
+                  product && roaster ? `${product.name} · ${roaster.name}` : '',
+                  '— RoastCost',
+                ]
+                  .filter(Boolean)
+                  .join('\n'),
+              })
+            }
+          />
           {approved && recipe ? (
             <Button
               title={t('catalog.compare')}
@@ -283,30 +295,58 @@ export default function Cost() {
       ) : null}
 
       <BottomSheet visible={picker} onClose={() => setPicker(false)} title={t('cost.pickProduct')}>
-        <ScrollView style={styles.sheetList}>
-          {activeRoasters(catalog).map((r) => (
-            <View key={r.id}>
-              <Text variant="caption" style={styles.sheetHead}>
-                {r.name.toUpperCase()}
-              </Text>
-              {productsOf(catalog, r.id).map((p) => (
-                <Row
-                  key={p.id}
-                  title={p.name}
-                  subtitle={p.category === 'espresso' ? t('catalog.espresso') : t('catalog.filter')}
-                  right={
-                    prefs.productId === p.id ? (
-                      <Icon name="check" color={c.primaryText} />
-                    ) : undefined
-                  }
-                  onPress={() => {
-                    prefs.set({ productId: p.id, mode: 'catalog' });
-                    setPicker(false);
-                  }}
-                />
-              ))}
-            </View>
-          ))}
+        <Field
+          label={t('common.search')}
+          hideLabel
+          value={q}
+          onChangeText={setQ}
+          placeholder={t('cost.searchBean')}
+          autoCorrect={false}
+        />
+        <ScrollView style={styles.sheetList} keyboardShouldPersistTaps="handled">
+          {activeRoasters(catalog).map((r) => {
+            const ps = productsOf(catalog, r.id)
+              .filter(
+                (p) =>
+                  !qn ||
+                  `${p.name} ${r.name} ${p.origin ?? ''} ${p.tastingNotes ?? ''}`
+                    .toLocaleLowerCase('tr')
+                    .includes(qn),
+              )
+              .sort((a, b) => (a.category === b.category ? 0 : a.category === 'espresso' ? -1 : 1));
+            if (!ps.length) return null;
+            return (
+              <View key={r.id}>
+                <Text variant="caption" style={styles.sheetHead}>
+                  {r.name.toLocaleUpperCase('tr')}
+                </Text>
+                {ps.map((p) => (
+                  <Row
+                    key={p.id}
+                    title={p.name}
+                    subtitle={[
+                      p.category === 'espresso' ? t('catalog.espresso') : t('catalog.filter'),
+                      tiersOf(catalog, p.id)[0]
+                        ? `${formatTRY(tiersOf(catalog, p.id)[0]!.pricePerKgKurus)}/kg`
+                        : null,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                    right={
+                      prefs.productId === p.id ? (
+                        <Icon name="check" color={c.primaryText} />
+                      ) : undefined
+                    }
+                    onPress={() => {
+                      prefs.set({ productId: p.id, mode: 'catalog' });
+                      setPicker(false);
+                      setQ('');
+                    }}
+                  />
+                ))}
+              </View>
+            );
+          })}
         </ScrollView>
       </BottomSheet>
     </Screen>

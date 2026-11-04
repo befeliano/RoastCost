@@ -20,7 +20,8 @@
     "saved": "Kaydedildi",
     "required": "Zorunlu alan",
     "invalidNumber": "Geçerli bir sayı girin",
-    "invalidMoney": "Geçerli bir tutar girin (örn. 45,50)"
+    "invalidMoney": "Geçerli bir tutar girin (örn. 45,50)",
+    "search": "Ara"
   },
   "auth": {
     "welcomeTitle": "Fincanın gerçek maliyeti",
@@ -101,7 +102,13 @@
     "ok": "Hedef marjın üzerinde",
     "syrupMissing": "Mocha için şurup seçilmedi. Reçeteler'den şurup ekleyin.",
     "milkPriceZero": "Süt fiyatı 0 TL. Ayarlar → Malzemeler'den girin.",
-    "belowMin": "{kg} kg en küçük kademenin ({min} kg) altında; o kademenin fiyatı kullanıldı"
+    "belowMin": "{kg} kg en küçük kademenin ({min} kg) altında; o kademenin fiyatı kullanıldı",
+    "searchBean": "Çekirdek, kavurucu veya tat notu ara",
+    "barCoffee": "Kahve",
+    "barIngredients": "Malzeme",
+    "barCup": "Bardak",
+    "barOverhead": "Sabit",
+    "share": "Maliyeti paylaş"
   },
   "recipes": {
     "title": "Reçeteler",
@@ -204,7 +211,16 @@
     "pricePerKg": "KG FİYATI",
     "saving": "İNDİRİM",
     "updateCart": "Sepeti güncelle",
-    "cupWith": "Bu çekirdekle {recipe} maliyeti: {price}/fincan"
+    "cupWith": "Bu çekirdekle {recipe} maliyeti: {price}/fincan",
+    "copyAddress": "Adresi kopyalar",
+    "addressCopied": "Adres kopyalandı",
+    "terms": "Sipariş koşulları",
+    "termsMin": "Sipariş başına toplam en az {kg} kg (farklı çekirdekler karışabilir)",
+    "termsCard": "Kredi kartıyla ödemede %{pct} fark",
+    "sortDefault": "Varsayılan sıralama",
+    "sortPrice": "Fiyata göre sırala",
+    "sortPriceShort": "Fiyat",
+    "directions": "Yol tarifi al"
   },
   "orders": {
     "title": "Siparişler",
@@ -245,7 +261,13 @@
     "tier": "{kg} kg+ kademe",
     "waMissing": "WhatsApp açılamadı. Mesajı kopyalayıp gönderebilirsiniz.",
     "emptyCartTitle": "Sepetiniz boş",
-    "goExplore": "Kavurucuları keşfet"
+    "goExplore": "Kavurucuları keşfet",
+    "tierHint": "{kg} kg daha eklerseniz kg fiyatı {price} olur",
+    "totalKg": "Toplam {kg}",
+    "minOrder": "en az {kg} kg",
+    "minOk": "Minimum sipariş miktarı karşılandı",
+    "minMissing": "Göndermek için {kg} kg daha ekleyin (farklı çekirdekler karışabilir)",
+    "cardSurcharge": "Kredi kartıyla öderseniz %{pct} fark: +{amount}"
   },
   "admin": {
     "panel": "Panel",
@@ -317,7 +339,9 @@
     "logoUrl": "Logo adresi (https://…)",
     "description": "Kısa tanıtım",
     "featured": "Keşfet'te öne çıkar",
-    "auditEmpty": "Henüz kayıt yok — yönetim işlemleri burada listelenir"
+    "auditEmpty": "Henüz kayıt yok — yönetim işlemleri burada listelenir",
+    "minOrderKg": "Min. toplam sipariş",
+    "cardSurcharge": "Kart farkı"
   },
   "empty": {
     "generic": "Burada henüz bir şey yok"
@@ -336,6 +360,19 @@
     "tapPin": "Bir pine dokunun, kavurucuyu görün",
     "pendingTitle": "Kavurucular onaydan sonra açılacak",
     "pendingBody": "Kafeniz onaylanınca Eskişehir'deki kavurucuları haritada görecek, toptan fiyatları karşılaştırıp sipariş verebileceksiniz.",
-    "featuredBadge": "Öne çıkan"
+    "featuredBadge": "Öne çıkan",
+    "greet": {
+      "morning": "Günaydın, {name}",
+      "day": "İyi günler, {name}",
+      "evening": "İyi akşamlar, {name}",
+      "night": "İyi geceler, {name}"
+    },
+    "searchPlaceholder": "Kavurucu, çekirdek, köken veya tat notu",
+    "results": "Sonuçlar",
+    "noResults": "Sonuç bulunamadı",
+    "noResultsBody": "Farklı bir kelime deneyin: \"Etiyopya\", \"çikolata\", \"Tepebaşı\"…",
+    "tip": "İpucu: bir kavurucuya dokunup çekirdeğini seçin; kademeli fiyatı ve fincan başı maliyetinizi hemen görürsünüz.",
+    "beanCount": "{n} çekirdek",
+    "cheapest": "En uygun espresso çekirdekleri"
   }
 }

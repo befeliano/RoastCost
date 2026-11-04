@@ -1,10 +1,13 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
+import { useState } from 'react';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import type { CatalogProduct } from '@/api/types';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Icon } from '@/components/Icon';
-import { Pill } from '@/components/Misc';
+import { Chips, Pill } from '@/components/Misc';
+import { toast } from '@/components/Toast';
 import { RoasterAvatar } from '@/components/RoasterAvatar';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
@@ -14,7 +17,7 @@ import { productsOf, tiersOf, useCatalog } from '@/features/catalog/store';
 import { t } from '@/locales';
 import { useCart } from '@/store/cart';
 import { colors, space, useColors } from '@/theme';
-import { formatTRY } from '@/lib/format';
+import { formatGramsKg, formatTRY } from '@/lib/format';
 import { NoteChips } from '@/features/catalog/NoteChips';
 import { Skeleton } from '@/components/Skeleton';
 
@@ -40,7 +43,7 @@ function ProductRow({ p }: { p: CatalogProduct }) {
               .join(' · ')}
           </Text>
         </View>
-        {inCart ? <Pill tone="primary" icon="check" label={`${inCart / 1000} kg`} /> : null}
+        {inCart ? <Pill tone="primary" icon="check" label={formatGramsKg(inCart)} /> : null}
       </View>
       <NoteChips notes={p.tastingNotes} max={4} />
       <View style={styles.row}>
@@ -53,8 +56,8 @@ function ProductRow({ p }: { p: CatalogProduct }) {
         ) : null}
         <Icon name="chevron" size={18} color={colors.textMuted} />
       </View>
-      {best && from && best !== from ? (
-        <Text variant="caption">
+      {best && from && best !== from && best.pricePerKgKurus < from.pricePerKgKurus ? (
+        <Text variant="small" color={colors.success}>
           {t('catalog.bestTier', { kg: best.minKg, price: formatTRY(best.pricePerKgKurus) })}
         </Text>
       ) : null}
@@ -65,8 +68,12 @@ function ProductRow({ p }: { p: CatalogProduct }) {
 export default function RoasterDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const catalog = useCatalog();
+  const c = useColors();
   const roaster = catalog.roasters[id];
-  const cartCount = useCart((s) => Object.keys(s.carts[id]?.items ?? {}).length);
+  const cartItems = useCart((s) => s.carts[id]?.items);
+  const cartCount = Object.keys(cartItems ?? {}).length;
+  const [cat, setCat] = useState<'all' | 'espresso' | 'filter'>('all');
+  const [sort, setSort] = useState<'default' | 'price'>('default');
   if (!roaster) {
     return (
       <Screen title={t('catalog.title')} back>
@@ -75,8 +82,12 @@ export default function RoasterDetail() {
     );
   }
   const products = productsOf(catalog, id);
-  const espresso = products.filter((p) => p.category === 'espresso');
-  const filter = products.filter((p) => p.category === 'filter');
+  const fromPrice = (pid: string) => tiersOf(catalog, pid)[0]?.pricePerKgKurus ?? Infinity;
+  const ordered =
+    sort === 'price' ? [...products].sort((a, b) => fromPrice(a.id) - fromPrice(b.id)) : products;
+  const espresso = ordered.filter((p) => p.category === 'espresso');
+  const filter = ordered.filter((p) => p.category === 'filter');
+  const cartG = Object.values(cartItems ?? {}).reduce((s, g) => s + g, 0);
   return (
     <Screen
       title={roaster.name}
@@ -84,7 +95,7 @@ export default function RoasterDetail() {
       footer={
         cartCount ? (
           <Button
-            title={`${t('orders.carts')} · ${t('orders.items', { n: cartCount })}`}
+            title={`${t('orders.carts')} · ${formatGramsKg(cartG)}`}
             icon="box"
             onPress={() =>
               router.push({ pathname: '/cart/[roasterId]', params: { roasterId: id } })
@@ -109,7 +120,59 @@ export default function RoasterDetail() {
           </View>
         </View>
         {roaster.description ? <Text variant="body">{roaster.description}</Text> : null}
-        {roaster.address ? <Text variant="small">{roaster.address}</Text> : null}
+        {roaster.address ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityHint={t('catalog.copyAddress')}
+            onPress={() => {
+              void Clipboard.setStringAsync(roaster.address ?? '');
+              toast(t('catalog.addressCopied'), 'copy');
+            }}
+            style={styles.row}
+          >
+            <Icon name="pin" size={16} color={colors.textMuted} />
+            <Text variant="small" style={styles.flex}>
+              {roaster.address}
+            </Text>
+            <Icon name="copy" size={16} color={colors.textMuted} />
+          </Pressable>
+        ) : null}
+        {roaster.latitude !== null && roaster.longitude !== null ? (
+          <Pressable
+            accessibilityRole="link"
+            onPress={() =>
+              void Linking.openURL(
+                `https://www.google.com/maps/search/?api=1&query=${roaster.latitude},${roaster.longitude}`,
+              )
+            }
+            style={styles.row}
+            hitSlop={6}
+          >
+            <Icon name="send" size={16} color={c.primaryText} />
+            <Text variant="bodyStrong" color={c.primaryText}>
+              {t('catalog.directions')}
+            </Text>
+          </Pressable>
+        ) : null}
+        {roaster.minOrderKg || roaster.cardSurchargeBp ? (
+          <View style={[styles.terms, { backgroundColor: c.primaryBg }]}>
+            <Text variant="caption" color={c.primaryText}>
+              {t('catalog.terms').toUpperCase()}
+            </Text>
+            {roaster.minOrderKg ? (
+              <Text variant="small" color={colors.text}>
+                {t('catalog.termsMin', { kg: String(roaster.minOrderKg).replace('.', ',') })}
+              </Text>
+            ) : null}
+            {roaster.cardSurchargeBp ? (
+              <Text variant="small" color={colors.text}>
+                {t('catalog.termsCard', {
+                  pct: String(roaster.cardSurchargeBp / 100).replace('.', ','),
+                })}
+              </Text>
+            ) : null}
+          </View>
+        ) : null}
         <View style={styles.pills}>
           <Freshness iso={roaster.pricesUpdatedAt} />
           <Pill
@@ -119,7 +182,31 @@ export default function RoasterDetail() {
         </View>
       </Card>
 
-      {espresso.length ? (
+      <View style={styles.tools}>
+        <View style={styles.flex}>
+          <Chips
+            options={[
+              { value: 'all' as const, label: t('catalog.all') },
+              { value: 'espresso' as const, label: t('catalog.espresso') },
+              { value: 'filter' as const, label: t('catalog.filter') },
+            ]}
+            value={cat}
+            onChange={setCat}
+          />
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={sort === 'price' ? t('catalog.sortDefault') : t('catalog.sortPrice')}
+          onPress={() => setSort((v) => (v === 'price' ? 'default' : 'price'))}
+          style={[styles.sortBtn, sort === 'price' && { borderColor: c.primaryText }]}
+        >
+          <Icon name="sort" size={18} color={sort === 'price' ? c.primaryText : colors.textMuted} />
+          <Text variant="caption" color={sort === 'price' ? c.primaryText : colors.textMuted}>
+            {t('catalog.sortPriceShort')}
+          </Text>
+        </Pressable>
+      </View>
+      {espresso.length && cat !== 'filter' ? (
         <>
           <Text variant="h2" style={styles.section}>
             {t('catalog.espresso')}{' '}
@@ -132,7 +219,7 @@ export default function RoasterDetail() {
           ))}
         </>
       ) : null}
-      {filter.length ? (
+      {filter.length && cat !== 'espresso' ? (
         <>
           <Text variant="h2" style={styles.section}>
             {t('catalog.filter')}{' '}
@@ -157,4 +244,17 @@ const styles = StyleSheet.create({
   pills: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   section: { marginTop: space.md },
   product: { gap: space.sm },
+  terms: { borderRadius: 10, padding: space.md, gap: 2 },
+  tools: { flexDirection: 'row', alignItems: 'center', gap: space.sm, marginTop: space.sm },
+  sortBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    minHeight: 40,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.bg,
+  },
 });

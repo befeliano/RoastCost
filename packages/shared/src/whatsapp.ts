@@ -42,6 +42,7 @@ export function buildOrderMessage(i: OrderMessageInput): string {
     `Sipariş no: ${formatOrderNo(i.orderNo)}`,
     '',
     items,
+    `Toplam: ${formatKg(i.items.reduce((s, it) => s + it.quantityG, 0))}`,
     '',
     `İstenen teslim tarihi: ${i.requestedDeliveryDate ? formatDateTr(i.requestedDeliveryDate) : 'Belirtilmedi'}`,
     `Not: ${note}`,

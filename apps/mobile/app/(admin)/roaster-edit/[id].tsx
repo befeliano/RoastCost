@@ -11,7 +11,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { api, ApiError } from '@/api/client';
-import type { AdminProduct, AdminRoaster, AdminTier } from '@/api/types';
+import type { AdminProduct, AdminRoaster, AdminTier, CatalogRoaster } from '@/api/types';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -22,6 +22,7 @@ import { Text } from '@/components/Text';
 import { parseDecimal, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 import { colors, space, useColors } from '@/theme';
+import { CityMap } from '@/features/explore/Maps';
 
 type TierSheet = { productId: string; tier?: AdminTier } | null;
 const CAT_LABEL: Record<ProductCategory, string> = {
@@ -58,6 +59,8 @@ export default function RoasterEdit() {
     color: '',
     logo: '',
     desc: '',
+    minOrder: '',
+    card: '',
   });
   const [featured, setFeatured] = useState(false);
   const [incVat, setIncVat] = useState(false);
@@ -83,6 +86,8 @@ export default function RoasterEdit() {
         color: r.brandColor ?? '',
         logo: r.logoUrl ?? '',
         desc: r.description ?? '',
+        minOrder: r.minOrderKg !== null ? String(r.minOrderKg).replace('.', ',') : '',
+        card: r.cardSurchargeBp !== null ? String(r.cardSurchargeBp / 100).replace('.', ',') : '',
       });
       setFeatured(r.isFeatured);
       setIncVat(r.pricesIncludeVat);
@@ -124,6 +129,8 @@ export default function RoasterEdit() {
         logoUrl: f.logo.trim() || null,
         description: f.desc.trim() || null,
         isFeatured: featured,
+        minOrderKg: f.minOrder.trim() ? parseDecimal(f.minOrder) : null,
+        cardSurchargeBp: f.card.trim() ? Math.round((parseDecimal(f.card) ?? 0) * 100) : null,
       };
       try {
         if (isNew) {
@@ -268,6 +275,43 @@ export default function RoasterEdit() {
         </View>
       </View>
       <Text variant="small">{t('admin.latLonHint')}</Text>
+      {parseDecimal(f.lat) !== null && parseDecimal(f.lon) !== null ? (
+        <CityMap
+          roasters={[
+            {
+              id: 'preview',
+              name: f.name,
+              district: f.district || null,
+              latitude: parseDecimal(f.lat),
+              longitude: parseDecimal(f.lon),
+            } as CatalogRoaster,
+          ]}
+          selectedId="preview"
+          onSelect={() => undefined}
+        />
+      ) : null}
+      <View style={styles.row}>
+        <View style={styles.flex}>
+          <Field
+            label={t('admin.minOrderKg')}
+            value={f.minOrder}
+            onChangeText={(v) => setF({ ...f, minOrder: v })}
+            keyboardType="decimal-pad"
+            suffix="kg"
+            placeholder="örn. 5"
+          />
+        </View>
+        <View style={styles.flex}>
+          <Field
+            label={t('admin.cardSurcharge')}
+            value={f.card}
+            onChangeText={(v) => setF({ ...f, card: v })}
+            keyboardType="decimal-pad"
+            suffix="%"
+            placeholder="örn. 2,5"
+          />
+        </View>
+      </View>
       <Field
         label={t('admin.brandColor')}
         value={f.color}

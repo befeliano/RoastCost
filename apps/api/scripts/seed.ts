@@ -117,6 +117,8 @@ await withCtx(db, ctx, async (tx) => {
       name: FLORES.name,
       whatsapp_e164: FLORES.whatsapp,
       prices_include_vat: true,
+      min_order_kg: 5,
+      card_surcharge_bp: 250,
       district: FLORES.district,
       address: FLORES.address,
       latitude: FLORES.latitude,
@@ -166,6 +168,7 @@ await withCtx(db, ctx, async (tx) => {
         brand_color: r.color,
         description: r.description,
         is_featured: r.featured,
+        min_order_kg: r.featured ? 3 : null,
       })
       .returning('id')
       .executeTakeFirstOrThrow();

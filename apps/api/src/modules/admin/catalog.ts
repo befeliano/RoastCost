@@ -111,6 +111,8 @@ export const adminCatalogRoutes: FastifyPluginAsyncZod = async (app) => {
         brandColor: r.brand_color,
         description: r.description,
         isFeatured: r.is_featured,
+        minOrderKg: r.min_order_kg,
+        cardSurchargeBp: r.card_surcharge_bp,
         commissionRateBp: r.commission_rate_bp ?? 1500,
         adminNotes: r.admin_notes,
         productCount: Number(counts.find((c) => c.roaster_id === r.id)?.n ?? 0),
@@ -139,6 +141,8 @@ export const adminCatalogRoutes: FastifyPluginAsyncZod = async (app) => {
           brand_color: b.brandColor,
           description: b.description,
           is_featured: b.isFeatured,
+          min_order_kg: b.minOrderKg ?? null,
+          card_surcharge_bp: b.cardSurchargeBp ?? null,
         })
         .returningAll()
         .executeTakeFirstOrThrow();
@@ -191,6 +195,8 @@ export const adminCatalogRoutes: FastifyPluginAsyncZod = async (app) => {
           ...(b.brandColor !== undefined && { brand_color: b.brandColor }),
           ...(b.description !== undefined && { description: b.description }),
           ...(b.isFeatured !== undefined && { is_featured: b.isFeatured }),
+          ...(b.minOrderKg !== undefined && { min_order_kg: b.minOrderKg }),
+          ...(b.cardSurchargeBp !== undefined && { card_surcharge_bp: b.cardSurchargeBp }),
         };
         if (Object.keys(set).length)
           await tx.updateTable('roasters').set(set).where('id', '=', req.params.id).execute();

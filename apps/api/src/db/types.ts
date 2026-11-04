@@ -132,6 +132,8 @@ export interface RoastersTable {
   brand_color: string | null;
   description: string | null;
   is_featured: ColumnType<boolean, boolean | undefined, boolean>;
+  min_order_kg: number | null;
+  card_surcharge_bp: number | null;
   rev: Generated<number>;
   created_at: Timestamp;
   updated_at: Timestamp;

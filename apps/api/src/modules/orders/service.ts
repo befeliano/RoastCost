@@ -103,7 +103,7 @@ export async function createOrder(deps: Deps, ctx: DbContext, input: OrderCreate
       .executeTakeFirstOrThrow();
     const roaster = await tx
       .selectFrom('roasters')
-      .select(['id', 'name'])
+      .select(['id', 'name', 'min_order_kg'])
       .where('id', '=', input.roasterId)
       .where('is_active', '=', true)
       .where('deleted_at', 'is', null)
@@ -158,6 +158,14 @@ export async function createOrder(deps: Deps, ctx: DbContext, input: OrderCreate
         line_total_kurus: lineTotalKurus(item.quantityG, tier.pricePerKgKurus),
       };
     });
+    const totalG = lines.reduce((s, l) => s + l.quantity_g, 0);
+    if (roaster.min_order_kg !== null && totalG < Number(roaster.min_order_kg) * 1000) {
+      throw badRequest(
+        'below_order_minimum',
+        `${roaster.name} için toplam en az ${String(Number(roaster.min_order_kg)).replace('.', ',')} kg sipariş verilebilir.`,
+        { minOrderKg: Number(roaster.min_order_kg), totalKg: totalG / 1000 },
+      );
+    }
     const subtotal = lines.reduce((s, l) => s + l.line_total_kurus, 0);
     const token = randomToken();
     const order = await tx

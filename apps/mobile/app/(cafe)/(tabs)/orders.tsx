@@ -10,11 +10,11 @@ import { StatusCard } from '@/features/account/StatusCards';
 import { tiersOf, useCatalog } from '@/features/catalog/store';
 import { ORDER_TONE } from '@/features/orders/status';
 import { useOrders } from '@/hooks/useCafeData';
-import { formatDate, formatTRY } from '@/lib/format';
+import { formatDate, formatGramsKg, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 import { useCart } from '@/store/cart';
 import { useSession } from '@/store/session';
-import { space } from '@/theme';
+import { colors, space } from '@/theme';
 
 export default function Orders() {
   const cafe = useSession((s) => s.me?.cafe);
@@ -60,7 +60,21 @@ export default function Orders() {
           >
             <View style={styles.flex}>
               <Text variant="h3">{catalog.roasters[roasterId]?.name ?? '—'}</Text>
-              <Text variant="small">{t('orders.items', { n: Object.keys(c.items).length })}</Text>
+              <Text variant="small">
+                {t('orders.items', { n: Object.keys(c.items).length })} ·{' '}
+                {formatGramsKg(Object.values(c.items).reduce((s, g) => s + g, 0))}
+              </Text>
+              {(() => {
+                const min = catalog.roasters[roasterId]?.minOrderKg;
+                const total = Object.values(c.items).reduce((s, g) => s + g, 0);
+                return min && total < min * 1000 ? (
+                  <Text variant="small" color={colors.warning}>
+                    {t('orders.minMissing', {
+                      kg: String(Math.round((min * 1000 - total) / 10) / 100).replace('.', ','),
+                    })}
+                  </Text>
+                ) : null;
+              })()}
             </View>
             <Text variant="money">{formatTRY(subtotal)}</Text>
           </Card>
