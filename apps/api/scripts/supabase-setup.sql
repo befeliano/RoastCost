@@ -5,7 +5,7 @@
 -- =====================================================================
 
 -- The API connects as roastcost_app (RLS enforced). Give it a login.
-alter role roastcost_app with login password 'BURAYA-EN-AZ-24-KARAKTER-RASTGELE-PAROLA';
+alter role roastcost_app with login password 'SELAMBENBURAK975!';
 
 -- RoastCost does NOT use Supabase's auto-generated REST API (PostgREST).
 -- Close the schema to Supabase's anon/authenticated roles so nothing is reachable with the public anon key.
