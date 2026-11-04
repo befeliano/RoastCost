@@ -91,10 +91,10 @@ export function HeaderBlobs() {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       <Floating dx={-14} dy={10} duration={6000}>
-        <Blob size={220} color={colors.sun} opacity={0.55} style={{ top: -110, right: -60 }} />
+        <Blob size={170} color={colors.sun} opacity={0.45} style={{ top: -90, right: -40 }} />
       </Floating>
       <Floating dx={12} dy={-6} duration={7500}>
-        <Blob size={160} color={colors.orange} opacity={0.4} style={{ bottom: -90, left: 40 }} />
+        <Blob size={120} color={colors.orange} opacity={0.35} style={{ bottom: -70, left: 60 }} />
       </Floating>
     </View>
   );

@@ -308,3 +308,131 @@ export const FILTER: {
     tl: 1250,
   },
 ];
+
+/**
+ * Flores Roastery — real price list provided by Burak (cash price per kg, TL). Vadeli prices and the
+ * Türk Kahvesi line are not modelled (no category); minimum order / payment terms are in the description.
+ * Map position / district are left empty until entered from the admin panel.
+ */
+export const FLORES = {
+  name: 'Flores Roastery',
+  whatsapp: '+905522256226',
+  color: '#1A1A1A',
+  description:
+    'Minimum sipariş toplam 5 kg (farklı kahveler karıştırılabilir). Havale/EFT komisyonsuz, kredi kartında %2,5 banka farkı. Eskişehir içinde 10 kg ve üzeri siparişler 1 iş günü içinde teslim. Vadeli fiyatlar bilgi içindir.',
+  products: [
+    // espresso — Tanah & Pagi are blends; Sidamo (Manis), Arjuna and Mogiana are single origins used for espresso
+    {
+      name: 'Tanah',
+      category: 'espresso',
+      origin: 'Endonezya & Etiyopya harmanı',
+      notes: 'yoğun gövde, yoğun crema, az asidite',
+      process: null,
+      tl: 885,
+    },
+    {
+      name: 'Pagi',
+      category: 'espresso',
+      origin: 'Harman',
+      notes: 'yumuşak, temiz, sütlü içime ve filtreye uyumlu',
+      process: null,
+      tl: 885,
+    },
+    {
+      name: 'Etiyopya Sidamo (Manis)',
+      category: 'espresso',
+      origin: 'Etiyopya, Sidamo',
+      notes: 'canlı, yumuşak, meyvemsi, yüksek tatlılık',
+      process: null,
+      tl: 885,
+    },
+    {
+      name: 'Endonezya Arjuna',
+      category: 'espresso',
+      origin: 'Garut, Batı Java · 1100–1400 m',
+      notes: 'karamel, çikolata, misket limonu',
+      process: 'other',
+      tl: 1250,
+    },
+    {
+      name: 'Brezilya Mogiana',
+      category: 'espresso',
+      origin: 'Alta Mogiana · 800–1200 m',
+      notes: 'badem, çikolata',
+      process: 'natural',
+      tl: 1100,
+    },
+    // demleme
+    {
+      name: 'Endonezya Frinsa',
+      category: 'filter',
+      origin: 'Batı Java · 1300–1500 m',
+      notes: 'yaban mersini, erik, SCA 87',
+      process: 'honey',
+      tl: 2200,
+    },
+    {
+      name: 'Endonezya Frinsa #3',
+      category: 'filter',
+      origin: 'Batı Java · 1300–1500 m',
+      notes: 'kan portakalı, kırmızı meyveler',
+      process: 'natural',
+      tl: 2400,
+    },
+    {
+      name: 'Endonezya Guntur',
+      category: 'filter',
+      origin: 'Garut, Batı Java · 1200–1500 m',
+      notes: 'çiçeksi, şeftali, sarı elma, esmer şeker',
+      process: 'honey',
+      tl: 1400,
+    },
+    {
+      name: 'Endonezya Papandayan',
+      category: 'filter',
+      origin: 'Garut, Batı Java · 1100–1400 m',
+      notes: 'çiçeksi, ahududu, erik',
+      process: 'natural',
+      tl: 2400,
+    },
+    {
+      name: 'Endonezya Sumatra',
+      category: 'filter',
+      origin: 'Sumatra · 1300 m (Giling Basah)',
+      notes: 'çikolata, baharat, tarçın',
+      process: 'other',
+      tl: 1100,
+    },
+    {
+      name: 'El Salvador Ochuspe',
+      category: 'filter',
+      origin: 'Santa Ana · 1250–1400 m · 60 saat',
+      notes: 'beyaz üzüm, karamel, kayısı',
+      process: 'anaerobic',
+      tl: 1350,
+    },
+    {
+      name: 'Kolombiya Watermelon',
+      category: 'filter',
+      origin: 'Castillo, Santa Monica · 1250–1800 m · Jairo Arcila',
+      notes: 'karpuz şekeri, kavun',
+      process: 'washed',
+      tl: 3600,
+    },
+    {
+      name: 'Meksika Kafeinsiz',
+      category: 'filter',
+      origin: 'Altura, Chiapas · 1300 m (Swiss Water)',
+      notes: 'çikolata, badem',
+      process: 'other',
+      tl: 1350,
+    },
+  ] as {
+    name: string;
+    category: 'espresso' | 'filter';
+    origin: string;
+    notes: string;
+    process: 'washed' | 'natural' | 'honey' | 'anaerobic' | 'other' | null;
+    tl: number;
+  }[],
+};

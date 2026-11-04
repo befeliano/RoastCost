@@ -6,7 +6,7 @@
 import { SYSTEM, createDb, withCtx } from '../src/db';
 import { hashPassword } from '../src/lib/crypto';
 import { seedCafeDefaults } from '../src/modules/auth/service';
-import { ESPRESSO, FILTER, ROASTERS } from './seed-data';
+import { ESPRESSO, FILTER, FLORES, ROASTERS } from './seed-data';
 
 try {
   process.loadEnvFile?.();
@@ -108,6 +108,43 @@ await withCtx(db, ctx, async (tx) => {
         .values({ user_id: u.id, doc_type: doc, doc_version: '2026-11-04' })
         .execute();
     }
+  }
+
+  // real catalogue (Flores Roastery) — featured, single 1 kg cash-price tier
+  const flores = await tx
+    .insertInto('roasters')
+    .values({
+      name: FLORES.name,
+      whatsapp_e164: FLORES.whatsapp,
+      prices_include_vat: false,
+      prices_updated_at: new Date(),
+      brand_color: FLORES.color,
+      description: FLORES.description,
+      is_featured: true,
+    })
+    .returning('id')
+    .executeTakeFirstOrThrow();
+  await tx
+    .insertInto('roaster_admin')
+    .values({ roaster_id: flores.id, commission_rate_bp: 1500 })
+    .execute();
+  for (const it of FLORES.products) {
+    const p = await tx
+      .insertInto('products')
+      .values({
+        roaster_id: flores.id,
+        name: it.name,
+        category: it.category,
+        process: it.process,
+        origin: it.origin,
+        tasting_notes: it.notes,
+      })
+      .returning('id')
+      .executeTakeFirstOrThrow();
+    await tx
+      .insertInto('price_tiers')
+      .values({ product_id: p.id, min_kg: 1, price_per_kg_kurus: it.tl * 100 })
+      .execute();
   }
 
   for (const r of ROASTERS) {

@@ -129,7 +129,7 @@ export default function Explore() {
                       ) : null}
                     </View>
                     <View style={styles.featuredBody}>
-                      <Text variant="h3" numberOfLines={1}>
+                      <Text variant="bodyStrong" numberOfLines={1}>
                         {r.name}
                       </Text>
                       <Text variant="small" numberOfLines={1}>
@@ -213,8 +213,8 @@ export default function Explore() {
                   <RoasterAvatar name={r.name} logoUrl={r.logoUrl} color={r.brandColor} size={52} />
                   <View style={styles.flex}>
                     <Text variant="h3">{r.name}</Text>
+                    <Text variant="small">{r.district ?? r.city}</Text>
                     <Text variant="small">
-                      {r.district ?? r.city} ·{' '}
                       {t('explore.counts', { e: st.espresso, f: st.filter })}
                     </Text>
                     <View style={styles.rowMeta}>
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   },
   featuredRow: { gap: space.md, paddingRight: space.lg },
   featured: {
-    width: 200,
+    width: 176,
     borderRadius: radius.lg,
     overflow: 'hidden',
     backgroundColor: colors.bg,

@@ -18,21 +18,21 @@ export interface Palette {
   onAccent: string;
 }
 
-export type PaletteKey = 'green' | 'sunset' | 'blue' | 'brown' | 'bordo';
+export type PaletteKey = 'coffee' | 'sunset' | 'blue' | 'bordo';
 
 /** Every pair is checked for WCAG AA in contrast.test.ts. */
 export const PALETTES: Record<PaletteKey, Palette> = {
-  green: {
-    key: 'green',
-    label: 'Orman & lime',
-    primary: '#163300',
-    primaryPressed: '#0D1F00',
-    onPrimary: '#9FE870',
-    primaryText: '#163300',
-    primaryBg: '#E2F6D5',
-    gradient: ['#0D1F00', '#2E6B12'],
-    accent: '#9FE870',
-    onAccent: '#163300',
+  coffee: {
+    key: 'coffee',
+    label: 'Kahve',
+    primary: '#5C3A21',
+    primaryPressed: '#472C18',
+    onPrimary: '#FFFFFF',
+    primaryText: '#5C3A21',
+    primaryBg: '#F4EBE2',
+    gradient: ['#3B2416', '#A0714A'],
+    accent: '#F2C36B',
+    onAccent: '#3B2416',
   },
   sunset: {
     key: 'sunset',
@@ -57,18 +57,6 @@ export const PALETTES: Record<PaletteKey, Palette> = {
     gradient: ['#7FD0F5', '#38A8E0'],
     accent: '#FADC65',
     onAccent: '#06273A',
-  },
-  brown: {
-    key: 'brown',
-    label: 'Kahve',
-    primary: '#7A4B2A',
-    primaryPressed: '#5F3A20',
-    onPrimary: '#FFFFFF',
-    primaryText: '#7A4B2A',
-    primaryBg: '#F5ECE4',
-    gradient: ['#5C3519', '#8A5532'],
-    accent: '#F2C36B',
-    onAccent: '#3A2A22',
   },
   bordo: {
     key: 'bordo',

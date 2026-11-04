@@ -62,7 +62,7 @@ export function Screen({
         colors={c.gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={[styles.bar, { paddingTop: insets.top + space.sm }]}
+        style={[styles.bar, { paddingTop: insets.top + space.xs }]}
       >
         <HeaderBlobs />
         <View style={styles.barRow}>
@@ -76,21 +76,16 @@ export function Screen({
             >
               <BlurView intensity={30} tint="light" style={StyleSheet.absoluteFill} />
               <View style={styles.layer}>
-                <Icon name="back" color={c.onPrimary} size={22} />
+                <Icon name="back" color={c.onPrimary} size={20} />
               </View>
             </Pressable>
           ) : null}
           <Animated.View entering={FadeIn.duration(250)} style={styles.title}>
-            <Text
-              variant={back ? 'h2' : 'h1'}
-              color={c.onPrimary}
-              numberOfLines={1}
-              accessibilityRole="header"
-            >
+            <Text variant="h2" color={c.onPrimary} numberOfLines={1} accessibilityRole="header">
               {title}
             </Text>
             {subtitle ? (
-              <Text variant="body" color={c.onPrimary} numberOfLines={1} style={styles.subtitle}>
+              <Text variant="small" color={c.onPrimary} numberOfLines={1} style={styles.subtitle}>
                 {subtitle}
               </Text>
             ) : null}
@@ -141,17 +136,17 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   bar: {
     paddingHorizontal: space.lg,
-    paddingBottom: space.xl,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
+    paddingBottom: space.md,
+    borderBottomLeftRadius: 22,
+    borderBottomRightRadius: 22,
     overflow: 'hidden',
     zIndex: 2,
   },
-  barRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 44 },
+  barRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 38 },
   backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
@@ -160,7 +155,7 @@ const styles = StyleSheet.create({
   title: { flex: 1 },
   // own layer: on web, absolutely positioned siblings (blur) would paint over a bare <svg>
   layer: { zIndex: 1 },
-  subtitle: { opacity: 0.92, marginTop: 2 },
+  subtitle: { opacity: 0.9, marginTop: 1 },
   content: { padding: space.lg, gap: space.md },
   footer: {
     paddingHorizontal: space.lg,

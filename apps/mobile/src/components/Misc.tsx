@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import Svg, { Circle, Ellipse, Path } from 'react-native-svg';
-import { colors, radius, space, useColors, type ThemeColors } from '@/theme';
+import { colors, fonts, radius, space, useColors, type ThemeColors } from '@/theme';
 import { Icon, type IconName } from './Icon';
 import { Text } from './Text';
 
@@ -119,7 +119,9 @@ export function ToggleRow({
   return (
     <View style={styles.toggle}>
       <View style={styles.flex}>
-        <Text variant="body">{label}</Text>
+        <Text variant="body" style={styles.rowTitle}>
+          {label}
+        </Text>
         {hint ? <Text variant="small">{hint}</Text> : null}
       </View>
       <Switch
@@ -153,11 +155,13 @@ export function Row({
       {left}
       {icon ? (
         <View style={[styles.rowIcon, { backgroundColor: c.primaryBg }]}>
-          <Icon name={icon} size={20} color={c.primaryText} />
+          <Icon name={icon} size={17} color={c.primaryText} />
         </View>
       ) : null}
       <View style={styles.flex}>
-        <Text variant="bodyStrong">{title}</Text>
+        <Text variant="body" style={styles.rowTitle}>
+          {title}
+        </Text>
         {subtitle ? <Text variant="small">{subtitle}</Text> : null}
       </View>
       {right}
@@ -246,11 +250,11 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: radius.pill,
     paddingHorizontal: 16,
-    minHeight: 44,
+    minHeight: 40,
     justifyContent: 'center',
     backgroundColor: colors.bg,
   },
-  chipText: { fontSize: 15 },
+  chipText: { fontSize: 14 },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -272,17 +276,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.md,
-    minHeight: 60,
+    minHeight: 52,
     paddingVertical: space.sm,
     paddingHorizontal: space.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     backgroundColor: colors.bg,
   },
+  rowTitle: { fontSize: 14.5, fontFamily: fonts.medium },
   rowIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
   },

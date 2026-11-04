@@ -54,7 +54,7 @@ export function RoasterAvatar({
       <Text
         style={{
           color: '#FFFFFF',
-          fontFamily: 'PlusJakartaSans_800ExtraBold',
+          fontFamily: 'Urbanist_800ExtraBold',
           fontSize: size * 0.38,
         }}
       >
