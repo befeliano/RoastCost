@@ -1,0 +1,24 @@
+# Automatic HTTPS (Let's Encrypt). DOMAIN comes from the environment, e.g. api.ornek.com.tr
+{$DOMAIN} {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+	request_body {
+		max_size 512KB
+	}
+	reverse_proxy api:3000
+	log {
+		output stdout
+		format json
+		# never log query strings (tokens) or headers
+		format filter {
+			wrap json
+			fields {
+				request>uri delete
+				request>headers delete
+			}
+		}
+	}
+}
