@@ -1,11 +1,12 @@
 -- =====================================================================
 -- RoastCost on Supabase (TEST / DEMO ONLY — see docs/RUNBOOK.md, spec K12)
 -- 1) SQL Editor → run apps/api/migrations/0001_init.sql (whole file)
--- 2) SQL Editor → run THIS file after replacing the password below
+-- 2) SQL Editor → paste THIS file, replace the password below IN THE EDITOR ONLY, run.
+--    ⚠ Never commit the real password: this repository is public.
 -- =====================================================================
 
 -- The API connects as roastcost_app (RLS enforced). Give it a login.
-alter role roastcost_app with login password 'SELAMBENBURAK975!';
+alter role roastcost_app with login password 'BURAYA-EN-AZ-24-KARAKTER-RASTGELE-PAROLA';
 
 -- RoastCost does NOT use Supabase's auto-generated REST API (PostgREST).
 -- Close the schema to Supabase's anon/authenticated roles so nothing is reachable with the public anon key.
