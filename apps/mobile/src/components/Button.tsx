@@ -1,8 +1,6 @@
 import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
 import {
   ActivityIndicator,
-  Platform,
   Pressable,
   StyleSheet,
   View,
@@ -38,7 +36,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 /**
  * Press: squish to 0.95 + fade to 0.85; release: springs back (spec §11.4).
- * Primary = palette gradient with a coloured glow.
+ * Primary = solid palette colour (no gradient / glow — keeps it calm).
  */
 export function Button({
   title,
@@ -92,30 +90,12 @@ export function Button({
         styles.base,
         small && styles.small,
         { backgroundColor: bg, borderColor: border },
-        variant === 'primary' &&
-          !isDisabled &&
-          Platform.select({
-            ios: {
-              shadowColor: c.primary,
-              shadowOpacity: 0.35,
-              shadowRadius: 12,
-              shadowOffset: { width: 0, height: 6 },
-            },
-            default: { elevation: 4 },
-          }),
+        variant === 'primary' && { backgroundColor: c.primary, borderColor: c.primary },
         isDisabled && styles.disabled,
         anim,
         style,
       ]}
     >
-      {variant === 'primary' ? (
-        <LinearGradient
-          colors={c.gradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[StyleSheet.absoluteFill, { borderRadius: 999 }]}
-        />
-      ) : null}
       {loading ? (
         <ActivityIndicator color={fg} />
       ) : (
@@ -130,14 +110,14 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 56,
-    borderRadius: 999,
+    minHeight: 52,
+    borderRadius: 14,
     borderWidth: 1.5,
     paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  small: { minHeight: 44, paddingHorizontal: 16 },
+  small: { minHeight: 44, borderRadius: 12, paddingHorizontal: 16 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   disabled: { opacity: 0.45 },
 });

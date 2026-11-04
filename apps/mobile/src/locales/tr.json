@@ -322,7 +322,7 @@
     "map": "Haritada kavurucular",
     "byDistrict": "İlçeye göre kavurucular",
     "counts": "{e} espresso – {f} demleme",
-    "from": "{price}/kg'dan başlayan",
+    "from": "{price}/kg'dan",
     "catalog": "Kataloğu gör →",
     "tapPin": "Bir pine dokunun, kavurucuyu görün",
     "pendingTitle": "Kavurucular onaydan sonra açılacak",

@@ -14,7 +14,7 @@ import { RoastDots } from '@/features/catalog/RoastDots';
 import { productsOf, tiersOf, useCatalog } from '@/features/catalog/store';
 import { t } from '@/locales';
 import { useCart } from '@/store/cart';
-import { colors, radius, space, useColors } from '@/theme';
+import { colors, space, useColors } from '@/theme';
 
 function ProductRow({ p }: { p: CatalogProduct }) {
   const catalog = useCatalog();
@@ -42,7 +42,7 @@ function ProductRow({ p }: { p: CatalogProduct }) {
       </View>
       {p.tastingNotes ? (
         <Text variant="small" color={colors.text}>
-          “{p.tastingNotes}”
+          {p.tastingNotes}
         </Text>
       ) : null}
       <View style={styles.row}>
@@ -96,13 +96,12 @@ export default function RoasterDetail() {
       }
     >
       <Card style={styles.header}>
-        <View style={[styles.band, { backgroundColor: roaster.brandColor ?? colors.coffee }]} />
         <View style={styles.headerRow}>
           <RoasterAvatar
             name={roaster.name}
             logoUrl={roaster.logoUrl}
             color={roaster.brandColor}
-            size={72}
+            size={56}
           />
           <View style={styles.flex}>
             <Text variant="h2">{roaster.name}</Text>
@@ -155,15 +154,8 @@ export default function RoasterDetail() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  header: { gap: space.sm, paddingTop: 0, overflow: 'hidden' },
-  band: {
-    height: 56,
-    marginHorizontal: -space.lg,
-    marginBottom: -28,
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
-  },
-  headerRow: { flexDirection: 'row', alignItems: 'flex-end', gap: space.md },
+  header: { gap: space.sm },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   pills: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   section: { marginTop: space.md },
   product: { gap: space.sm },

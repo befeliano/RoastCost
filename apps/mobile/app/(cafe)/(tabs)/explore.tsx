@@ -4,22 +4,23 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated';
-import { Blob } from '@/components/Blobs';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Icon } from '@/components/Icon';
-import { Chips, EmptyState, Pill, SectionTitle } from '@/components/Misc';
+import { Chips, EmptyState, SectionTitle } from '@/components/Misc';
 import { RoasterAvatar } from '@/components/RoasterAvatar';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { EmailVerifyNotice, StatusCard } from '@/features/account/StatusCards';
-import { Freshness } from '@/features/catalog/Freshness';
 import { districtsOf, roasterStats } from '@/features/catalog/stats';
 import { activeRoasters, useCatalog } from '@/features/catalog/store';
 import { CityMap, TurkeyMap } from '@/features/explore/Maps';
 import { t } from '@/locales';
 import { useSession } from '@/store/session';
 import { colors, radius, space, useColors } from '@/theme';
+
+/** "₺885,00" → "₺885" for whole-lira list prices */
+const priceShort = (kurus: number) => formatTRY(kurus).replace(/,00$/, '');
 
 export default function Explore() {
   const me = useSession((s) => s.me);
@@ -67,10 +68,9 @@ export default function Explore() {
           <LinearGradient
             colors={c.gradient}
             start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+            end={{ x: 1, y: 0.4 }}
             style={StyleSheet.absoluteFill}
           />
-          <Blob size={170} color={colors.sun} opacity={0.5} style={{ top: -80, right: -60 }} />
           <View style={styles.layer}>
             <Icon name="cup" color={c.onPrimary} size={28} />
           </View>
@@ -113,21 +113,12 @@ export default function Explore() {
                     onPress={() => open(r.id)}
                     style={styles.featured}
                   >
-                    <View
-                      style={[styles.featuredBand, { backgroundColor: r.brandColor ?? c.primary }]}
-                    >
-                      <RoasterAvatar
-                        name={r.name}
-                        logoUrl={r.logoUrl}
-                        color={r.brandColor}
-                        size={56}
-                      />
-                      {r.isFeatured ? (
-                        <View style={styles.badge}>
-                          <Pill tone="accent" label={t('explore.featuredBadge')} />
-                        </View>
-                      ) : null}
-                    </View>
+                    <RoasterAvatar
+                      name={r.name}
+                      logoUrl={r.logoUrl}
+                      color={r.brandColor}
+                      size={44}
+                    />
                     <View style={styles.featuredBody}>
                       <Text variant="bodyStrong" numberOfLines={1}>
                         {r.name}
@@ -140,7 +131,7 @@ export default function Explore() {
                       </Text>
                       {st.minPricePerKgKurus ? (
                         <Text variant="bodyStrong" color={c.primaryText}>
-                          {t('explore.from', { price: formatTRY(st.minPricePerKgKurus) })}
+                          {t('explore.from', { price: priceShort(st.minPricePerKgKurus) })}
                         </Text>
                       ) : null}
                     </View>
@@ -220,10 +211,9 @@ export default function Explore() {
                     <View style={styles.rowMeta}>
                       {st.minPricePerKgKurus ? (
                         <Text variant="bodyStrong" color={c.primaryText}>
-                          {t('explore.from', { price: formatTRY(st.minPricePerKgKurus) })}
+                          {t('explore.from', { price: priceShort(st.minPricePerKgKurus) })}
                         </Text>
                       ) : null}
-                      <Freshness iso={r.pricesUpdatedAt} />
                     </View>
                   </View>
                   <Icon name="chevron" size={18} color={colors.textMuted} />
@@ -252,16 +242,16 @@ const styles = StyleSheet.create({
   featuredRow: { gap: space.md, paddingRight: space.lg },
   featured: {
     width: 176,
-    borderRadius: radius.lg,
+    padding: space.md,
+    gap: space.md,
+    borderRadius: 14,
     overflow: 'hidden',
     backgroundColor: colors.bg,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  featuredBand: { height: 72, justifyContent: 'flex-end', padding: space.md, paddingBottom: 0 },
   layer: { zIndex: 1 },
-  badge: { position: 'absolute', top: space.md, right: space.md },
-  featuredBody: { padding: space.md, paddingTop: space.lg, gap: 2 },
+  featuredBody: { gap: 2 },
   mapCard: { gap: space.md, padding: space.md },
   selRow: {
     flexDirection: 'row',

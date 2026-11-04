@@ -116,7 +116,11 @@ await withCtx(db, ctx, async (tx) => {
     .values({
       name: FLORES.name,
       whatsapp_e164: FLORES.whatsapp,
-      prices_include_vat: false,
+      prices_include_vat: true,
+      district: FLORES.district,
+      address: FLORES.address,
+      latitude: FLORES.latitude,
+      longitude: FLORES.longitude,
       prices_updated_at: new Date(),
       brand_color: FLORES.color,
       description: FLORES.description,

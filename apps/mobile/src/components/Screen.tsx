@@ -16,7 +16,6 @@ import {
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, hitSlop, space, useColors } from '@/theme';
-import { BlobField, HeaderBlobs } from './Blobs';
 import { Icon } from './Icon';
 import { OfflineBanner } from './OfflineBanner';
 import { Text } from './Text';
@@ -57,14 +56,12 @@ export function Screen({
   return (
     <View style={styles.root}>
       <StatusBar style={c.onPrimary === '#FFFFFF' ? 'light' : 'dark'} />
-      <BlobField />
       <LinearGradient
         colors={c.gradient}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        end={{ x: 1, y: 0.4 }}
         style={[styles.bar, { paddingTop: insets.top + space.xs }]}
       >
-        <HeaderBlobs />
         <View style={styles.barRow}>
           {back ? (
             <Pressable
@@ -74,10 +71,7 @@ export function Screen({
               onPress={() => router.back()}
               style={styles.backBtn}
             >
-              <BlurView intensity={30} tint="light" style={StyleSheet.absoluteFill} />
-              <View style={styles.layer}>
-                <Icon name="back" color={c.onPrimary} size={20} />
-              </View>
+              <Icon name="back" color={c.onPrimary} size={22} />
             </Pressable>
           ) : null}
           <Animated.View entering={FadeIn.duration(250)} style={styles.title}>
@@ -137,20 +131,16 @@ const styles = StyleSheet.create({
   bar: {
     paddingHorizontal: space.lg,
     paddingBottom: space.md,
-    borderBottomLeftRadius: 22,
-    borderBottomRightRadius: 22,
     overflow: 'hidden',
     zIndex: 2,
   },
   barRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 38 },
   backBtn: {
-    width: 34,
+    width: 30,
     height: 34,
-    borderRadius: 17,
-    overflow: 'hidden',
+    marginLeft: -6,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.18)',
   },
   title: { flex: 1 },
   // own layer: on web, absolutely positioned siblings (blur) would paint over a bare <svg>

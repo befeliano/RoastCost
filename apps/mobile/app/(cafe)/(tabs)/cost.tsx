@@ -10,7 +10,6 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { AnimatedNumber } from '@/components/AnimatedNumber';
-import { Blob } from '@/components/Blobs';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -225,13 +224,6 @@ export default function Cost() {
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={StyleSheet.absoluteFill}
-            />
-            <Blob size={220} color={colors.sun} opacity={0.45} style={{ top: -90, right: -70 }} />
-            <Blob
-              size={160}
-              color={colors.orange}
-              opacity={0.35}
-              style={{ bottom: -80, left: -40 }}
             />
             <Text variant="caption" color={c.onPrimary}>
               {t('cost.suggested').toUpperCase()}

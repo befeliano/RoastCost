@@ -16,10 +16,12 @@ interface Props extends TextInputProps {
   error?: string | undefined;
   hint?: string | undefined;
   suffix?: string;
+  /** label stays for screen readers but isn't drawn (e.g. when a heading above already says it) */
+  hideLabel?: boolean;
 }
 
 /** Labelled input; on error: gentle shake + haptic (spec §11.4) and the error as text (§11.5). */
-export function Field({ label, error, hint, suffix, style, ...rest }: Props) {
+export function Field({ label, error, hint, suffix, hideLabel, style, ...rest }: Props) {
   const x = useSharedValue(0);
   const reduce = useReducedMotion();
   useEffect(() => {
@@ -36,9 +38,11 @@ export function Field({ label, error, hint, suffix, style, ...rest }: Props) {
   const anim = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
   return (
     <Animated.View style={[styles.wrap, anim]}>
-      <Text variant="caption" style={styles.label}>
-        {label}
-      </Text>
+      {hideLabel ? null : (
+        <Text variant="caption" style={styles.label}>
+          {label}
+        </Text>
+      )}
       <View style={[styles.inputRow, error ? styles.inputError : null]}>
         <TextInput
           accessibilityLabel={label}

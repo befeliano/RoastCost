@@ -312,12 +312,16 @@ export const FILTER: {
 /**
  * Flores Roastery — real price list provided by Burak (cash price per kg, TL). Vadeli prices and the
  * Türk Kahvesi line are not modelled (no category); minimum order / payment terms are in the description.
- * Map position / district are left empty until entered from the admin panel.
+ * Prices include VAT. Position: Kanaat Sokak, Merkez Yeni Mah. (OpenStreetMap / Nominatim).
  */
 export const FLORES = {
   name: 'Flores Roastery',
   whatsapp: '+905522256226',
   color: '#1A1A1A',
+  district: 'Tepebaşı',
+  address: 'Merkez Yeni Mah. Kanaat Sok. No: 8/A, 26004 Tepebaşı / Eskişehir',
+  latitude: 39.77623,
+  longitude: 30.52919,
   description:
     'Minimum sipariş toplam 5 kg (farklı kahveler karıştırılabilir). Havale/EFT komisyonsuz, kredi kartında %2,5 banka farkı. Eskişehir içinde 10 kg ve üzeri siparişler 1 iş günü içinde teslim. Vadeli fiyatlar bilgi içindir.',
   products: [

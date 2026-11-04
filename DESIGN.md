@@ -4,15 +4,14 @@ Tasarım dili. Bileşen ve şekil dili DesignMD kataloğundaki **Wise**'tan (hap
 
 ## Renk
 
-| Token                  | Varsayılan (Kahve)            | Kullanım                                    |
-| ---------------------- | ----------------------------- | ------------------------------------------- |
-| `primary`              | `#5C3A21`                     | dolgu: butonlar, seçili chip                |
-| `gradient`             | `#3B2416 → #A0714A`           | başlık, ana buton, hero kartlar             |
-| `onPrimary`            | `#FFFFFF`                     | primary/gradient üstündeki yazı ve ikon     |
-| `accent` / `onAccent`  | `#F2C36B` / `#3B2416`         | rozet, aktif sekme hapı, ikincil hızlı kart |
-| `primaryText`          | `#5C3A21`                     | beyaz üstünde vurgu yazısı, ikincil buton   |
-| `primaryBg`            | `#F4EBE2`                     | yumuşak vurgu zemini                        |
-| `sun / orange / coral` | `#FFD23F / #FF9F43 / #FF6B6B` | yalnızca dekoratif blob — asla yazı         |
+| Token                 | Varsayılan (Kahve)    | Kullanım                                    |
+| --------------------- | --------------------- | ------------------------------------------- |
+| `primary`             | `#5C3A21`             | dolgu: butonlar, seçili chip                |
+| `gradient`            | `#3B2416 → #A0714A`   | başlık, ana buton, hero kartlar             |
+| `onPrimary`           | `#FFFFFF`             | primary/gradient üstündeki yazı ve ikon     |
+| `accent` / `onAccent` | `#F2C36B` / `#3B2416` | rozet, aktif sekme hapı, ikincil hızlı kart |
+| `primaryText`         | `#5C3A21`             | beyaz üstünde vurgu yazısı, ikincil buton   |
+| `primaryBg`           | `#F4EBE2`             | yumuşak vurgu zemini                        |
 
 Paletler (Ayarlar → Görünüm): Kahve (koyu → açık kahve gradyan, varsayılan), Gün batımı, Açık mavi, Bordo. Her palet `contrast.test.ts` ile WCAG AA'dan geçer (yazı 4.5:1, başlıktaki büyük yazı 3:1).
 
@@ -22,11 +21,14 @@ Urbanist (OFL, uygulamayla paketli) — yuvarlak, zarif geometrik sans. Ölçek:
 
 ## Şekil ve derinlik
 
-- Butonlar **hap** (`borderRadius: 999`), min 56 pt; küçük 44 pt.
-- Kartlar 20 pt köşe, **kenarlık yok, yalnızca gölge** (`rgba(59,36,22,0.08) 0 8 24`).
-- Başlık: ince gradyan şerit + iki sıcak blob, alt köşeler 22 pt, safe area üst boşluğu dahil; başlık h2.
-- Arka plan: yavaşça süzülen sıcak bloblar (`BlobField`).
-- Buzlu cam: alt menü, alt pencere arka planı, başarı ekranı, footer (`expo-blur`).
+İlke: **sakin ve el yapımı** — süs yok, içerik öne çıksın ("yapay zekâ şablonu" görüntüsünden kaçın: parlayan bloblar, renkli gölge, her yerde gradyan, kalın beyaz halkalı avatar yok).
+
+- Butonlar 14 pt köşeli dikdörtgen, düz `primary` dolgu (gradyan ve renkli parıltı yok); min 52 pt, küçük 44 pt.
+- Kartlar 14 pt köşe, ince kenarlık (`border`) + çok hafif gölge.
+- Zemin sıcak kâğıt tonu `#F5F1EB`; metin kahve tonlu siyah.
+- Başlık: ince, düz alt kenarlı şerit; koyu → açık kahve yatay gradyan. Gradyan yalnızca başlıkta ve ana hesap kartında.
+- Kavurucu logosu: yuvarlatılmış kare karo (logo yoksa baş harfler, toprak tonları).
+- Buzlu cam yalnızca alt menü, alt pencere ve başarı ekranında (`expo-blur`).
 
 ## Hareket (Reanimated, "Hareketi azalt"ta anlık)
 

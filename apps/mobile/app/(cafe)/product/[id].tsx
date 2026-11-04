@@ -168,6 +168,7 @@ export default function ProductDetail() {
         <View style={styles.flex}>
           <Field
             label={t('catalog.quantity')}
+            hideLabel
             value={kg}
             onChangeText={setKg}
             keyboardType="decimal-pad"

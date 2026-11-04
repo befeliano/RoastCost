@@ -14,11 +14,11 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { colors, radius, space } from '@/theme';
+import { colors, space } from '@/theme';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-/** Rounded card with a soft shadow; pressable cards squish slightly (0.98) and spring back. */
+/** Card with a hairline border and a faint shadow; pressable cards squish slightly (0.98) and spring back. */
 export function Card({
   style,
   onPress,
@@ -56,17 +56,19 @@ export function Card({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.bg,
-    borderRadius: radius.lg + 4,
+    borderRadius: 14,
     padding: space.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
     ...Platform.select({
       ios: {
-        shadowColor: '#163300',
-        shadowOpacity: 0.08,
-        shadowRadius: 24,
-        shadowOffset: { width: 0, height: 8 },
+        shadowColor: '#3B2416',
+        shadowOpacity: 0.04,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 2 },
       },
-      android: { elevation: 2 },
-      default: { boxShadow: '0 8px 24px rgba(22,51,0,0.08)' },
+      android: { elevation: 1 },
+      default: { boxShadow: '0 2px 6px rgba(59,36,22,0.04)' },
     }),
   },
 });

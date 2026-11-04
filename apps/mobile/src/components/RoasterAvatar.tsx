@@ -1,7 +1,8 @@
 import { Image, StyleSheet, View } from 'react-native';
 import { Text } from './Text';
 
-const FALLBACK = ['#12874A', '#1769AA', '#B5452B', '#7A4B2A', '#8A2BE2', '#C27C0E'];
+// earthy, coffee-shop colours for roasters without a logo or brand colour
+const FALLBACK = ['#5C3A21', '#2F4A3A', '#9A4A2C', '#3E4C5E', '#7A5A2E', '#4A2C3A'];
 
 function initials(name: string): string {
   return name
@@ -24,8 +25,8 @@ export function RoasterAvatar({
   color?: string | null;
   size?: number;
 }) {
-  const bg = color ?? FALLBACK[name.length % FALLBACK.length] ?? '#12874A';
-  const r = size / 2;
+  const bg = color ?? FALLBACK[name.length % FALLBACK.length] ?? '#5C3A21';
+  const r = Math.round(size * 0.26);
   if (logoUrl) {
     return (
       <Image
@@ -45,8 +46,6 @@ export function RoasterAvatar({
           height: size,
           borderRadius: r,
           backgroundColor: bg,
-          borderWidth: size >= 48 ? 3 : 0,
-          borderColor: '#FFFFFF',
         },
       ]}
       accessibilityElementsHidden
@@ -54,8 +53,9 @@ export function RoasterAvatar({
       <Text
         style={{
           color: '#FFFFFF',
-          fontFamily: 'Urbanist_800ExtraBold',
-          fontSize: size * 0.38,
+          fontFamily: 'Urbanist_700Bold',
+          fontSize: size * 0.34,
+          letterSpacing: 0.5,
         }}
       >
         {initials(name)}
