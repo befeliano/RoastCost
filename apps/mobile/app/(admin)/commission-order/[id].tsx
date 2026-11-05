@@ -22,6 +22,7 @@ import { COMMISSION_TONE } from '@/features/admin/labels';
 import { formatDateTime, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 import { space } from '@/theme';
+import { LoadState } from '@/components/LoadState';
 
 const NEXT: Record<CommissionStatus, CommissionStatus[]> = {
   not_applicable: [],
@@ -45,7 +46,7 @@ export default function CommissionOrder() {
   if (!o)
     return (
       <Screen title={t('admin.commission')} back>
-        {null}
+        <LoadState q={q} notFound={t('common.notFound')} />
       </Screen>
     );
 

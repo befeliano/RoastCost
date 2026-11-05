@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { api, ApiError } from '@/api/client';
 import type { CatalogProduct, CatalogRoaster, CatalogSync, CatalogTier } from '@/api/types';
 import { kv } from '@/lib/kv';
+import { todayTr } from '@roastcost/shared';
 
 const KEY = 'catalog_v3'; // v3: roaster order terms (0003) → force a full resync
 const MIN_INTERVAL_MS = 5 * 60_000;
@@ -41,6 +42,9 @@ function applyDelta<T extends { id: string; deletedAt: string | null }>(
  * Catalog cache with delta sync (spec §12.1): the device keeps `rev`, asks only for changes,
  * tombstones remove rows. Works offline from the last snapshot.
  */
+/** bumped on sign-out; results of older syncs are discarded */
+let generation = 0;
+
 export const useCatalog = create<CatalogState>((set, get) => ({
   ...empty,
   loaded: false,
@@ -60,8 +64,10 @@ export const useCatalog = create<CatalogState>((set, get) => ({
     if (!opts.force && s.syncedAt && Date.now() - new Date(s.syncedAt).getTime() < MIN_INTERVAL_MS)
       return;
     set({ syncing: true, error: null });
+    const gen = generation;
     try {
       const d = await api<CatalogSync | undefined>(`/catalog/sync?since_rev=${s.rev}`);
+      if (gen !== generation) return;
       const now = new Date().toISOString();
       const next: CatalogData = d
         ? {
@@ -75,13 +81,15 @@ export const useCatalog = create<CatalogState>((set, get) => ({
       set({ ...next, syncing: false });
       await kv.setJSON(KEY, next);
     } catch (e) {
+      if (gen !== generation) return;
       set({ syncing: false, error: e instanceof ApiError ? e.code : 'unknown' });
     }
   },
 
   async reset() {
+    generation++; // a sync still in flight for the previous account must not write back
     await kv.remove(KEY);
-    set({ ...empty, loaded: true });
+    set({ ...empty, loaded: true, syncing: false });
   },
 }));
 
@@ -97,11 +105,7 @@ export function productsOf(s: CatalogData, roasterId: string): CatalogProduct[] 
     .sort((a, b) => a.name.localeCompare(b.name, 'tr'));
 }
 
-export function tiersOf(
-  s: CatalogData,
-  productId: string,
-  today = new Date().toISOString().slice(0, 10),
-): CatalogTier[] {
+export function tiersOf(s: CatalogData, productId: string, today = todayTr()): CatalogTier[] {
   return Object.values(s.tiers)
     .filter((t) => t.productId === productId && (!t.validUntil || t.validUntil >= today))
     .sort((a, b) => a.minKg - b.minKg);

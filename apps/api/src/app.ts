@@ -48,6 +48,8 @@ export async function buildApp(
     clock?: Clock;
     logger?: FastifyServerOptions['logger'];
     rateLimit?: boolean;
+    /** test hook: receives every registered route (used to check that nothing is left unprotected) */
+    onRoute?: (r: { method: string | string[]; url: string }) => void;
   },
 ) {
   const deps: Deps = {
@@ -83,6 +85,10 @@ export async function buildApp(
             },
           }),
   }).withTypeProvider<ZodTypeProvider>();
+  if (input.onRoute) {
+    const cb = input.onRoute;
+    app.addHook('onRoute', (r) => cb({ method: r.method, url: r.url }));
+  }
 
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);

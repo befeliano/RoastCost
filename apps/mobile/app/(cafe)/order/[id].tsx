@@ -20,10 +20,10 @@ import { t } from '@/locales';
 import { colors, space } from '@/theme';
 import { confirm } from '@/lib/confirm';
 import { toast } from '@/components/Toast';
-import { Skeleton } from '@/components/Skeleton';
 import { useCatalog } from '@/features/catalog/store';
 import { useCart } from '@/store/cart';
 import { nav } from '@/lib/nav';
+import { LoadState } from '@/components/LoadState';
 
 function Step({
   done,
@@ -65,7 +65,7 @@ export default function OrderDetail() {
   if (!o)
     return (
       <Screen title={t('orders.title')} back>
-        <Skeleton rows={3} />
+        <LoadState q={q} notFound={t('common.notFound')} />
       </Screen>
     );
   const open = o.status === 'draft' || o.status === 'sent';

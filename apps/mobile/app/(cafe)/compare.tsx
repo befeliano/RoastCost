@@ -18,13 +18,17 @@ import { t } from '@/locales';
 import { colors, space } from '@/theme';
 import { formatTRY } from '@/lib/format';
 import { nav } from '@/lib/nav';
+import { LoadState } from '@/components/LoadState';
 
 /** Every active product ranked by cost per cup for the selected recipe (spec §7.3 Karşılaştırma). */
 export default function Compare() {
   const catalog = useCatalog();
   const prefs = useCostPrefs();
-  const recipes = (useRecipes().data ?? []).filter((r) => r.isActive);
-  const ingredients = useIngredients().data ?? [];
+  const recipesQ = useRecipes();
+  const recipesData = recipesQ.data;
+  const recipes = useMemo(() => (recipesData ?? []).filter((r) => r.isActive), [recipesData]);
+  const ingredientsData = useIngredients().data;
+  const ingredients = useMemo(() => ingredientsData ?? [], [ingredientsData]);
   const settings = useSettings().data;
   const [cat, setCat] = useState<'all' | 'espresso' | 'filter'>('espresso');
   const recipe = recipes.find((r) => r.id === prefs.recipeId) ?? recipes[0];
@@ -46,6 +50,7 @@ export default function Compare() {
 
   return (
     <Screen title={t('catalog.compareTitle')} back scroll={false}>
+      <LoadState q={recipesQ} rows={4} />
       <Chips
         options={recipes.map((r) => ({ value: r.id, label: r.name }))}
         value={recipe?.id ?? null}

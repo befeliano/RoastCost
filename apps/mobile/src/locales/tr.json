@@ -21,7 +21,8 @@
     "required": "Zorunlu alan",
     "invalidNumber": "Geçerli bir sayı girin",
     "invalidMoney": "Geçerli bir tutar girin (örn. 45,50)",
-    "search": "Ara"
+    "search": "Ara",
+    "notFound": "Bulunamadı"
   },
   "auth": {
     "welcomeTitle": "Fincanın gerçek maliyeti",
@@ -255,7 +256,10 @@
     "useInCalc": "Maliyet hesabında kullan",
     "usedInCalc": "Maliyet hesabına eklendi",
     "removeFromCart": "Sepetten çıkar",
-    "removedFromCart": "Sepetten çıkarıldı"
+    "removedFromCart": "Sepetten çıkarıldı",
+    "productGone": "Bu çekirdek artık satışta değil",
+    "roasterGone": "Bu kavurucu artık listede değil",
+    "goneBody": "Katalog güncellendi; benzer çekirdekleri Keşfet'te bulabilirsiniz."
   },
   "orders": {
     "title": "Siparişler",
@@ -311,7 +315,8 @@
     "monthOrders": "{n} sipariş",
     "filterOpen": "Açık",
     "filterClosed": "Kapanan",
-    "emptyHistoryBody": "Gönderdiğiniz siparişler ve kavurucunun yanıtı burada görünür."
+    "emptyHistoryBody": "Gönderdiğiniz siparişler ve kavurucunun yanıtı burada görünür.",
+    "loadMore": "Daha eski siparişler"
   },
   "admin": {
     "panel": "Panel",

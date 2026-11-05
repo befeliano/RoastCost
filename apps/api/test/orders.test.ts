@@ -318,6 +318,34 @@ describe('order flow (spec §8)', () => {
     expect(expired.body).toContain('geçersiz ya da süresi dolmuş');
   });
 
+  it('history pagination: every order exactly once across pages, newest first', async () => {
+    const { cafe, roasterId, productId } = await setup();
+    const ids: string[] = [];
+    for (let i = 0; i < 5; i++) {
+      ids.push(
+        (await placeOrder(cafe.accessToken, roasterId, productId, 1000 + i * 1000)).json().order.id,
+      );
+      t.clock.advance(1000);
+    }
+    const seen: string[] = [];
+    let cursor: string | null = null;
+    let pages = 0;
+    do {
+      const page: { items: { id: string }[]; nextCursor: string | null } = (
+        await t.app.inject({
+          method: 'GET',
+          url: `/v1/orders?limit=2${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`,
+          headers: bearer(cafe.accessToken),
+        })
+      ).json();
+      seen.push(...page.items.map((o: { id: string }) => o.id));
+      cursor = page.nextCursor;
+      pages++;
+    } while (cursor && pages < 10);
+    expect(pages).toBe(3); // 2 + 2 + 1, and no empty trailing page
+    expect(seen).toEqual([...ids].reverse());
+  });
+
   it('roaster minimum total kg (0003): blocks smaller orders, syncs terms to cafes, message shows total', async () => {
     const { cafe, admin, roasterId, productId } = await setup();
     const patch = await t.app.inject({

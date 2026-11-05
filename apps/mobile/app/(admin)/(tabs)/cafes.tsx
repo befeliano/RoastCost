@@ -10,6 +10,7 @@ import { formatDate } from '@/lib/format';
 import { t } from '@/locales';
 import { Field } from '@/components/Field';
 import { nav } from '@/lib/nav';
+import { LoadState } from '@/components/LoadState';
 
 export default function Cafes() {
   const [status, setStatus] = useState<CafeStatus | 'all'>('pending');
@@ -22,6 +23,7 @@ export default function Cafes() {
   });
   return (
     <Screen title={t('admin.cafes')} onRefresh={() => void q.refetch()} refreshing={q.isRefetching}>
+      <LoadState q={q} />
       <Chips
         options={[
           { value: 'pending' as const, label: CAFE_LABEL.pending },
@@ -41,7 +43,9 @@ export default function Cafes() {
         placeholder={t('admin.searchCafes')}
         autoCapitalize="none"
       />
-      {!q.data?.items.length && !q.isLoading ? <EmptyState title={t('admin.emptyCafes')} /> : null}
+      {!q.data?.items.length && !q.isLoading && !q.isError ? (
+        <EmptyState title={t('admin.emptyCafes')} />
+      ) : null}
       <RowGroup>
         {(q.data?.items ?? [])
           .filter(

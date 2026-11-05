@@ -23,6 +23,7 @@ import { colors, space, useColors } from '@/theme';
 import { toast } from '@/components/Toast';
 import { confirm } from '@/lib/confirm';
 import { useCupCost } from '@/features/cost/useCupCost';
+import { LoadState } from '@/components/LoadState';
 
 interface Line {
   ingredientId: string;
@@ -33,7 +34,8 @@ export default function RecipeEdit() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const isNew = id === 'new';
   const c = useColors();
-  const recipe = useRecipes().data?.find((r) => r.id === id);
+  const recipesQ = useRecipes();
+  const recipe = recipesQ.data?.find((r) => r.id === id);
   const ingredients = useIngredients().data ?? [];
   const dose = useSettings().data?.espressoDoseG ?? 18;
   const save = useSaveRecipe();
@@ -136,6 +138,12 @@ export default function RecipeEdit() {
     router.back();
   };
 
+  if (!isNew && !recipe)
+    return (
+      <Screen title={t('recipes.title')} back>
+        <LoadState q={recipesQ} notFound={recipesQ.isSuccess && t('common.notFound')} />
+      </Screen>
+    );
   return (
     <Screen
       title={isNew ? t('recipes.new') : name || t('recipes.title')}

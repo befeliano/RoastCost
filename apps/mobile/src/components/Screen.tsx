@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { BottomTabBarHeightContext } from 'expo-router/js-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback, useContext, useRef, type ReactNode } from 'react';
+import { useCallback, useContext, useEffect, useRef, type ReactNode } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -60,8 +60,12 @@ export function Screen({
   const viewport = useRef(0);
   // After the keyboard has opened (and the KeyboardAvoidingView has shrunk us), scroll the focused
   // input into the visible area if it ended up underneath.
+  const revealTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // clear a pending reveal when the screen goes away (no measuring an unmounted view)
+  useEffect(() => () => clearTimeout(revealTimer.current), []);
   const reveal = useCallback((node: ViewNode | null) => {
-    setTimeout(() => {
+    clearTimeout(revealTimer.current);
+    revealTimer.current = setTimeout(() => {
       const sc = scrollRef.current as
         (ScrollViewInstance & { getInnerViewRef?: () => ViewNode | null }) | null;
       const inner = sc?.getInnerViewRef?.();

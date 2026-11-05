@@ -17,6 +17,7 @@ import { useCart } from '@/store/cart';
 import { useSession } from '@/store/session';
 import { colors, space, useColors } from '@/theme';
 import { nav } from '@/lib/nav';
+import { Button } from '@/components/Button';
 
 export default function Orders() {
   const cafe = useSession((s) => s.me?.cafe);
@@ -25,7 +26,7 @@ export default function Orders() {
   const orders = useOrders();
   const c = useColors();
   const [filter, setFilter] = useState<'all' | 'open' | 'confirmed' | 'closed'>('all');
-  const all = orders.data?.items ?? [];
+  const all = orders.data?.pages.flatMap((pg) => pg.items) ?? [];
   const visible = all.filter((o) =>
     filter === 'all'
       ? true
@@ -107,7 +108,7 @@ export default function Orders() {
         );
       })}
 
-      <SectionTitle count={orders.data?.items.length}>{t('orders.history')}</SectionTitle>
+      <SectionTitle count={all.length}>{t('orders.history')}</SectionTitle>
       {monthSpend ? (
         <Card style={styles.row}>
           <Icon name="chart" color={c.primaryText} />
@@ -118,7 +119,7 @@ export default function Orders() {
           <Text variant="small">{t('orders.monthOrders', { n: monthCount })}</Text>
         </Card>
       ) : null}
-      {orders.data?.items.length ? (
+      {all.length ? (
         <Chips
           options={[
             { value: 'all' as const, label: t('catalog.all') },
@@ -132,7 +133,7 @@ export default function Orders() {
       ) : null}
       {orders.isLoading ? <Skeleton rows={2} /> : null}
       {orders.isError ? <ErrorState onRetry={() => void orders.refetch()} /> : null}
-      {!orders.data?.items.length && !orders.isLoading && !orders.isError ? (
+      {!all.length && !orders.isLoading && !orders.isError ? (
         <EmptyState compact title={t('orders.emptyHistory')} body={t('orders.emptyHistoryBody')} />
       ) : null}
       {visible.map((o) => (
@@ -155,6 +156,15 @@ export default function Orders() {
           </View>
         </Card>
       ))}
+      {orders.hasNextPage ? (
+        <Button
+          title={t('orders.loadMore')}
+          variant="ghost"
+          icon="history"
+          loading={orders.isFetchingNextPage}
+          onPress={() => orders.fetchNextPage()}
+        />
+      ) : null}
     </Screen>
   );
 }

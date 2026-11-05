@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'react-native-reanimated';
 import { Text } from './Text';
 
@@ -15,19 +15,26 @@ export function AnimatedNumber({
 }: { value: number; format: (n: number) => string } & Omit<TextProps, 'children'>) {
   const reduce = useReducedMotion();
   const [shown, setShown] = useState(value);
+  // the number currently on screen — read through a ref so a new target starts from where the
+  // previous animation actually is (not from a stale value captured by an old closure)
+  const current = useRef(value);
   useEffect(() => {
-    if (reduce || shown === value) {
-      setShown(value);
+    const show = (n: number) => {
+      current.current = n;
+      setShown(n);
+    };
+    if (reduce || current.current === value) {
+      show(value);
       return;
     }
-    const from = shown;
+    const from = current.current;
     const start = Date.now();
     const dur = 350;
     let raf = 0;
     const tick = () => {
       const p = Math.min(1, (Date.now() - start) / dur);
       const eased = 1 - Math.pow(1 - p, 3);
-      setShown(Math.round(from + (value - from) * eased));
+      show(Math.round(from + (value - from) * eased));
       if (p < 1) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);

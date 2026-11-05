@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import type { AuditLog, Page } from '@/api/types';
-import { EmptyState, Notice, Row, RowGroup } from '@/components/Misc';
+import { EmptyState, Row, RowGroup } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
 import { formatDateTime } from '@/lib/format';
 import { t } from '@/locales';
+import { LoadState } from '@/components/LoadState';
 
 const AUDIT_LABEL: Record<string, string> = {
   'account.delete': 'Hesap silindi',
@@ -35,7 +36,7 @@ export default function Audit() {
   });
   return (
     <Screen title={t('admin.audit')} onRefresh={() => void q.refetch()} refreshing={q.isRefetching}>
-      {q.isError ? <Notice tone="danger" text={t('common.unknownError')} /> : null}
+      <LoadState q={q} />
       {q.data && !q.data.items.length ? <EmptyState title={t('admin.auditEmpty')} /> : null}
       <RowGroup>
         {q.data?.items.map((l) => (

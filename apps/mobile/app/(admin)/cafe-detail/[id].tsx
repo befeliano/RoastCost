@@ -16,6 +16,7 @@ import { CAFE_LABEL, CAFE_TONE } from '@/features/admin/labels';
 import { formatDate } from '@/lib/format';
 import { t } from '@/locales';
 import { space } from '@/theme';
+import { LoadState } from '@/components/LoadState';
 
 export default function CafeDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -49,7 +50,7 @@ export default function CafeDetail() {
   if (!c)
     return (
       <Screen title={t('admin.cafes')} back>
-        {null}
+        <LoadState q={q} notFound={t('common.notFound')} />
       </Screen>
     );
   return (

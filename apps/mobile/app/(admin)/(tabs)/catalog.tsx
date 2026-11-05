@@ -9,6 +9,7 @@ import { t } from '@/locales';
 import { Field } from '@/components/Field';
 import { useState } from 'react';
 import { nav } from '@/lib/nav';
+import { LoadState } from '@/components/LoadState';
 
 export default function Catalog() {
   const [qText, setQText] = useState('');
@@ -23,6 +24,7 @@ export default function Catalog() {
       onRefresh={() => void q.refetch()}
       refreshing={q.isRefetching}
     >
+      <LoadState q={q} />
       <Button
         title={t('admin.newRoaster')}
         icon="plus"
@@ -36,7 +38,9 @@ export default function Catalog() {
         onChangeText={setQText}
         placeholder={t('admin.searchRoasters')}
       />
-      {!q.data?.length && !q.isLoading ? <EmptyState title={t('catalog.empty')} /> : null}
+      {!q.data?.length && !q.isLoading && !q.isError ? (
+        <EmptyState title={t('catalog.empty')} />
+      ) : null}
       <RowGroup>
         {(q.data ?? [])
           .filter(

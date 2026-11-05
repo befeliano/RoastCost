@@ -9,6 +9,7 @@ import { COMMISSION_TONE } from '@/features/admin/labels';
 import { formatDate, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 import { nav } from '@/lib/nav';
+import { LoadState } from '@/components/LoadState';
 
 type Filter = CommissionStatus | 'all' | 'conflict';
 
@@ -25,6 +26,7 @@ export default function Commission() {
       onRefresh={() => void q.refetch()}
       refreshing={q.isRefetching}
     >
+      <LoadState q={q} />
       <Chips
         options={[
           { value: 'pending' as const, label: t('admin.commissionStatus.pending') },
@@ -37,7 +39,9 @@ export default function Commission() {
         value={f}
         onChange={setF}
       />
-      {!q.data?.items.length && !q.isLoading ? <EmptyState title={t('empty.generic')} /> : null}
+      {!q.data?.items.length && !q.isLoading && !q.isError ? (
+        <EmptyState title={t('empty.generic')} />
+      ) : null}
       {q.data?.items.map((o) => (
         <Row
           key={o.id}

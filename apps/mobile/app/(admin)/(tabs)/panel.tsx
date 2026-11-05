@@ -15,6 +15,7 @@ import { formatTRY } from '@/lib/format';
 import { Notice, Row } from '@/components/Misc';
 import { daysSince } from '@/lib/format';
 import { nav } from '@/lib/nav';
+import { LoadState } from '@/components/LoadState';
 
 function Stat({
   label,
@@ -58,6 +59,7 @@ export default function Panel() {
   );
   return (
     <Screen title={t('admin.panel')} onRefresh={() => void q.refetch()} refreshing={q.isRefetching}>
+      <LoadState q={q} />
       {s ? (
         <View style={styles.grid}>
           <Stat

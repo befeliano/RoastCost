@@ -33,8 +33,18 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     const msg = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('\n');
     throw new Error(`Invalid environment configuration:\n${msg}`);
   }
-  if (parsed.data.NODE_ENV === 'production' && !parsed.data.SMTP_URL) {
-    throw new Error('SMTP_URL is required in production');
+  if (parsed.data.NODE_ENV === 'production') {
+    // values that only make sense locally must be replaced before going live
+    const problems = [
+      !parsed.data.SMTP_URL && 'SMTP_URL is required',
+      !parsed.data.PUBLIC_BASE_URL.startsWith('https://') && 'PUBLIC_BASE_URL must be https://',
+      parsed.data.CONTACT_EMAIL.endsWith('@example.com') &&
+        'CONTACT_EMAIL is still the placeholder',
+      parsed.data.MAIL_FROM.includes('@example.com') && 'MAIL_FROM is still the placeholder',
+      parsed.data.DATA_CONTROLLER.startsWith('[') && 'DATA_CONTROLLER is still the placeholder',
+    ].filter(Boolean);
+    if (problems.length)
+      throw new Error(`Invalid production configuration:\n${problems.join('\n')}`);
   }
   return parsed.data;
 }

@@ -17,6 +17,7 @@ import {
   selectTierForComparison,
   LEGAL_VERSIONS,
   nextTierHint,
+  todayTr,
   orderTerms,
 } from '../src';
 
@@ -84,6 +85,14 @@ describe('tiers', () => {
   it('computes line totals', () => {
     expect(lineTotalKurus(2500, 90_000)).toBe(225_000);
     expect(lineTotalKurus(333, 100_001)).toBe(33_300);
+  });
+});
+
+describe('todayTr', () => {
+  it('uses the Turkish calendar day, not UTC', () => {
+    // 22:30 UTC on 4 Nov = 01:30 on 5 Nov in Istanbul (UTC+3)
+    expect(todayTr(new Date('2026-11-04T22:30:00Z'))).toBe('2026-11-05');
+    expect(todayTr(new Date('2026-11-04T20:59:00Z'))).toBe('2026-11-04');
   });
 });
 

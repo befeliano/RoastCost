@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import { useState } from 'react';
 import { Linking, StyleSheet, View } from 'react-native';
@@ -6,7 +6,7 @@ import type { CatalogProduct } from '@/api/types';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Icon } from '@/components/Icon';
-import { Chips, Pill } from '@/components/Misc';
+import { Chips, Pill, EmptyState } from '@/components/Misc';
 import { toast } from '@/components/Toast';
 import { RoasterAvatar } from '@/components/RoasterAvatar';
 import { Screen } from '@/components/Screen';
@@ -79,7 +79,19 @@ export default function RoasterDetail() {
   if (!roaster) {
     return (
       <Screen title={t('catalog.title')} back>
-        <Skeleton rows={4} />
+        {catalog.syncedAt || !catalog.syncing ? (
+          <EmptyState
+            title={t('catalog.roasterGone')}
+            body={t('catalog.goneBody')}
+            action={{
+              label: t('explore.title'),
+              icon: 'store',
+              onPress: () => router.replace('/explore'),
+            }}
+          />
+        ) : (
+          <Skeleton rows={3} />
+        )}
       </Screen>
     );
   }

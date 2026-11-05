@@ -1,5 +1,5 @@
 import { DEFAULT_COST_SETTINGS } from '@roastcost/shared';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import type { Ingredient, Order, Page, Recipe, Settings } from '@/api/types';
 import { useSession } from '@/store/session';
@@ -46,11 +46,17 @@ export function useRecipes() {
     enabled,
   });
 }
+/** Order history, newest first, 30 per page (keyset cursor from the API). */
 export function useOrders() {
   const enabled = useIsCafe();
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: keys.orders,
-    queryFn: () => api<Page<Order>>('/orders?limit=50'),
+    initialPageParam: null as string | null,
+    queryFn: ({ pageParam }) =>
+      api<Page<Order>>(
+        `/orders?limit=30${pageParam ? `&cursor=${encodeURIComponent(pageParam)}` : ''}`,
+      ),
+    getNextPageParam: (last) => last.nextCursor,
     staleTime: 15_000,
     enabled,
   });

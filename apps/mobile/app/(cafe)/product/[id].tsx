@@ -7,7 +7,7 @@ import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Field } from '@/components/Field';
 import { Icon } from '@/components/Icon';
-import { Chips, Notice, Pill, Row, RowGroup } from '@/components/Misc';
+import { Chips, Notice, Pill, Row, RowGroup, EmptyState } from '@/components/Misc';
 import { toast } from '@/components/Toast';
 import { useCostPrefs } from '@/features/cost/prefs';
 import { RoasterAvatar } from '@/components/RoasterAvatar';
@@ -44,7 +44,19 @@ export default function ProductDetail() {
   if (!p || !roaster) {
     return (
       <Screen title={t('catalog.title')} back>
-        <Skeleton rows={3} />
+        {catalog.syncedAt || !catalog.syncing ? (
+          <EmptyState
+            title={t('catalog.productGone')}
+            body={t('catalog.goneBody')}
+            action={{
+              label: t('explore.title'),
+              icon: 'store',
+              onPress: () => router.replace('/explore'),
+            }}
+          />
+        ) : (
+          <Skeleton rows={3} />
+        )}
       </Screen>
     );
   }

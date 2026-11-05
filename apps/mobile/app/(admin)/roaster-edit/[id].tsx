@@ -25,6 +25,7 @@ import { colors, space, useColors } from '@/theme';
 import { CityMap } from '@/features/explore/Maps';
 import { nav } from '@/lib/nav';
 import { Tap } from '@/components/Tap';
+import { LoadState } from '@/components/LoadState';
 
 type TierSheet = { productId: string; tier?: AdminTier } | null;
 const CAT_LABEL: Record<ProductCategory, string> = {
@@ -209,6 +210,9 @@ export default function RoasterEdit() {
 
   return (
     <Screen title={isNew ? t('admin.newRoaster') : (r?.name ?? '')} back>
+      {!isNew && !r ? (
+        <LoadState q={roasters} notFound={roasters.isSuccess && t('common.notFound')} />
+      ) : null}
       {error ? <Notice text={error} tone="danger" /> : null}
       <Field label="Ad" value={f.name} onChangeText={(v) => setF({ ...f, name: v })} />
       <Field

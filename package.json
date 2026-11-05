@@ -17,12 +17,15 @@
     "db:migrate": "pnpm --filter @roastcost/api migrate",
     "db:seed": "pnpm --filter @roastcost/api seed",
     "api:dev": "pnpm --filter @roastcost/api dev",
-    "mobile": "pnpm --filter @roastcost/mobile start"
+    "mobile": "pnpm --filter @roastcost/mobile start",
+    "check:deps": "node scripts/check-deps.mjs",
+    "verify": "pnpm check:deps && pnpm typecheck && pnpm lint && pnpm format:check && pnpm test"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
     "eslint": "^9.39.0",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^16.5.0",
     "prettier": "^3.9.10",
     "typescript": "~6.0.3",

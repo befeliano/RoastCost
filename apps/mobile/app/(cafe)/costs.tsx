@@ -18,12 +18,14 @@ import { SectionTitle } from '@/components/Misc';
 import { Text } from '@/components/Text';
 import { formatTRYFull } from '@/lib/format';
 import { space, useColors } from '@/theme';
+import { LoadState } from '@/components/LoadState';
 
 type Form = Record<'dose' | 'cw' | 'iw' | 'cup' | 'over' | 'margin' | 'vat' | 'step', string>;
 
 export default function Costs() {
   const c = useColors();
-  const s = useSettings().data;
+  const sq = useSettings();
+  const s = sq.data;
   const update = useUpdateSettings();
   const [f, setF] = useState<Form | null>(null);
   const [exVat, setExVat] = useState(true);
@@ -49,7 +51,7 @@ export default function Costs() {
   if (!f)
     return (
       <Screen title={t('settings.costParams')} back>
-        {null}
+        <LoadState q={sq} rows={4} />
       </Screen>
     );
   const set = (k: keyof Form) => (v: string) => setF({ ...f, [k]: v });

@@ -17,17 +17,23 @@ jobs:
     env:
       TEST_PG_SUPERUSER_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Every import is declared in its own package.json
+        run: pnpm check:deps
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm test
+      - name: API production bundle builds
+        run: pnpm --filter @roastcost/api build
+      - name: Mobile bundle builds (catches missing modules / wrong import paths tsc can't see)
+        run: pnpm --filter @roastcost/mobile exec expo export --platform web --output-dir /tmp/rc-web-ci
       - name: Dependency audit
         run: pnpm audit --prod --audit-level high
         continue-on-error: true

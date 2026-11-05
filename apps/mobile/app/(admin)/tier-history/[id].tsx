@@ -10,6 +10,7 @@ import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { formatDateTime, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
+import { LoadState } from '@/components/LoadState';
 
 const ACTION: Record<
   PriceHistory['action'],
@@ -57,6 +58,7 @@ export default function TierHistory() {
       onRefresh={() => void q.refetch()}
       refreshing={q.isRefetching}
     >
+      <LoadState q={q} />
       {q.data?.map((h) => (
         <Card key={h.id} style={{ gap: 6 }}>
           <Pill tone={ACTION[h.action].tone} label={`${ACTION[h.action].label} · ${h.minKg} kg+`} />
