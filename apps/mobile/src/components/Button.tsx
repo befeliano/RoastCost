@@ -1,12 +1,6 @@
 import * as Haptics from 'expo-haptics';
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  View,
-  type StyleProp,
-  type ViewStyle,
-} from 'react-native';
+import { useRef, useState } from 'react';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,
@@ -16,13 +10,15 @@ import Animated, {
 } from 'react-native-reanimated';
 import { type as typo, useColors } from '@/theme';
 import { Icon, type IconName } from './Icon';
+import { LoadingDots } from './LoadingDots';
 import { Text } from './Text';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
 interface Props {
   title: string;
-  onPress?: () => void;
+  /** May return a promise: the button then locks (and shows dots) until it settles — no double submits. */
+  onPress?: () => unknown;
   variant?: Variant;
   icon?: IconName;
   loading?: boolean;
@@ -57,7 +53,25 @@ export function Button({
     transform: [{ scale: scale.value }],
     opacity: fade.value,
   }));
-  const isDisabled = disabled || loading;
+  const lock = useRef(0);
+  const [running, setRunning] = useState(false);
+  const busy = loading || running;
+  const isDisabled = disabled || busy;
+  const fire = () => {
+    // ignore a second tap while the first is still running, or within 500 ms of it
+    const now = Date.now();
+    if (lock.current === -1 || now - lock.current < 500) return;
+    lock.current = now;
+    const r = onPress?.();
+    if (r && typeof (r as Promise<unknown>).finally === 'function') {
+      lock.current = -1;
+      setRunning(true);
+      void (r as Promise<unknown>).finally(() => {
+        lock.current = Date.now();
+        setRunning(false);
+      });
+    }
+  };
   const fg = variant === 'primary' ? c.onPrimary : variant === 'danger' ? c.danger : c.primaryText;
   const border =
     variant === 'secondary' ? c.primaryText : variant === 'danger' ? c.danger : 'transparent';
@@ -67,7 +81,7 @@ export function Button({
       accessibilityRole="button"
       accessibilityLabel={title}
       accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled: !!isDisabled, busy: !!loading }}
+      accessibilityState={{ disabled: !!isDisabled, busy: !!busy }}
       disabled={isDisabled}
       onPressIn={() => {
         if (reduce) return;
@@ -84,20 +98,20 @@ export function Button({
             ? Haptics.ImpactFeedbackStyle.Medium
             : Haptics.ImpactFeedbackStyle.Light,
         );
-        onPress?.();
+        fire();
       }}
       style={[
         styles.base,
         small && styles.small,
         { backgroundColor: bg, borderColor: border },
         variant === 'primary' && { backgroundColor: c.primary, borderColor: c.primary },
-        isDisabled && styles.disabled,
+        disabled && styles.disabled,
         anim,
         style,
       ]}
     >
-      {loading ? (
-        <ActivityIndicator color={fg} />
+      {busy ? (
+        <LoadingDots color={fg} />
       ) : (
         <View style={styles.row}>
           {icon ? <Icon name={icon} size={small ? 18 : 20} color={fg} /> : null}

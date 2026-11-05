@@ -1,5 +1,4 @@
 import { calculateCupCost } from '@roastcost/shared';
-import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated';
 import { Button } from '@/components/Button';
@@ -14,6 +13,7 @@ import { formatTRY } from '@/lib/format';
 import { toRecipeInput } from '@/features/cost/compute';
 import { useCupCost } from '@/features/cost/useCupCost';
 import { space } from '@/theme';
+import { nav } from '@/lib/nav';
 
 export default function Recipes() {
   const cup = useCupCost();
@@ -32,14 +32,22 @@ export default function Recipes() {
         title={t('recipes.new')}
         icon="plus"
         variant="secondary"
-        onPress={() => router.push({ pathname: '/recipe/[id]', params: { id: 'new' } })}
+        onPress={() => nav.push({ pathname: '/recipe/[id]', params: { id: 'new' } })}
       />
       {recipes.isLoading ? <Skeleton rows={4} /> : null}
       {recipes.isError && !list.length ? (
         <ErrorState onRetry={() => void recipes.refetch()} />
       ) : null}
       {!list.length && !recipes.isLoading && !recipes.isError ? (
-        <EmptyState title={t('recipes.empty')} />
+        <EmptyState
+          title={t('recipes.empty')}
+          body={t('recipes.emptyBody')}
+          action={{
+            label: t('recipes.new'),
+            icon: 'plus',
+            onPress: () => nav.push({ pathname: '/recipe/[id]', params: { id: 'new' } }),
+          }}
+        />
       ) : null}
       {list.map((r, i) => {
         const parts = r.ingredients.map(
@@ -53,7 +61,7 @@ export default function Recipes() {
             entering={reduce || i >= 8 ? undefined : FadeInDown.delay(i * 40).duration(220)}
           >
             <Card
-              onPress={() => router.push({ pathname: '/recipe/[id]', params: { id: r.id } })}
+              onPress={() => nav.push({ pathname: '/recipe/[id]', params: { id: r.id } })}
               accessibilityLabel={r.name}
             >
               <Text variant="h3">{r.name}</Text>

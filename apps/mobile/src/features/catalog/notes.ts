@@ -15,7 +15,7 @@ const FAMILIES: { re: RegExp; bg: string; fg: string }[] = [
   // stone & tropical fruit
   { re: /(şeftali|kayısı|mango|ananas|elma|armut|kavun|meyve)/i, bg: '#FCE9DA', fg: '#8C4511' },
   // floral & tea
-  { re: /(çiçek|yasemin|lavanta|gül|çay)/i, bg: '#EFE7F6', fg: '#5B3A7A' },
+  { re: /(çiçek|yasemin|lavanta|gül|çay)/i, bg: '#F6E8E4', fg: '#8A3F35' },
   // chocolate & cocoa
   { re: /(çikolata|kakao|bitter)/i, bg: '#EFE3D9', fg: '#5C3A21' },
   // caramel, sugar, nuts

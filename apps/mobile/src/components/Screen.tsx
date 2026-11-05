@@ -3,15 +3,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { BottomTabBarHeightContext } from 'expo-router/js-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { useContext, type ReactNode } from 'react';
+import { useCallback, useContext, useRef, type ReactNode } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
   View,
+  type ScrollViewInstance,
 } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,6 +19,8 @@ import { colors, hitSlop, space, useColors } from '@/theme';
 import { Icon } from './Icon';
 import { OfflineBanner } from './OfflineBanner';
 import { Text } from './Text';
+import { Tap } from './Tap';
+import { RevealContext, type ViewNode } from './reveal';
 
 interface Props {
   title: string;
@@ -53,6 +55,25 @@ export function Screen({
   const tabBar = useContext(BottomTabBarHeightContext) ?? 0;
   const c = useColors();
   const bottomPad = footer ? space.lg : Math.max(tabBar, insets.bottom) + space.xxl;
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  const offset = useRef(0);
+  const viewport = useRef(0);
+  // After the keyboard has opened (and the KeyboardAvoidingView has shrunk us), scroll the focused
+  // input into the visible area if it ended up underneath.
+  const reveal = useCallback((node: ViewNode | null) => {
+    setTimeout(() => {
+      const sc = scrollRef.current as
+        (ScrollViewInstance & { getInnerViewRef?: () => ViewNode | null }) | null;
+      const inner = sc?.getInnerViewRef?.();
+      if (!node || !sc || !inner) return;
+      node.measureLayout(inner, (_x: number, y: number, _w: number, h: number) => {
+        const top = offset.current;
+        const bottom = top + viewport.current;
+        if (y + h + space.xl > bottom || y < top)
+          sc.scrollTo({ y: Math.max(0, y - space.xxl * 2) });
+      });
+    }, 320);
+  }, []);
   return (
     <View style={styles.root}>
       <StatusBar style={c.onPrimary === '#FFFFFF' ? 'light' : 'dark'} />
@@ -64,7 +85,7 @@ export function Screen({
       >
         <View style={styles.barRow}>
           {back ? (
-            <Pressable
+            <Tap
               accessibilityRole="button"
               accessibilityLabel="Geri"
               hitSlop={hitSlop}
@@ -72,7 +93,7 @@ export function Screen({
               style={styles.backBtn}
             >
               <Icon name="back" color={c.onPrimary} size={22} />
-            </Pressable>
+            </Tap>
           ) : null}
           <Animated.View entering={FadeIn.duration(250)} style={styles.title}>
             <Text variant="h2" color={c.onPrimary} numberOfLines={1} accessibilityRole="header">
@@ -94,6 +115,11 @@ export function Screen({
       >
         {scroll ? (
           <ScrollView
+            ref={scrollRef}
+            onLayout={(e) => (viewport.current = e.nativeEvent.layout.height)}
+            onScroll={(e) => (offset.current = e.nativeEvent.contentOffset.y)}
+            scrollEventThrottle={64}
+            keyboardDismissMode="interactive"
             style={styles.flex}
             contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
             keyboardShouldPersistTaps="handled"
@@ -107,7 +133,7 @@ export function Screen({
               ) : undefined
             }
           >
-            {children}
+            <RevealContext.Provider value={reveal}>{children}</RevealContext.Provider>
           </ScrollView>
         ) : (
           <View style={[styles.flex, styles.content, { paddingBottom: bottomPad }]}>
@@ -136,8 +162,8 @@ const styles = StyleSheet.create({
   },
   barRow: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 38 },
   backBtn: {
-    width: 30,
-    height: 34,
+    width: 36,
+    height: 40,
     marginLeft: -6,
     alignItems: 'center',
     justifyContent: 'center',

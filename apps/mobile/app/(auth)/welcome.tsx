@@ -1,7 +1,6 @@
-import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 import Animated, {
   FadeInDown,
   useAnimatedStyle,
@@ -19,6 +18,8 @@ import { Text } from '@/components/Text';
 import { t } from '@/locales';
 import { colors, space, useColors } from '@/theme';
 import { Icon } from '@/components/Icon';
+import { nav } from '@/lib/nav';
+import { Tap } from '@/components/Tap';
 
 /** Our own mascot-free cup illustration with gentle steam (no third-party character). */
 function Hero() {
@@ -111,10 +112,10 @@ export default function Welcome() {
         </View>
       </Animated.View>
       <View style={styles.actions}>
-        <Button title={t('auth.register')} onPress={() => router.push('/register')} />
-        <Button title={t('auth.login')} variant="secondary" onPress={() => router.push('/login')} />
+        <Button title={t('auth.register')} onPress={() => nav.push('/register')} />
+        <Button title={t('auth.login')} variant="secondary" onPress={() => nav.push('/login')} />
         {ROASTER_CONTACT ? (
-          <Pressable
+          <Tap
             accessibilityRole="link"
             onPress={() =>
               void Linking.openURL(
@@ -126,7 +127,7 @@ export default function Welcome() {
             <Text variant="small" color={c.primaryText}>
               {t('auth.areYouRoaster')}
             </Text>
-          </Pressable>
+          </Tap>
         ) : null}
       </View>
     </View>

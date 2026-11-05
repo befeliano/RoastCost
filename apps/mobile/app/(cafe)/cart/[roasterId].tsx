@@ -2,7 +2,7 @@ import { lineTotalKurus, nextTierHint, orderTerms, selectTier } from '@roastcost
 import { useNetworkState } from 'expo-network';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { api, ApiError } from '@/api/client';
 import type { OrderCreated } from '@/api/types';
 import { BottomSheet } from '@/components/BottomSheet';
@@ -21,6 +21,7 @@ import { useCart } from '@/store/cart';
 import { useSession } from '@/store/session';
 import { colors, space, useColors } from '@/theme';
 import { Icon } from '@/components/Icon';
+import { Tap } from '@/components/Tap';
 
 function nextDays(n: number) {
   const fmt = new Intl.DateTimeFormat('tr-TR', {
@@ -116,15 +117,15 @@ export default function Cart() {
             <Text variant="money">{formatTRY(l.total)}</Text>
           </View>
           <View style={styles.row}>
-            <Pressable
+            <Tap
               accessibilityRole="button"
               accessibilityLabel={`${l.product?.name ?? ''} 1 kg azalt`}
               onPress={() => setKg(l.productId, l.grams - 1000)}
               style={styles.step}
-              hitSlop={6}
+              hitSlop={8}
             >
               <Icon name="minus" size={18} color={c.primaryText} />
-            </Pressable>
+            </Tap>
             <View style={styles.kg}>
               <Field
                 label={t('catalog.quantity')}
@@ -139,31 +140,31 @@ export default function Cart() {
                 }}
               />
             </View>
-            <Pressable
+            <Tap
               accessibilityRole="button"
               accessibilityLabel={`${l.product?.name ?? ''} 1 kg artır`}
               onPress={() => setKg(l.productId, l.grams + 1000)}
               style={styles.step}
-              hitSlop={6}
+              hitSlop={8}
             >
               <Icon name="plus" size={18} color={c.primaryText} />
-            </Pressable>
+            </Tap>
             <Text variant="small" style={styles.flex}>
               {l.tier
                 ? `${t('orders.tier', { kg: l.tier.minKg })}\n${formatTRY(l.tier.pricePerKgKurus)}/kg`
                 : t('orders.minKg', { kg: l.minKg ?? 1 })}
             </Text>
-            <Pressable
+            <Tap
               accessibilityRole="button"
               accessibilityLabel={`${l.product?.name ?? ''} — ${t('orders.remove')}`}
               onPress={() => remove(roasterId, l.productId)}
-              hitSlop={10}
+              hitSlop={13}
             >
               <Icon name="trash" size={20} color={colors.textMuted} />
-            </Pressable>
+            </Tap>
           </View>
           {l.hint && l.tier ? (
-            <Pressable
+            <Tap
               accessibilityRole="button"
               onPress={() => setKg(l.productId, l.hint!.tier.minKg * 1000)}
               style={[styles.hint, { backgroundColor: c.primaryBg }]}
@@ -175,7 +176,7 @@ export default function Cart() {
                   price: formatTRY(l.hint.tier.pricePerKgKurus),
                 })}
               </Text>
-            </Pressable>
+            </Tap>
           ) : null}
           {!l.tier ? <Notice text={t('orders.minKg', { kg: l.minKg ?? 1 })} tone="danger" /> : null}
         </Card>
@@ -279,7 +280,7 @@ export default function Cart() {
             variant="secondary"
             icon="copy"
             small
-            onPress={() => void flow.copy()}
+            onPress={() => flow.copy()}
           />
           <Button title={t('orders.didSend')} small onPress={() => flow.setAsk(true)} />
         </Card>
@@ -288,12 +289,12 @@ export default function Cart() {
 
       <BottomSheet visible={flow.ask} onClose={flow.notYet} title={t('orders.didSend')}>
         <Text variant="body">{t('orders.didSendBody')}</Text>
-        <Button title={t('orders.sentYes')} icon="check" onPress={() => void flow.confirmSent()} />
+        <Button title={t('orders.sentYes')} icon="check" onPress={() => flow.confirmSent()} />
         <Button
           title={t('orders.copy')}
           variant="secondary"
           icon="copy"
-          onPress={() => void flow.copy()}
+          onPress={() => flow.copy()}
         />
         <Button title={t('orders.sentNo')} variant="ghost" onPress={flow.notYet} />
       </BottomSheet>

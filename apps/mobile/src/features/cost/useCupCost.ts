@@ -38,9 +38,14 @@ export function useCupCost() {
 
   useEffect(() => {
     const first = cheapest[0];
-    if (approved && first && !prefs.productId && !prefs.manualPricePerKgKurus)
+    if (!approved || !first) return;
+    const chosen = prefs.productId ? catalog.products[prefs.productId] : undefined;
+    // first use, or the remembered bean was removed from the catalogue → pick a sensible one
+    if (!prefs.productId && !prefs.manualPricePerKgKurus)
       prefs.set({ mode: 'catalog', productId: first.p.id });
-  }, [approved, cheapest, prefs]);
+    else if (prefs.productId && (!chosen || !chosen.isActive || chosen.deletedAt))
+      prefs.set({ productId: first.p.id });
+  }, [approved, cheapest, prefs, catalog.products]);
 
   const recipes = useMemo(() => (recipesQ.data ?? []).filter((r) => r.isActive), [recipesQ.data]);
   const recipe = recipes.find((r) => r.id === prefs.recipeId) ?? recipes[0];

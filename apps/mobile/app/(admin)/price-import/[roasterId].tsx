@@ -57,13 +57,13 @@ export default function PriceImport() {
           <Button
             title={t('admin.preview')}
             variant="secondary"
-            onPress={() => void run(true)}
+            onPress={() => run(true)}
             loading={busy}
             disabled={!text.trim()}
           />
           <Button
             title={t('admin.apply')}
-            onPress={() => void run(false)}
+            onPress={() => run(false)}
             disabled={!res || res.errors.length > 0 || busy}
           />
         </>

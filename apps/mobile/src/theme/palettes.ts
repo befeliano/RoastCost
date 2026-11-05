@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { kv } from '@/lib/kv';
+import { persist } from 'zustand/middleware';
 import { colors } from './colors';
 import { PALETTES, type Palette, type PaletteKey } from './palettes-data';
+import { persistOptions } from '@/lib/persist';
 
 export { PALETTES, type Palette, type PaletteKey };
 
@@ -12,10 +12,10 @@ interface ThemeState {
 }
 
 export const useThemeStore = create<ThemeState>()(
-  persist((set) => ({ palette: 'coffee', setPalette: (palette) => set({ palette }) }), {
-    name: 'theme_v1',
-    storage: createJSONStorage(() => kv.storage),
-  }),
+  persist(
+    (set) => ({ palette: 'coffee', setPalette: (palette) => set({ palette }) }),
+    persistOptions('theme_v1'),
+  ),
 );
 
 export type ThemeColors = typeof colors & Palette;

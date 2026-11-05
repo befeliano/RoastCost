@@ -1,7 +1,7 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import { useState } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 import type { CatalogProduct } from '@/api/types';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -20,6 +20,8 @@ import { colors, space, useColors } from '@/theme';
 import { formatGramsKg, formatTRY } from '@/lib/format';
 import { NoteChips } from '@/features/catalog/NoteChips';
 import { Skeleton } from '@/components/Skeleton';
+import { nav } from '@/lib/nav';
+import { Tap } from '@/components/Tap';
 
 function ProductRow({ p }: { p: CatalogProduct }) {
   const catalog = useCatalog();
@@ -30,7 +32,7 @@ function ProductRow({ p }: { p: CatalogProduct }) {
   const best = tiers[tiers.length - 1];
   return (
     <Card
-      onPress={() => router.push({ pathname: '/product/[id]', params: { id: p.id } })}
+      onPress={() => nav.push({ pathname: '/product/[id]', params: { id: p.id } })}
       style={styles.product}
       accessibilityLabel={p.name}
     >
@@ -97,9 +99,7 @@ export default function RoasterDetail() {
           <Button
             title={`${t('orders.carts')} · ${formatGramsKg(cartG)}`}
             icon="box"
-            onPress={() =>
-              router.push({ pathname: '/cart/[roasterId]', params: { roasterId: id } })
-            }
+            onPress={() => nav.push({ pathname: '/cart/[roasterId]', params: { roasterId: id } })}
           />
         ) : undefined
       }
@@ -121,7 +121,7 @@ export default function RoasterDetail() {
         </View>
         {roaster.description ? <Text variant="body">{roaster.description}</Text> : null}
         {roaster.address ? (
-          <Pressable
+          <Tap
             accessibilityRole="button"
             accessibilityHint={t('catalog.copyAddress')}
             onPress={() => {
@@ -135,10 +135,10 @@ export default function RoasterDetail() {
               {roaster.address}
             </Text>
             <Icon name="copy" size={16} color={colors.textMuted} />
-          </Pressable>
+          </Tap>
         ) : null}
         {roaster.latitude !== null && roaster.longitude !== null ? (
-          <Pressable
+          <Tap
             accessibilityRole="link"
             onPress={() =>
               void Linking.openURL(
@@ -146,13 +146,13 @@ export default function RoasterDetail() {
               )
             }
             style={styles.row}
-            hitSlop={6}
+            hitSlop={8}
           >
             <Icon name="send" size={16} color={c.primaryText} />
             <Text variant="bodyStrong" color={c.primaryText}>
               {t('catalog.directions')}
             </Text>
-          </Pressable>
+          </Tap>
         ) : null}
         {roaster.minOrderKg || roaster.cardSurchargeBp ? (
           <View style={[styles.terms, { backgroundColor: c.primaryBg }]}>
@@ -194,17 +194,18 @@ export default function RoasterDetail() {
             onChange={setCat}
           />
         </View>
-        <Pressable
+        <Tap
           accessibilityRole="button"
           accessibilityLabel={sort === 'price' ? t('catalog.sortDefault') : t('catalog.sortPrice')}
           onPress={() => setSort((v) => (v === 'price' ? 'default' : 'price'))}
+          hitSlop={4}
           style={[styles.sortBtn, sort === 'price' && { borderColor: c.primaryText }]}
         >
           <Icon name="sort" size={18} color={sort === 'price' ? c.primaryText : colors.textMuted} />
           <Text variant="caption" color={sort === 'price' ? c.primaryText : colors.textMuted}>
             {t('catalog.sortPriceShort')}
           </Text>
-        </Pressable>
+        </Tap>
       </View>
       {espresso.length && cat !== 'filter' ? (
         <>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { kv } from '@/lib/kv';
+import { persist } from 'zustand/middleware';
+import { persistOptions } from '@/lib/persist';
 
 export interface RoasterCart {
   /** productId → grams */
@@ -60,6 +60,6 @@ export const useCart = create<CartState>()(
         }),
       clearAll: () => set({ carts: {} }),
     }),
-    { name: 'cart_v1', storage: createJSONStorage(() => kv.storage) },
+    persistOptions('cart_v1'),
   ),
 );

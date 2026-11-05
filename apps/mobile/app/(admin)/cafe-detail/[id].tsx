@@ -84,7 +84,7 @@ export default function CafeDetail() {
           <Button
             title={t('admin.approve')}
             icon="check"
-            onPress={() => void act('approve')}
+            onPress={() => act('approve')}
             loading={busy === 'approve'}
           />
         ) : null}
@@ -92,7 +92,7 @@ export default function CafeDetail() {
           <Button
             title={t('admin.reject')}
             variant="danger"
-            onPress={() => void act('reject')}
+            onPress={() => act('reject')}
             loading={busy === 'reject'}
           />
         ) : null}
@@ -100,7 +100,7 @@ export default function CafeDetail() {
           <Button
             title={t('admin.suspend')}
             variant="danger"
-            onPress={() => void act('suspend')}
+            onPress={() => act('suspend')}
             loading={busy === 'suspend'}
           />
         ) : null}

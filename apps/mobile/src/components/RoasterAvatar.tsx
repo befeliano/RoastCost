@@ -51,6 +51,7 @@ export function RoasterAvatar({
       accessibilityElementsHidden
     >
       <Text
+        allowFontScaling={false}
         style={{
           color: '#FFFFFF',
           fontFamily: 'PlusJakartaSans_700Bold',

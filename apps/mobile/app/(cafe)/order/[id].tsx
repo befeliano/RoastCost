@@ -23,6 +23,7 @@ import { toast } from '@/components/Toast';
 import { Skeleton } from '@/components/Skeleton';
 import { useCatalog } from '@/features/catalog/store';
 import { useCart } from '@/store/cart';
+import { nav } from '@/lib/nav';
 
 function Step({
   done,
@@ -166,7 +167,7 @@ export default function OrderDetail() {
           }
           if (!added) return toast(t('orders.reorderNone'), 'warning');
           toast(t('orders.reordered', { n: added }), 'repeat');
-          router.push({ pathname: '/cart/[roasterId]', params: { roasterId: o.roasterId } });
+          nav.push({ pathname: '/cart/[roasterId]', params: { roasterId: o.roasterId } });
         }}
       />
       {useCatalog.getState().roasters[o.roasterId] ? (
@@ -174,13 +175,13 @@ export default function OrderDetail() {
           title={t('orders.openRoaster')}
           variant="ghost"
           icon="store"
-          onPress={() => router.push({ pathname: '/roaster/[id]', params: { id: o.roasterId } })}
+          onPress={() => nav.push({ pathname: '/roaster/[id]', params: { id: o.roasterId } })}
         />
       ) : null}
       {open ? (
         <>
-          <Button title={t('orders.resend')} icon="send" onPress={() => void resend()} />
-          <Button title={t('orders.cancelOrder')} variant="danger" onPress={() => void cancel()} />
+          <Button title={t('orders.resend')} icon="send" onPress={() => resend()} />
+          <Button title={t('orders.cancelOrder')} variant="danger" onPress={() => cancel()} />
         </>
       ) : null}
       <BottomSheet visible={flow.ask} onClose={flow.notYet} title={t('orders.didSend')}>
@@ -197,7 +198,7 @@ export default function OrderDetail() {
           title={t('orders.copy')}
           variant="secondary"
           icon="copy"
-          onPress={() => void flow.copy()}
+          onPress={() => flow.copy()}
         />
         <Button title={t('orders.sentNo')} variant="ghost" onPress={flow.notYet} />
       </BottomSheet>

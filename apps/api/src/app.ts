@@ -145,12 +145,29 @@ export async function buildApp(
     }
     const e = err as { statusCode?: number; code?: string; message?: string; error?: unknown };
     if (e.statusCode === 429)
-      return reply
-        .status(429)
-        .send(e.error ? e : { error: { code: 'rate_limited', message: 'Çok fazla istek.' } });
+      return reply.status(429).send(
+        e.error
+          ? e
+          : {
+              error: {
+                code: 'rate_limited',
+                message: 'Çok fazla deneme yaptınız. Bir dakika bekleyip tekrar deneyin.',
+              },
+            },
+      );
     if (e.statusCode && e.statusCode >= 400 && e.statusCode < 500) {
+      // framework errors (empty body, bad JSON, too large…) carry English text: never show it to users
+      req.log.info({ err }, 'client error');
       return reply.status(e.statusCode).send({
-        error: { code: e.code ?? 'bad_request', message: e.message ?? 'Geçersiz istek.' },
+        error: {
+          code: e.code ?? 'bad_request',
+          message:
+            e.statusCode === 413
+              ? 'Gönderilen veri çok büyük.'
+              : e.statusCode === 415
+                ? 'Desteklenmeyen içerik türü.'
+                : 'İstek okunamadı. Uygulamayı güncelleyip tekrar deneyin.',
+        },
       });
     }
     req.log.error({ err }, 'unhandled error');

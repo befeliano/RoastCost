@@ -256,7 +256,7 @@ export default function RecipeEdit() {
           title={t('recipes.duplicate')}
           variant="ghost"
           icon="copy"
-          onPress={() => void duplicate()}
+          onPress={() => duplicate()}
         />
       ) : null}
       {!isNew ? (
@@ -264,7 +264,7 @@ export default function RecipeEdit() {
           title={t('common.delete')}
           variant="danger"
           icon="trash"
-          onPress={() => void onDelete()}
+          onPress={() => onDelete()}
           loading={del.isPending}
         />
       ) : null}

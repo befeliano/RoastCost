@@ -1,6 +1,15 @@
 import { BlurView } from 'expo-blur';
 import { useEffect, useState, type ReactNode } from 'react';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -26,6 +35,7 @@ export function BottomSheet({
   children: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
   const reduce = useReducedMotion();
   const [mounted, setMounted] = useState(visible);
   const y = useSharedValue(600);
@@ -59,7 +69,11 @@ export function BottomSheet({
           onPress={onClose}
         />
       </Animated.View>
-      <View style={styles.anchor} pointerEvents="box-none">
+      <KeyboardAvoidingView
+        style={styles.anchor}
+        pointerEvents="box-none"
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
         <Animated.View
           style={[styles.sheet, { paddingBottom: insets.bottom + space.lg }, sheet]}
           accessibilityViewIsModal
@@ -70,23 +84,33 @@ export function BottomSheet({
               {title}
             </Text>
           ) : null}
-          {children}
+          <ScrollView
+            style={{ maxHeight: height * 0.72 }}
+            contentContainerStyle={styles.body}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="interactive"
+            bounces={false}
+          >
+            {children}
+          </ScrollView>
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  backdrop: { backgroundColor: 'rgba(13,31,0,0.25)' },
+  backdrop: { backgroundColor: 'rgba(34,27,22,0.25)' },
   anchor: { flex: 1, justifyContent: 'flex-end' },
   sheet: {
     backgroundColor: colors.bg,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    padding: space.xl,
+    padding: space.lg,
+    paddingTop: space.md,
     gap: space.md,
   },
+  body: { gap: space.md },
   handle: {
     alignSelf: 'center',
     width: 44,

@@ -136,7 +136,7 @@ export default function CommissionOrder() {
                   small
                   style={styles.flex}
                   variant={s === 'paid' ? 'primary' : 'secondary'}
-                  onPress={() => void patch('commission', { status: s })}
+                  onPress={() => patch('commission', { status: s })}
                 />
               ))}
             </View>
@@ -167,7 +167,7 @@ export default function CommissionOrder() {
           title="Karşılanamadı"
           variant="danger"
           small
-          onPress={() => void patch('decision', { status: 'declined' })}
+          onPress={() => patch('decision', { status: 'declined' })}
         />
       </View>
     </Screen>

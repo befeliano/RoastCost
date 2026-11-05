@@ -1,8 +1,7 @@
 import { formatPct, kurusToInput, parseTRYInput } from '@roastcost/shared';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { ScrollView, Share, StyleSheet, View } from 'react-native';
 import { AnimatedNumber } from '@/components/AnimatedNumber';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
@@ -19,6 +18,8 @@ import { useCupCost } from '@/features/cost/useCupCost';
 import { t } from '@/locales';
 import { colors, space, useColors } from '@/theme';
 import { formatTRY, formatTRYFull } from '@/lib/format';
+import { nav } from '@/lib/nav';
+import { Tap } from '@/components/Tap';
 
 function Line({ label, value }: { label: string; value: number }) {
   return (
@@ -175,7 +176,7 @@ export default function Cost() {
       {syrupMissing ? <Notice text={t('cost.syrupMissing')} /> : null}
       {milkZero ? <Notice text={t('cost.milkPriceZero')} /> : null}
 
-      {result && settings ? (
+      {result && settings && source ? (
         <>
           <Card style={styles.gap}>
             <CostBar
@@ -255,13 +256,13 @@ export default function Cost() {
               />
             </Card>
           ) : recipe ? (
-            <Pressable
+            <Tap
               accessibilityRole="button"
               accessibilityLabel={t('cost.addMenuPrice')}
-              onPress={() => router.push({ pathname: '/recipe/[id]', params: { id: recipe.id } })}
+              onPress={() => nav.push({ pathname: '/recipe/[id]', params: { id: recipe.id } })}
             >
               <Notice text={t('cost.addMenuPrice')} tone="info" icon="plus" />
-            </Pressable>
+            </Tap>
           ) : null}
           <Button
             title={t('cost.share')}
@@ -289,7 +290,7 @@ export default function Cost() {
               title={t('catalog.compare')}
               variant="secondary"
               icon="chart"
-              onPress={() => router.push('/compare')}
+              onPress={() => nav.push('/compare')}
             />
           ) : null}
         </>

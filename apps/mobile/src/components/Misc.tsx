@@ -1,8 +1,9 @@
-import { Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { ScrollView, StyleSheet, Switch, View } from 'react-native';
 import Svg, { Circle, Ellipse, Path } from 'react-native-svg';
 import { colors, fonts, radius, space, useColors, type ThemeColors } from '@/theme';
 import { Icon, type IconName } from './Icon';
 import { Text } from './Text';
+import { Tap } from './Tap';
 
 export function Chips<T extends string>({
   options,
@@ -24,7 +25,7 @@ export function Chips<T extends string>({
       {options.map((o) => {
         const on = o.value === value;
         return (
-          <Pressable
+          <Tap
             key={o.value}
             accessibilityRole="button"
             accessibilityState={{ selected: on }}
@@ -39,7 +40,7 @@ export function Chips<T extends string>({
             >
               {o.label}
             </Text>
-          </Pressable>
+          </Tap>
         );
       })}
     </ScrollView>
@@ -174,14 +175,9 @@ export function Row({
     </>
   );
   return onPress ? (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={title}
-      onPress={onPress}
-      style={({ pressed }) => [styles.row, pressed && { backgroundColor: c.primaryBg }]}
-    >
+    <Tap accessibilityRole="button" accessibilityLabel={title} onPress={onPress} style={styles.row}>
       {content}
-    </Pressable>
+    </Tap>
   ) : (
     <View style={styles.row}>{content}</View>
   );
@@ -231,7 +227,7 @@ export function ErrorState({ onRetry, text }: { onRetry: () => void; text?: stri
       <Text variant="body" style={styles.center}>
         {text ?? 'Bağlantı kurulamadı. İnternetinizi kontrol edip tekrar deneyin.'}
       </Text>
-      <Pressable
+      <Tap
         accessibilityRole="button"
         onPress={onRetry}
         style={[styles.retry, { borderColor: c.primaryText }]}
@@ -240,7 +236,7 @@ export function ErrorState({ onRetry, text }: { onRetry: () => void; text?: stri
         <Text variant="bodyStrong" color={c.primaryText}>
           Tekrar dene
         </Text>
-      </Pressable>
+      </Tap>
     </View>
   );
 }
@@ -250,46 +246,51 @@ export function EmptyState({
   title,
   body,
   action,
+  compact,
 }: {
   title: string;
   body?: string;
   action?: { label: string; onPress: () => void; icon?: IconName };
+  /** text only, small padding — for a second empty section on the same screen */
+  compact?: boolean;
 }) {
   const c = useColors();
   return (
-    <View style={styles.empty}>
-      <Svg width={120} height={96} viewBox="0 0 120 96" accessibilityElementsHidden>
-        <Ellipse cx="60" cy="86" rx="44" ry="6" fill={c.border} />
-        <Path
-          d="M24 34h60v18c0 16-13 28-30 28h0C37 80 24 68 24 52V34Z"
-          fill={c.primaryBg}
-          stroke={c.primary}
-          strokeWidth={3}
-        />
-        <Path
-          d="M84 40h6a10 10 0 0 1 0 20h-7"
-          fill="none"
-          stroke={c.primary}
-          strokeWidth={3}
-          strokeLinecap="round"
-        />
-        <Path
-          d="M42 12c0 6 6 6 6 12M58 8c0 6 6 6 6 12"
-          fill="none"
-          stroke={c.border}
-          strokeWidth={3}
-          strokeLinecap="round"
-        />
-        <Ellipse cx="54" cy="56" rx="9" ry="12" fill={c.coffee} transform="rotate(-25 54 56)" />
-        <Path
-          d="M50 47c4 5-2 9 3 18"
-          stroke={c.surface}
-          strokeWidth={2}
-          fill="none"
-          strokeLinecap="round"
-        />
-        <Circle cx="98" cy="20" r="3" fill={c.border} />
-      </Svg>
+    <View style={[styles.empty, compact && styles.emptyCompact]}>
+      {compact ? null : (
+        <Svg width={120} height={96} viewBox="0 0 120 96" accessibilityElementsHidden>
+          <Ellipse cx="60" cy="86" rx="44" ry="6" fill={c.border} />
+          <Path
+            d="M24 34h60v18c0 16-13 28-30 28h0C37 80 24 68 24 52V34Z"
+            fill={c.primaryBg}
+            stroke={c.primary}
+            strokeWidth={3}
+          />
+          <Path
+            d="M84 40h6a10 10 0 0 1 0 20h-7"
+            fill="none"
+            stroke={c.primary}
+            strokeWidth={3}
+            strokeLinecap="round"
+          />
+          <Path
+            d="M42 12c0 6 6 6 6 12M58 8c0 6 6 6 6 12"
+            fill="none"
+            stroke={c.border}
+            strokeWidth={3}
+            strokeLinecap="round"
+          />
+          <Ellipse cx="54" cy="56" rx="9" ry="12" fill={c.coffee} transform="rotate(-25 54 56)" />
+          <Path
+            d="M50 47c4 5-2 9 3 18"
+            stroke={c.surface}
+            strokeWidth={2}
+            fill="none"
+            strokeLinecap="round"
+          />
+          <Circle cx="98" cy="20" r="3" fill={c.border} />
+        </Svg>
+      )}
       <Text variant="h3" style={styles.center}>
         {title}
       </Text>
@@ -299,7 +300,7 @@ export function EmptyState({
         </Text>
       ) : null}
       {action ? (
-        <Pressable
+        <Tap
           accessibilityRole="button"
           onPress={action.onPress}
           style={[styles.retry, { borderColor: c.primaryText }]}
@@ -308,7 +309,7 @@ export function EmptyState({
           <Text variant="bodyStrong" color={c.primaryText}>
             {action.label}
           </Text>
-        </Pressable>
+        </Tap>
       ) : null}
     </View>
   );
@@ -369,7 +370,7 @@ const styles = StyleSheet.create({
   count: {
     minWidth: 22,
     paddingHorizontal: 6,
-    height: 20,
+    minHeight: 20,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
@@ -395,6 +396,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
     marginTop: space.xs,
   },
-  empty: { alignItems: 'center', gap: space.sm, paddingVertical: space.xxl },
+  empty: { alignItems: 'center', gap: space.sm, paddingVertical: space.xl },
+  emptyCompact: { paddingVertical: space.md },
   center: { textAlign: 'center' },
 });

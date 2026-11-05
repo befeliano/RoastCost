@@ -2,7 +2,7 @@ import { calculateCupCost, lineTotalKurus, selectTier } from '@roastcost/shared'
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Field } from '@/components/Field';
@@ -24,6 +24,8 @@ import { useCart } from '@/store/cart';
 import { colors, radius, space, useColors } from '@/theme';
 import { NoteChips } from '@/features/catalog/NoteChips';
 import { Skeleton } from '@/components/Skeleton';
+import { nav } from '@/lib/nav';
+import { Tap } from '@/components/Tap';
 
 /** One bean: detailed tier pricing, cup cost with this bean, quantity → cart. */
 export default function ProductDetail() {
@@ -87,9 +89,9 @@ export default function ProductDetail() {
       }
     >
       <Card style={styles.gap}>
-        <Pressable
+        <Tap
           accessibilityRole="button"
-          onPress={() => router.push({ pathname: '/roaster/[id]', params: { id: roaster.id } })}
+          onPress={() => nav.push({ pathname: '/roaster/[id]', params: { id: roaster.id } })}
           style={styles.row}
         >
           <RoasterAvatar
@@ -102,7 +104,7 @@ export default function ProductDetail() {
             {roaster.name}
           </Text>
           <Icon name="chevron" size={18} color={colors.textMuted} />
-        </Pressable>
+        </Tap>
         <View style={styles.pills}>
           <Pill
             tone="primary"
@@ -132,7 +134,7 @@ export default function ProductDetail() {
           const on = tier?.id === tt.id;
           const save = base ? Math.round((1 - tt.pricePerKgKurus / base) * 100) : 0;
           return (
-            <Pressable
+            <Tap
               key={tt.id}
               accessibilityRole="button"
               onPress={() => setKg(String(tt.minKg))}
@@ -152,7 +154,7 @@ export default function ProductDetail() {
                 {save > 0 ? `−%${save}` : '—'}
                 {save > 0 ? `\n−${formatTRY(base - tt.pricePerKgKurus)}` : ''}
               </Text>
-            </Pressable>
+            </Tap>
           );
         })}
       </Card>
@@ -242,7 +244,7 @@ export default function ProductDetail() {
         onPress={() => {
           useCostPrefs.getState().set({ mode: 'catalog', productId: p.id });
           toast(t('catalog.usedInCalc'));
-          router.push('/cost');
+          nav.push('/cost');
         }}
       />
       {inCart ? (

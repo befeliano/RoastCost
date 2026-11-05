@@ -10,16 +10,35 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { AppState } from 'react-native';
+import { AppState, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useCatalog } from '@/features/catalog/store';
 import { CACHE_BUSTER, persister, queryClient } from '@/lib/query';
 import { useSession } from '@/store/session';
-import { colors } from '@/theme';
+import { colors, space } from '@/theme';
 import { ToastHost } from '@/components/Toast';
+import type { ErrorBoundaryProps } from 'expo-router';
+import { Button } from '@/components/Button';
+import { Text } from '@/components/Text';
 
 void SplashScreen.preventAutoHideAsync();
+
+/** A crash in a screen shows a calm Turkish message — never a raw stack trace. */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  if (__DEV__) console.error(error);
+  return (
+    <View style={styles.crash}>
+      <Text variant="h2" style={styles.center}>
+        Bir şeyler ters gitti
+      </Text>
+      <Text variant="body" color={colors.textMuted} style={styles.center}>
+        Bu ekran açılırken bir sorun oluştu. Verileriniz güvende; tekrar deneyebilirsiniz.
+      </Text>
+      <Button title="Tekrar dene" icon="refresh" onPress={retry} />
+    </View>
+  );
+}
 
 export default function RootLayout() {
   // Fonts ship inside the app bundle (@expo-google-fonts packages) — no runtime request to Google.
@@ -91,3 +110,14 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  crash: {
+    flex: 1,
+    justifyContent: 'center',
+    gap: space.lg,
+    padding: space.xl,
+    backgroundColor: colors.surface,
+  },
+  center: { textAlign: 'center' },
+});

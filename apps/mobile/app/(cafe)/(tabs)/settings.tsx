@@ -1,5 +1,4 @@
 import Constants from 'expo-constants';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { Linking, Share, StyleSheet, View } from 'react-native';
 import { api, ApiError } from '@/api/client';
@@ -18,6 +17,7 @@ import { useSession } from '@/store/session';
 import { space } from '@/theme';
 import { RoasterAvatar } from '@/components/RoasterAvatar';
 import { confirm } from '@/lib/confirm';
+import { nav } from '@/lib/nav';
 
 export default function Settings() {
   const me = useSession((s) => s.me);
@@ -66,12 +66,12 @@ export default function Settings() {
       ) : null}
       {error ? <Notice text={error} tone="danger" /> : null}
       <RowGroup>
-        <Row icon="store" title={t('settings.business')} onPress={() => router.push('/business')} />
-        <Row icon="chart" title={t('settings.costParams')} onPress={() => router.push('/costs')} />
+        <Row icon="store" title={t('settings.business')} onPress={() => nav.push('/business')} />
+        <Row icon="chart" title={t('settings.costParams')} onPress={() => nav.push('/costs')} />
         <Row
           icon="cup"
           title={t('settings.ingredients')}
-          onPress={() => router.push('/ingredients')}
+          onPress={() => nav.push('/ingredients')}
         />
       </RowGroup>
       <SectionTitle>{t('settings.appearance')}</SectionTitle>
@@ -81,7 +81,7 @@ export default function Settings() {
         <Row
           icon="gear"
           title={t('settings.changePassword')}
-          onPress={() => router.push('/password')}
+          onPress={() => nav.push('/password')}
         />
         <Row
           icon="copy"
@@ -148,7 +148,7 @@ export default function Settings() {
         <Button
           title={t('settings.deleteAccount')}
           variant="danger"
-          onPress={() => void deleteAccount()}
+          onPress={() => deleteAccount()}
           loading={busy}
           disabled={!password}
         />

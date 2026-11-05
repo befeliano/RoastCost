@@ -13,6 +13,7 @@ import { Screen } from '@/components/Screen';
 import { t } from '@/locales';
 import { useSession } from '@/store/session';
 import { kv } from '@/lib/kv';
+import { nav } from '@/lib/nav';
 
 const schema = z.object({
   email: z.string().trim().email(t('common.required')),
@@ -90,12 +91,8 @@ export default function Login() {
           />
         )}
       />
-      <Button
-        title={t('auth.login')}
-        onPress={() => void onSubmit()}
-        loading={formState.isSubmitting}
-      />
-      <Button title={t('auth.forgot')} variant="ghost" onPress={() => router.push('/forgot')} />
+      <Button title={t('auth.login')} onPress={() => onSubmit()} loading={formState.isSubmitting} />
+      <Button title={t('auth.forgot')} variant="ghost" onPress={() => nav.push('/forgot')} />
     </Screen>
   );
 }

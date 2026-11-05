@@ -96,7 +96,7 @@ export function EmailVerifyNotice({ email }: { email: string }) {
           small
           title={t('auth.verifiedCheck')}
           style={styles.flex}
-          onPress={() => void useSession.getState().refreshMe()}
+          onPress={() => useSession.getState().refreshMe()}
         />
       </View>
     </Card>

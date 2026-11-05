@@ -126,3 +126,21 @@ Durum: `[x]` uygulandı, `[ ]` bekliyor.
 98. [x] Ç — Ürün/kavurucu detayında yükleme iskeleti.
 99. [x] G — Para biçimlendirme için birim testleri.
 100.  [x] G — DESIGN.md ve karar kaydı güncellenir.
+
+## "Vibe-coded" izleri — 15 madde kontrolü
+
+1. [x] Mor gradyan — yok; son mor kalıntı (çiçeksi tat notu tonu) gül kurusuna çevrildi.
+2. [x] Fazla boşluk — boş durumlar sıkılaştı, ikinci boş bölüm `compact` (çizimsiz); alt pencere iç boşluğu azaldı.
+3. [x] Klavye girişi kapatıyor — odaklanan alan görünür alana kaydırılır (`RevealContext`); alt pencere klavyeden kaçar ve kayar.
+4. [x] Küçük düğmeler — tüm ikon düğmeleri en az 44 pt dokunma alanı (hitSlop), geri düğmesi büyüdü.
+5. [x] Önbellek yok — zaten vardı: katalog ve sorgular cihazda kalıcı (`offlineFirst`, 7 gün).
+6. [x] Küçük yazı — en küçük punto 12 (etiketler, alt menü).
+7. [x] Her yerde spinner — tek kalan buton spinner'ı yerine üç nokta; listelerde iskelet.
+8. [x] Emoji — sunucu sayfalarındaki ✓ işaretleri kaldırıldı; uygulamada emoji yok.
+9. [x] Çift dokunuş iki kez gönderiyor — `Button` söz (promise) bitene kadar kilitli + 500 ms koruma; `nav.push` 600 ms içinde aynı ekranı ikinci kez açmaz.
+10. [x] Yeni kullanıcıya boş ekran — boş reçete/malzeme/sipariş ekranlarında açıklama + eylem; fiyat girilmeden sahte "₺0 kahve" maliyeti gösterilmez.
+11. [x] Yazı ölçekleme — sabit yükseklikli rozetler esnek; avatar harfleri ve alt menü sabit; arama alanı sınırlı.
+12. [x] Açık/koyu mod sorunları — uygulama bilinçli olarak yalnızca açık tema (`userInterfaceStyle: light`), klavye de açık; karışık görünüm yok.
+13. [x] Ham hata metni — sunucunun İngilizce çerçeve hataları ve 5xx metinleri gösterilmez; durum koduna göre Türkçe mesaj; çökme ekranı sakin bir "Tekrar dene".
+14. [x] Dokunma animasyonu yok — tüm dokunulabilir öğeler `Tap` ile hafif küçülüp solar.
+15. [x] Güncellemede tercihler siliniyor — kalıcı tercihler sürümlü, eski sürüm verisi korunur (`persistOptions` + test); silinen çekirdek seçiliyse yenisi atanır.

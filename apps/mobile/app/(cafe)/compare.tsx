@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
@@ -18,6 +17,7 @@ import { useIngredients, useRecipes, useSettings } from '@/hooks/useCafeData';
 import { t } from '@/locales';
 import { colors, space } from '@/theme';
 import { formatTRY } from '@/lib/format';
+import { nav } from '@/lib/nav';
 
 /** Every active product ranked by cost per cup for the selected recipe (spec §7.3 Karşılaştırma). */
 export default function Compare() {
@@ -79,7 +79,7 @@ export default function Compare() {
           renderItem={({ item, index }) => (
             <Card
               onPress={() =>
-                router.push({ pathname: '/product/[id]', params: { id: item.product.id } })
+                nav.push({ pathname: '/product/[id]', params: { id: item.product.id } })
               }
               style={styles.row}
             >

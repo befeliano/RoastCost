@@ -1,10 +1,11 @@
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Icon } from '@/components/Icon';
 import { Text } from '@/components/Text';
 import { t } from '@/locales';
 import { colors, PALETTES, radius, space, useThemeStore, type PaletteKey } from '@/theme';
+import { Tap } from '@/components/Tap';
 
 /** Ayarlar → Görünüm: accent colour is personal and stored on the device. */
 export function ThemePicker() {
@@ -18,7 +19,7 @@ export function ThemePicker() {
           const p = PALETTES[k];
           const on = k === current;
           return (
-            <Pressable
+            <Tap
               key={k}
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
@@ -40,7 +41,7 @@ export function ThemePicker() {
               <Text variant="caption" color={on ? p.primaryText : colors.textMuted}>
                 {p.label}
               </Text>
-            </Pressable>
+            </Tap>
           );
         })}
       </View>

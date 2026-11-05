@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { kv } from '@/lib/kv';
+import { persist } from 'zustand/middleware';
+import { persistOptions } from '@/lib/persist';
 
 interface CostPrefs {
   recipeId: string | null;
@@ -26,6 +26,11 @@ export const useCostPrefs = create<CostPrefs>()(
       monthlyKg: 5,
       set: (p) => set(p),
     }),
-    { name: 'cost_prefs_v1', storage: createJSONStorage(() => kv.storage) },
+    persistOptions<CostPrefs>('cost_prefs_v1', (s) => ({
+      ...s,
+      // a bad value from an old build falls back to the default instead of breaking the screen
+      monthlyKg: typeof s.monthlyKg === 'number' && s.monthlyKg > 0 ? s.monthlyKg : 5,
+      mode: s.mode === 'catalog' ? 'catalog' : 'manual',
+    })),
   ),
 );

@@ -9,7 +9,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { api, ApiError } from '@/api/client';
 import type { AdminProduct, AdminRoaster, AdminTier, CatalogRoaster } from '@/api/types';
 import { BottomSheet } from '@/components/BottomSheet';
@@ -23,6 +23,8 @@ import { parseDecimal, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
 import { colors, space, useColors } from '@/theme';
 import { CityMap } from '@/features/explore/Maps';
+import { nav } from '@/lib/nav';
+import { Tap } from '@/components/Tap';
 
 type TierSheet = { productId: string; tier?: AdminTier } | null;
 const CAT_LABEL: Record<ProductCategory, string> = {
@@ -338,7 +340,7 @@ export default function RoasterEdit() {
       <ToggleRow label={t('admin.active')} value={active} onChange={setActive} />
       <Button
         title={t('common.save')}
-        onPress={() => void saveRoaster()}
+        onPress={() => saveRoaster()}
         loading={busy}
         disabled={f.name.trim().length < 2}
       />
@@ -362,23 +364,23 @@ export default function RoasterEdit() {
               small
               style={styles.flex}
               onPress={() =>
-                router.push({ pathname: '/price-import/[roasterId]', params: { roasterId: id } })
+                nav.push({ pathname: '/price-import/[roasterId]', params: { roasterId: id } })
               }
             />
           </View>
           {products.data?.map((p) => (
             <Card key={p.id} style={styles.gap}>
-              <Pressable accessibilityRole="button" onPress={() => setProductSheet(p)}>
+              <Tap accessibilityRole="button" onPress={() => setProductSheet(p)}>
                 <Text variant="h3">{p.name}</Text>
                 <Text variant="small">
                   {CAT_LABEL[p.category]}
                   {p.origin ? ` · ${p.origin}` : ''}
                   {p.isActive ? '' : ' · pasif'}
                 </Text>
-              </Pressable>
+              </Tap>
               <View style={styles.tiers}>
                 {p.tiers.map((tt) => (
-                  <Pressable
+                  <Tap
                     key={tt.id}
                     accessibilityRole="button"
                     onPress={() => openTier(p.id, tt)}
@@ -386,9 +388,9 @@ export default function RoasterEdit() {
                   >
                     <Text variant="caption">{tt.minKg} kg+</Text>
                     <Text variant="money">{formatTRY(tt.pricePerKgKurus)}</Text>
-                  </Pressable>
+                  </Tap>
                 ))}
-                <Pressable
+                <Tap
                   accessibilityRole="button"
                   accessibilityLabel={t('admin.newTier')}
                   onPress={() => openTier(p.id)}
@@ -397,7 +399,7 @@ export default function RoasterEdit() {
                   <Text variant="bodyStrong" color={c.primaryText}>
                     + kademe
                   </Text>
-                </Pressable>
+                </Tap>
               </View>
             </Card>
           ))}
@@ -433,7 +435,7 @@ export default function RoasterEdit() {
           value={tierForm.reason}
           onChangeText={(v) => setTierForm({ ...tierForm, reason: v })}
         />
-        <Button title={t('common.save')} onPress={() => void saveTier()} />
+        <Button title={t('common.save')} onPress={() => saveTier()} />
         {tierSheet?.tier ? (
           <View style={styles.row}>
             <Button
@@ -445,7 +447,7 @@ export default function RoasterEdit() {
               onPress={() => {
                 const tierId = tierSheet.tier?.id;
                 setTierSheet(null);
-                if (tierId) router.push({ pathname: '/tier-history/[id]', params: { id: tierId } });
+                if (tierId) nav.push({ pathname: '/tier-history/[id]', params: { id: tierId } });
               }}
             />
             <Button
@@ -489,7 +491,7 @@ export default function RoasterEdit() {
           value={productSheet?.isActive ?? true}
           onChange={(v) => setProductSheet((p) => ({ ...p, isActive: v }))}
         />
-        <Button title={t('common.save')} onPress={() => void saveProduct()} />
+        <Button title={t('common.save')} onPress={() => saveProduct()} />
       </BottomSheet>
     </Screen>
   );

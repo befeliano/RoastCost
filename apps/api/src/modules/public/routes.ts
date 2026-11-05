@@ -126,7 +126,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         : 'Sipariş kapandı';
     const msg =
       o.status === 'confirmed'
-        ? `<p class="ok">✓ Siparişi aldığınızı işaretlediniz${justNow ? '' : ' (daha önce)'}. Teşekkürler!</p>`
+        ? `<p class="ok">Siparişi aldığınızı işaretlediniz${justNow ? '' : ' (daha önce)'}. Teşekkürler!</p>`
         : o.status === 'declined'
           ? `<p class="err">Siparişi karşılayamadığınızı bildirdiniz${justNow ? '' : ' (daha önce)'}.</p>`
           : `<p>Bu sipariş ${o.status === 'cancelled' ? 'kafe tarafından iptal edildi' : 'süresi dolduğu için kapandı'}.</p>`;
@@ -306,7 +306,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         page(
           ok ? 'Doğrulandı' : 'Geçersiz bağlantı',
           ok
-            ? '<h1 class="ok">✓ E-posta adresiniz doğrulandı</h1><p>Uygulamaya dönebilirsiniz.</p>'
+            ? '<h1 class="ok">E-posta adresiniz doğrulandı</h1><p>Uygulamaya dönebilirsiniz.</p>'
             : '<h1>Bağlantı geçersiz</h1><p>Bağlantının süresi dolmuş olabilir. Uygulamadan yeni doğrulama e-postası isteyin.</p>',
         ),
       );
@@ -336,7 +336,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         page(
           ok ? 'Parola değişti' : 'Geçersiz bağlantı',
           ok
-            ? '<h1 class="ok">✓ Parolanız değiştirildi</h1><p>Güvenliğiniz için tüm cihazlardaki oturumlar kapatıldı. Uygulamadan yeni parolanızla giriş yapın.</p>'
+            ? '<h1 class="ok">Parolanız değiştirildi</h1><p>Güvenliğiniz için tüm cihazlardaki oturumlar kapatıldı. Uygulamadan yeni parolanızla giriş yapın.</p>'
             : '<h1>Bağlantı geçersiz</h1><p>Bağlantının süresi dolmuş ya da daha önce kullanılmış olabilir.</p>',
         ),
       );

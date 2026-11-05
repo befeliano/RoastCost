@@ -5,7 +5,7 @@ import type { Ingredient } from '@/api/types';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Field } from '@/components/Field';
-import { Chips, Notice, Row, RowGroup } from '@/components/Misc';
+import { Chips, Notice, Row, RowGroup, EmptyState } from '@/components/Misc';
 import { Screen } from '@/components/Screen';
 import { useDeleteIngredient, useIngredients, useSaveIngredient } from '@/hooks/useCafeData';
 import { t } from '@/locales';
@@ -15,6 +15,7 @@ import { confirm } from '@/lib/confirm';
 import { StyleSheet, View } from 'react-native';
 import { Text } from '@/components/Text';
 import { space } from '@/theme';
+import { Skeleton } from '@/components/Skeleton';
 
 const KINDS: { value: IngredientKind; label: string }[] = [
   { value: 'milk', label: t('settings.kindMilk') },
@@ -69,16 +70,26 @@ export default function Ingredients() {
 
   return (
     <Screen title={t('settings.ingredients')} back>
-      <RowGroup>
-        {(list.data ?? []).map((i) => (
-          <Row
-            key={i.id}
-            title={i.name}
-            subtitle={`${KINDS.find((k) => k.value === i.kind)?.label} · ${formatTRY(i.pricePerLiterKurus)}/L`}
-            onPress={() => open(i)}
-          />
-        ))}
-      </RowGroup>
+      {list.isSuccess && !list.data.length ? (
+        <EmptyState
+          compact
+          title={t('settings.noIngredients')}
+          body={t('settings.noIngredientsBody')}
+        />
+      ) : null}
+      {list.isLoading ? <Skeleton rows={2} /> : null}
+      {list.data?.length ? (
+        <RowGroup>
+          {(list.data ?? []).map((i) => (
+            <Row
+              key={i.id}
+              title={i.name}
+              subtitle={`${KINDS.find((k) => k.value === i.kind)?.label} · ${formatTRY(i.pricePerLiterKurus)}/L`}
+              onPress={() => open(i)}
+            />
+          ))}
+        </RowGroup>
+      ) : null}
       <Button title={t('common.add')} icon="plus" variant="secondary" onPress={() => open()} />
       <BottomSheet
         visible={!!edit}
@@ -133,9 +144,9 @@ export default function Ingredients() {
             onPress={() => setPrice(kurusToInput(pkgPerL))}
           />
         ) : null}
-        <Button title={t('common.save')} onPress={() => void submit()} loading={save.isPending} />
+        <Button title={t('common.save')} onPress={() => submit()} loading={save.isPending} />
         {edit?.id ? (
-          <Button title={t('common.delete')} variant="danger" onPress={() => void remove()} />
+          <Button title={t('common.delete')} variant="danger" onPress={() => remove()} />
         ) : null}
       </BottomSheet>
     </Screen>

@@ -54,7 +54,9 @@ export function useTabOptions() {
       headerShown: false,
       tabBarActiveTintColor: c.primaryText,
       tabBarInactiveTintColor: c.textMuted,
-      tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 11.5, marginTop: 2 },
+      tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 12, marginTop: 2 },
+      // short labels in a fixed-height bar: don't let large Dynamic Type push them out
+      tabBarAllowFontScaling: false,
       tabBarBadgeStyle: {
         backgroundColor: c.primary,
         color: c.onPrimary,

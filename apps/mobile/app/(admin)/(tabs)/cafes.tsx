@@ -1,6 +1,5 @@
 import type { CafeStatus } from '@roastcost/shared';
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { api } from '@/api/client';
 import type { AdminCafe, Page } from '@/api/types';
@@ -10,6 +9,7 @@ import { CAFE_LABEL, CAFE_TONE } from '@/features/admin/labels';
 import { formatDate } from '@/lib/format';
 import { t } from '@/locales';
 import { Field } from '@/components/Field';
+import { nav } from '@/lib/nav';
 
 export default function Cafes() {
   const [status, setStatus] = useState<CafeStatus | 'all'>('pending');
@@ -55,7 +55,7 @@ export default function Cafes() {
               title={c.name}
               subtitle={`${c.district} · ${c.ownerEmail ?? ''} · ${formatDate(c.createdAt)}`}
               right={<Pill tone={CAFE_TONE[c.status]} label={CAFE_LABEL[c.status]} />}
-              onPress={() => router.push({ pathname: '/cafe-detail/[id]', params: { id: c.id } })}
+              onPress={() => nav.push({ pathname: '/cafe-detail/[id]', params: { id: c.id } })}
             />
           ))}
       </RowGroup>

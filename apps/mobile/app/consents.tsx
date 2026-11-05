@@ -68,7 +68,7 @@ export default function Consents() {
       <Button
         title={t('settings.logout')}
         variant="ghost"
-        onPress={() => void useSession.getState().signOut()}
+        onPress={() => useSession.getState().signOut()}
       />
     </Screen>
   );

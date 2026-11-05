@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
-  Pressable,
   StyleSheet,
   TextInput,
   View,
@@ -17,7 +16,9 @@ import Animated, {
 import * as Haptics from 'expo-haptics';
 import { colors, fonts, radius, space, useColors } from '@/theme';
 import { Icon } from './Icon';
+import { useReveal, type ViewNode } from './reveal';
 import { Text } from './Text';
+import { Tap } from './Tap';
 
 interface Props extends TextInputProps {
   label: string;
@@ -42,8 +43,11 @@ export function Field({
   onFocus,
   onBlur,
   keyboardType,
+  ref,
   ...rest
 }: Props) {
+  const revealInput = useReveal();
+  const box = useRef<ViewNode>(null);
   const c = useColors();
   const [focused, setFocused] = useState(false);
   const [reveal, setReveal] = useState(false);
@@ -70,6 +74,7 @@ export function Field({
         </Text>
       )}
       <View
+        ref={box}
         style={[
           styles.inputRow,
           focused && { borderColor: c.primaryText, borderWidth: 1.5 },
@@ -82,12 +87,15 @@ export function Field({
           placeholderTextColor={colors.textMuted}
           style={[styles.input, style]}
           maxFontSizeMultiplier={1.6}
+          keyboardAppearance="light"
           keyboardType={keyboardType}
           // numeric pads get a "Bitti" key so the keyboard can be closed (iOS)
           returnKeyType={numeric ? 'done' : rest.returnKeyType}
           secureTextEntry={secureTextEntry && !reveal}
+          ref={ref}
           onFocus={(e) => {
             setFocused(true);
+            revealInput?.(box.current);
             onFocus?.(e);
           }}
           onBlur={(e) => {
@@ -98,14 +106,14 @@ export function Field({
         />
         {suffix ? <Text variant="small">{suffix}</Text> : null}
         {secureTextEntry ? (
-          <Pressable
+          <Tap
             accessibilityRole="button"
             accessibilityLabel={reveal ? 'Parolayı gizle' : 'Parolayı göster'}
-            hitSlop={10}
+            hitSlop={13}
             onPress={() => setReveal((v) => !v)}
           >
             <Icon name={reveal ? 'eyeOff' : 'eye'} size={20} color={colors.textMuted} />
-          </Pressable>
+          </Tap>
         ) : null}
       </View>
       {error ? (

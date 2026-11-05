@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { colors, space, useColors } from '@/theme';
 import { Icon } from './Icon';
 import { Text } from './Text';
+import { Tap } from './Tap';
 
 /** Unchecked by default (spec §14.3). */
 export function Checkbox({
@@ -18,7 +19,7 @@ export function Checkbox({
   const c = useColors();
   return (
     <View style={styles.row}>
-      <Pressable
+      <Tap
         accessibilityRole="checkbox"
         accessibilityState={{ checked }}
         accessibilityLabel={label}
@@ -37,7 +38,7 @@ export function Checkbox({
         <Text variant="body" style={styles.label}>
           {label}
         </Text>
-      </Pressable>
+      </Tap>
       {right}
     </View>
   );

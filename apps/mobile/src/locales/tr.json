@@ -16,7 +16,7 @@
     "lastSync": "Son senkron: {time}",
     "never": "henüz yok",
     "networkError": "Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edin.",
-    "unknownError": "Beklenmeyen bir hata oluştu.",
+    "unknownError": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
     "saved": "Kaydedildi",
     "required": "Zorunlu alan",
     "invalidNumber": "Geçerli bir sayı girin",
@@ -89,7 +89,7 @@
     "manualPrice": "Kahvenin kg fiyatı (TL)",
     "manualVat": "Bu fiyata KDV dahil",
     "pickProduct": "Katalogdan seç",
-    "noSource": "Kahve fiyatı girin ya da katalogdan ürün seçin",
+    "noSource": "Kahvenizin kg fiyatını girin ya da katalogdan bir çekirdek seçin; fincan maliyetini hemen hesaplayalım.",
     "monthlyKg": "Aylık tüketim (kg)",
     "coffee": "Kahve ({grams} g)",
     "ingredients": "Süt / şurup",
@@ -137,7 +137,8 @@
     "useSuggested": "Önerilen fiyatı kullan ({price})",
     "duplicate": "Çoğalt",
     "copySuffix": "(kopya)",
-    "duplicated": "Reçete çoğaltıldı"
+    "duplicated": "Reçete çoğaltıldı",
+    "emptyBody": "Menünüzdeki içecekleri ekleyin; her birinin fincan maliyetini ve önerilen fiyatını görün."
   },
   "settings": {
     "title": "Ayarlar",
@@ -196,7 +197,9 @@
     "pkgCalc": "Paket fiyatından hesapla",
     "pkgPrice": "Paket fiyatı",
     "pkgMl": "Paket hacmi",
-    "usePkg": "Litre fiyatı {price} olarak kullan"
+    "usePkg": "Litre fiyatı {price} olarak kullan",
+    "noIngredients": "Henüz malzeme yok",
+    "noIngredientsBody": "Süt, şurup gibi malzemeleri litre fiyatıyla ekleyin; reçetelerde kullanılır."
   },
   "catalog": {
     "title": "Kavurucular",
@@ -307,7 +310,8 @@
     "monthSpend": "Bu ay kahve harcaması",
     "monthOrders": "{n} sipariş",
     "filterOpen": "Açık",
-    "filterClosed": "Kapanan"
+    "filterClosed": "Kapanan",
+    "emptyHistoryBody": "Gönderdiğiniz siparişler ve kavurucunun yanıtı burada görünür."
   },
   "admin": {
     "panel": "Panel",

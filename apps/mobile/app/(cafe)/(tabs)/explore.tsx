@@ -1,7 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import Animated, { FadeInDown, useReducedMotion } from 'react-native-reanimated';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
@@ -21,6 +20,8 @@ import { useSession } from '@/store/session';
 import { colors, fonts, radius, space, useColors } from '@/theme';
 import { formatTRY } from '@/lib/format';
 import { Skeleton } from '@/components/Skeleton';
+import { nav } from '@/lib/nav';
+import { Tap } from '@/components/Tap';
 
 function greeting(name: string, now = new Date()) {
   const h = now.getHours();
@@ -67,7 +68,7 @@ export default function Explore() {
   const districts = districtsOf(roasters);
   const list = district === 'all' ? roasters : roasters.filter((r) => r.district === district);
   const sel = selected ? catalog.roasters[selected] : undefined;
-  const open = (id: string) => router.push({ pathname: '/roaster/[id]', params: { id } });
+  const open = (id: string) => nav.push({ pathname: '/roaster/[id]', params: { id } });
   const cafe = me?.cafe;
 
   if (cafe && cafe.status !== 'approved') {
@@ -76,7 +77,7 @@ export default function Explore() {
         <StatusCard status={cafe.status} note={cafe.statusNote} />
         {me && !me.user.emailVerified ? <EmailVerifyNotice email={me.user.email} /> : null}
         <EmptyState title={t('explore.pendingTitle')} body={t('explore.pendingBody')} />
-        <Button title={t('explore.calc')} icon="cup" onPress={() => router.push('/cost')} />
+        <Button title={t('explore.calc')} icon="cup" onPress={() => nav.push('/cost')} />
       </Screen>
     );
   }
@@ -100,17 +101,19 @@ export default function Explore() {
           accessibilityLabel={t('common.search')}
           autoCorrect={false}
           returnKeyType="search"
+          maxFontSizeMultiplier={1.6}
+          keyboardAppearance="light"
           style={styles.searchInput}
         />
         {query ? (
-          <Pressable
+          <Tap
             accessibilityRole="button"
             accessibilityLabel="Temizle"
             onPress={() => setQuery('')}
-            hitSlop={10}
+            hitSlop={13}
           >
             <Icon name="close" size={18} color={colors.textMuted} />
-          </Pressable>
+          </Tap>
         ) : null}
       </View>
 
@@ -154,7 +157,7 @@ export default function Explore() {
                     ]
                       .filter(Boolean)
                       .join(' · ')}
-                    onPress={() => router.push({ pathname: '/product/[id]', params: { id: p.id } })}
+                    onPress={() => nav.push({ pathname: '/product/[id]', params: { id: p.id } })}
                   />
                 );
               })}
@@ -169,21 +172,21 @@ export default function Explore() {
               <Text variant="small" color={colors.text} style={styles.flex}>
                 {t('explore.tip')}
               </Text>
-              <Pressable
+              <Tap
                 accessibilityRole="button"
                 accessibilityLabel="Kapat"
                 onPress={hideTip}
-                hitSlop={10}
+                hitSlop={13}
               >
                 <Icon name="close" size={18} color={colors.textMuted} />
-              </Pressable>
+              </Tap>
             </View>
           ) : null}
 
           <View style={styles.quick}>
-            <Pressable
+            <Tap
               accessibilityRole="button"
-              onPress={() => router.push('/cost')}
+              onPress={() => nav.push('/cost')}
               style={[styles.quickCard, { backgroundColor: c.primary, overflow: 'hidden' }]}
             >
               <LinearGradient
@@ -205,10 +208,10 @@ export default function Explore() {
                   </Text>
                 ) : null}
               </View>
-            </Pressable>
-            <Pressable
+            </Tap>
+            <Tap
               accessibilityRole="button"
-              onPress={() => router.push('/compare')}
+              onPress={() => nav.push('/compare')}
               style={[styles.quickCard, { backgroundColor: c.accent, overflow: 'hidden' }]}
             >
               <Icon name="chart" color={c.onAccent} size={28} />
@@ -222,7 +225,7 @@ export default function Explore() {
                   </Text>
                 ) : null}
               </View>
-            </Pressable>
+            </Tap>
           </View>
 
           {!roasters.length && catalog.syncing ? <Skeleton rows={3} avatar /> : null}
@@ -245,7 +248,7 @@ export default function Explore() {
                         reduce || i >= 8 ? undefined : FadeInDown.delay(i * 60).duration(260)
                       }
                     >
-                      <Pressable
+                      <Tap
                         accessibilityRole="button"
                         accessibilityLabel={r.name}
                         onPress={() => open(r.id)}
@@ -273,7 +276,7 @@ export default function Explore() {
                             </Text>
                           ) : null}
                         </View>
-                      </Pressable>
+                      </Tap>
                     </Animated.View>
                   );
                 })}
@@ -290,11 +293,11 @@ export default function Explore() {
                 contentContainerStyle={styles.featuredRow}
               >
                 {cheapest.slice(0, 8).map(({ p, r, tier }) => (
-                  <Pressable
+                  <Tap
                     key={p.id}
                     accessibilityRole="button"
                     accessibilityLabel={`${p.name}, ${r.name}`}
-                    onPress={() => router.push({ pathname: '/product/[id]', params: { id: p.id } })}
+                    onPress={() => nav.push({ pathname: '/product/[id]', params: { id: p.id } })}
                     style={styles.bean}
                   >
                     <Icon name="bean" size={20} color={c.primaryText} />
@@ -309,7 +312,7 @@ export default function Explore() {
                         {formatTRY(tier.pricePerKgKurus)}/kg
                       </Text>
                     ) : null}
-                  </Pressable>
+                  </Tap>
                 ))}
               </ScrollView>
             </>
@@ -322,7 +325,7 @@ export default function Explore() {
                 <TurkeyMap roasters={roasters} />
                 <CityMap roasters={roasters} selectedId={selected} onSelect={setSelected} />
                 {sel ? (
-                  <Pressable
+                  <Tap
                     accessibilityRole="button"
                     onPress={() => open(sel.id)}
                     style={styles.selRow}
@@ -342,7 +345,7 @@ export default function Explore() {
                     <Text variant="bodyStrong" color={c.primaryText}>
                       {t('explore.catalog')}
                     </Text>
-                  </Pressable>
+                  </Tap>
                 ) : (
                   <Text variant="small" style={styles.center}>
                     {t('explore.tapPin')}
@@ -363,15 +366,12 @@ export default function Explore() {
                 {list.map((r) => {
                   const st = roasterStats(catalog, r.id);
                   return (
-                    <Pressable
+                    <Tap
                       key={r.id}
                       accessibilityRole="button"
                       accessibilityLabel={r.name}
                       onPress={() => open(r.id)}
-                      style={({ pressed }) => [
-                        styles.roasterRow,
-                        pressed && { backgroundColor: c.primaryBg },
-                      ]}
+                      style={styles.roasterRow}
                     >
                       <RoasterAvatar
                         name={r.name}
@@ -398,7 +398,7 @@ export default function Explore() {
                         </View>
                       </View>
                       <Icon name="chevron" size={18} color={colors.textMuted} />
-                    </Pressable>
+                    </Tap>
                   );
                 })}
               </View>

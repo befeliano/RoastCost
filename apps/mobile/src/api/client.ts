@@ -101,7 +101,13 @@ export async function api<T>(path: string, opts: Options = {}, retried = false):
   }
   if (res.status === 204 || res.status === 304) return undefined as T;
   const text = await res.text();
-  const data: unknown = text ? JSON.parse(text) : undefined;
+  let data: unknown;
+  try {
+    data = text ? JSON.parse(text) : undefined;
+  } catch {
+    // a proxy/gateway HTML page instead of our JSON
+    throw new ApiError(res.status, 'bad_response', friendlyMessage(res.status));
+  }
   if (!res.ok) {
     const e = (
       data as { error?: { code?: string; message?: string; details?: unknown } } | undefined
@@ -109,11 +115,22 @@ export async function api<T>(path: string, opts: Options = {}, retried = false):
     throw new ApiError(
       res.status,
       e?.code ?? 'http_' + res.status,
-      e?.message ?? 'Beklenmeyen bir hata oluştu.',
+      // 5xx and unknown shapes never surface server text
+      res.status < 500 && e?.message ? e.message : friendlyMessage(res.status),
       e?.details,
     );
   }
   return data as T;
+}
+
+/** Human, Turkish wording for statuses we can't explain better. */
+export function friendlyMessage(status: number): string {
+  if (status === 429) return 'Çok fazla deneme yaptınız. Bir dakika bekleyip tekrar deneyin.';
+  if (status === 401) return 'Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.';
+  if (status === 403) return 'Bu işlem için yetkiniz yok.';
+  if (status === 404) return 'Aradığınız kayıt bulunamadı.';
+  if (status >= 500) return 'Sunucuda geçici bir sorun var. Biraz sonra tekrar deneyin.';
+  return 'İşlem tamamlanamadı. Lütfen tekrar deneyin.';
 }
 
 export function apiUrl(path: string): string {

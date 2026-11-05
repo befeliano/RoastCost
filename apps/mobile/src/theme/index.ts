@@ -48,8 +48,8 @@ export const type = {
   small: { fontFamily: fonts.medium, fontSize: 13, lineHeight: 18, color: colors.textMuted },
   caption: {
     fontFamily: fonts.semibold,
-    fontSize: 11.5,
-    lineHeight: 15,
+    fontSize: 12,
+    lineHeight: 16,
     color: colors.textMuted,
     letterSpacing: 0.4,
   },

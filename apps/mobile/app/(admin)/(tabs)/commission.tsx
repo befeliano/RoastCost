@@ -1,6 +1,5 @@
 import { formatOrderNo, type CommissionStatus } from '@roastcost/shared';
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { api } from '@/api/client';
 import type { AdminOrder, Page } from '@/api/types';
@@ -9,6 +8,7 @@ import { Screen } from '@/components/Screen';
 import { COMMISSION_TONE } from '@/features/admin/labels';
 import { formatDate, formatTRY } from '@/lib/format';
 import { t } from '@/locales';
+import { nav } from '@/lib/nav';
 
 type Filter = CommissionStatus | 'all' | 'conflict';
 
@@ -53,7 +53,7 @@ export default function Commission() {
               <Pill tone="danger" icon="warning" label="!" />
             ) : undefined
           }
-          onPress={() => router.push({ pathname: '/commission-order/[id]', params: { id: o.id } })}
+          onPress={() => nav.push({ pathname: '/commission-order/[id]', params: { id: o.id } })}
         />
       ))}
     </Screen>

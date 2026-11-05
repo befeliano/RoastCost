@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
 import { api } from '@/api/client';
 import type { AdminRoaster } from '@/api/types';
 import { Button } from '@/components/Button';
@@ -9,6 +8,7 @@ import { formatDate } from '@/lib/format';
 import { t } from '@/locales';
 import { Field } from '@/components/Field';
 import { useState } from 'react';
+import { nav } from '@/lib/nav';
 
 export default function Catalog() {
   const [qText, setQText] = useState('');
@@ -27,7 +27,7 @@ export default function Catalog() {
         title={t('admin.newRoaster')}
         icon="plus"
         variant="secondary"
-        onPress={() => router.push({ pathname: '/roaster-edit/[id]', params: { id: 'new' } })}
+        onPress={() => nav.push({ pathname: '/roaster-edit/[id]', params: { id: 'new' } })}
       />
       <Field
         label={t('common.search')}
@@ -53,7 +53,7 @@ export default function Catalog() {
                 .filter(Boolean)
                 .join(' · ')}
               right={r.isActive ? undefined : <Pill label="Pasif" />}
-              onPress={() => router.push({ pathname: '/roaster-edit/[id]', params: { id: r.id } })}
+              onPress={() => nav.push({ pathname: '/roaster-edit/[id]', params: { id: r.id } })}
             />
           ))}
       </RowGroup>

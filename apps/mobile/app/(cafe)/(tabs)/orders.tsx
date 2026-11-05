@@ -1,5 +1,4 @@
 import { formatOrderNo, lineTotalKurus, selectTier } from '@roastcost/shared';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Card } from '@/components/Card';
@@ -17,6 +16,7 @@ import { t } from '@/locales';
 import { useCart } from '@/store/cart';
 import { useSession } from '@/store/session';
 import { colors, space, useColors } from '@/theme';
+import { nav } from '@/lib/nav';
 
 export default function Orders() {
   const cafe = useSession((s) => s.me?.cafe);
@@ -69,7 +69,7 @@ export default function Orders() {
           action={{
             label: t('orders.goExplore'),
             icon: 'store',
-            onPress: () => router.push('/explore'),
+            onPress: () => nav.push('/explore'),
           }}
         />
       ) : null}
@@ -81,7 +81,7 @@ export default function Orders() {
         return (
           <Card
             key={roasterId}
-            onPress={() => router.push({ pathname: '/cart/[roasterId]', params: { roasterId } })}
+            onPress={() => nav.push({ pathname: '/cart/[roasterId]', params: { roasterId } })}
             style={styles.row}
           >
             <View style={styles.flex}>
@@ -133,12 +133,12 @@ export default function Orders() {
       {orders.isLoading ? <Skeleton rows={2} /> : null}
       {orders.isError ? <ErrorState onRetry={() => void orders.refetch()} /> : null}
       {!orders.data?.items.length && !orders.isLoading && !orders.isError ? (
-        <EmptyState title={t('orders.emptyHistory')} />
+        <EmptyState compact title={t('orders.emptyHistory')} body={t('orders.emptyHistoryBody')} />
       ) : null}
       {visible.map((o) => (
         <Card
           key={o.id}
-          onPress={() => router.push({ pathname: '/order/[id]', params: { id: o.id } })}
+          onPress={() => nav.push({ pathname: '/order/[id]', params: { id: o.id } })}
           style={styles.gap}
         >
           <View style={styles.row}>

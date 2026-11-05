@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { api } from '@/api/client';
 import type { AdminStats, AdminRoaster } from '@/api/types';
@@ -15,6 +14,7 @@ import { colors, space, useColors } from '@/theme';
 import { formatTRY } from '@/lib/format';
 import { Notice, Row } from '@/components/Misc';
 import { daysSince } from '@/lib/format';
+import { nav } from '@/lib/nav';
 
 function Stat({
   label,
@@ -64,7 +64,7 @@ export default function Panel() {
             label={t('admin.pendingCafes')}
             value={s.pendingCafes}
             alert
-            onPress={() => router.push('/cafes')}
+            onPress={() => nav.push('/cafes')}
           />
           <Stat label={t('admin.approvedCafes')} value={s.approvedCafes} />
           <Stat
@@ -72,7 +72,7 @@ export default function Panel() {
             value={s.commissionToCollectKurus}
             money
             alert
-            onPress={() => router.push('/commission')}
+            onPress={() => nav.push('/commission')}
           />
           <Stat label={t('admin.requested')} value={s.commissionRequestedKurus} money />
           <Stat label={t('admin.ordersMonth')} value={s.ordersThisMonth} />
@@ -80,7 +80,7 @@ export default function Panel() {
             label={t('admin.conflicts')}
             value={s.commissionConflicts}
             alert
-            onPress={() => router.push('/commission')}
+            onPress={() => nav.push('/commission')}
           />
         </View>
       ) : null}
@@ -96,7 +96,7 @@ export default function Panel() {
                   ? t('admin.staleDays', { days: daysSince(r.pricesUpdatedAt) })
                   : t('admin.staleNever')
               }
-              onPress={() => router.push({ pathname: '/roaster-edit/[id]', params: { id: r.id } })}
+              onPress={() => nav.push({ pathname: '/roaster-edit/[id]', params: { id: r.id } })}
             />
           ))}
         </Card>
@@ -105,7 +105,7 @@ export default function Panel() {
       <Button
         title={t('settings.logout')}
         variant="secondary"
-        onPress={() => void signOutEverywhere()}
+        onPress={() => signOutEverywhere()}
       />
     </Screen>
   );
